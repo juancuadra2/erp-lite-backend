@@ -1,0 +1,457 @@
+{
+  "feature": "01-document-types",
+  "version": "1.0.0",
+  "lastUpdated": "2026-01-15T00:00:00Z",
+  "summary": {
+    "total": 30,
+    "completed": 30,
+    "inProgress": 0,
+    "blocked": 0,
+    "pending": 0
+  },
+  "phases": [
+    {
+      "id": "phase-1",
+      "name": "Foundation & Domain Models",
+      "order": 1,
+      "status": "completed",
+      "tasks": [
+        {
+          "id": "T001",
+          "title": "Crear entidad de dominio DocumentType",
+          "description": "Crear modelo de dominio puro sin anotaciones JPA con atributos y métodos de negocio",
+          "phase": "phase-1",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 2,
+          "actualHours": 1.5,
+          "tags": ["domain", "model"],
+          "completedAt": "2026-01-11T10:00:00Z"
+        },
+        {
+          "id": "T002",
+          "title": "Crear excepciones del dominio",
+          "description": "DocumentTypeNotFoundException, DuplicateCodeException, DocumentTypeConstraintException",
+          "phase": "phase-1",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 1,
+          "actualHours": 1,
+          "dependencies": ["T001"],
+          "tags": ["domain", "exception"],
+          "completedAt": "2026-01-11T11:00:00Z"
+        },
+        {
+          "id": "T003",
+          "title": "Implementar DocumentTypeDomainService",
+          "description": "Servicio con reglas de negocio: validateCode, normalizeCode y tests unitarios",
+          "phase": "phase-1",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 3,
+          "actualHours": 2.5,
+          "dependencies": ["T001", "T002"],
+          "tags": ["domain", "service"],
+          "completedAt": "2026-01-11T14:00:00Z"
+        }
+      ]
+    },
+    {
+      "id": "phase-2",
+      "name": "Database Schema & Migrations",
+      "order": 2,
+      "status": "completed",
+      "tasks": [
+        {
+          "id": "T004",
+          "title": "Crear migración V1.3 para tabla document_types",
+          "description": "Script SQL con estructura completa de tabla, índices y constraints",
+          "phase": "phase-2",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 2,
+          "actualHours": 1.5,
+          "dependencies": ["T003"],
+          "tags": ["database", "migration"],
+          "completedAt": "2026-01-12T10:00:00Z"
+        },
+        {
+          "id": "T005",
+          "title": "Crear migración V1.4 con datos iniciales",
+          "description": "Insertar 6 tipos de documento de Colombia (NIT, CC, CE, PA, TI, RC)",
+          "phase": "phase-2",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 1,
+          "actualHours": 0.5,
+          "dependencies": ["T004"],
+          "tags": ["database", "migration", "seed"],
+          "completedAt": "2026-01-12T11:00:00Z"
+        },
+        {
+          "id": "T006",
+          "title": "Configurar Flyway",
+          "description": "Configurar Flyway en application.properties y verificar ejecución automática",
+          "phase": "phase-2",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 1,
+          "actualHours": 0.5,
+          "dependencies": ["T005"],
+          "tags": ["configuration", "flyway"],
+          "completedAt": "2026-01-12T12:00:00Z"
+        }
+      ]
+    },
+    {
+      "id": "phase-3",
+      "name": "Persistence Layer",
+      "order": 3,
+      "status": "completed",
+      "tasks": [
+        {
+          "id": "T007",
+          "title": "Crear DocumentTypeEntity",
+          "description": "Entidad JPA con mapeo a tabla document_types y relaciones con User",
+          "phase": "phase-3",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 2,
+          "actualHours": 2,
+          "dependencies": ["T006"],
+          "tags": ["infrastructure", "jpa"],
+          "completedAt": "2026-01-12T15:00:00Z"
+        },
+        {
+          "id": "T008",
+          "title": "Crear DocumentTypeJpaRepository",
+          "description": "Repository con JpaSpecificationExecutor para filtros dinámicos",
+          "phase": "phase-3",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 2,
+          "actualHours": 2.5,
+          "dependencies": ["T007"],
+          "tags": ["infrastructure", "repository"],
+          "completedAt": "2026-01-12T18:00:00Z"
+        },
+        {
+          "id": "T009",
+          "title": "Crear DocumentTypeEntityMapper",
+          "description": "Mapper con MapStruct para domain ↔ entity con tests",
+          "phase": "phase-3",
+          "status": "completed",
+          "priority": "medium",
+          "estimatedHours": 2,
+          "actualHours": 1.5,
+          "dependencies": ["T007"],
+          "tags": ["infrastructure", "mapper"],
+          "completedAt": "2026-01-13T10:00:00Z"
+        },
+        {
+          "id": "T010",
+          "title": "Implementar DocumentTypeRepositoryAdapter",
+          "description": "Adapter que implementa DocumentTypePort con tests de integración",
+          "phase": "phase-3",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 3,
+          "actualHours": 3,
+          "dependencies": ["T008", "T009"],
+          "tags": ["infrastructure", "adapter", "test"],
+          "completedAt": "2026-01-13T14:00:00Z"
+        }
+      ]
+    },
+    {
+      "id": "phase-4",
+      "name": "Application Layer - Use Cases",
+      "order": 4,
+      "status": "completed",
+      "tasks": [
+        {
+          "id": "T011",
+          "title": "Implementar CreateDocumentTypeUseCase",
+          "description": "Use case con validación de código único y tests unitarios",
+          "phase": "phase-4",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 2,
+          "actualHours": 2,
+          "dependencies": ["T010"],
+          "tags": ["application", "use-case"],
+          "completedAt": "2026-01-13T16:00:00Z"
+        },
+        {
+          "id": "T012",
+          "title": "Implementar GetDocumentTypeUseCase",
+          "description": "Use case para búsqueda por UUID con tests",
+          "phase": "phase-4",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 1,
+          "actualHours": 1,
+          "dependencies": ["T010"],
+          "tags": ["application", "use-case"],
+          "completedAt": "2026-01-13T17:00:00Z"
+        },
+        {
+          "id": "T013",
+          "title": "Implementar UpdateDocumentTypeUseCase",
+          "description": "Use case con validación y auditoría con tests",
+          "phase": "phase-4",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 2,
+          "actualHours": 2,
+          "dependencies": ["T010"],
+          "tags": ["application", "use-case"],
+          "completedAt": "2026-01-14T10:00:00Z"
+        },
+        {
+          "id": "T014",
+          "title": "Implementar ListDocumentTypesUseCase",
+          "description": "Use case con filtros avanzados, paginación y populate de relaciones",
+          "phase": "phase-4",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 4,
+          "actualHours": 4.5,
+          "dependencies": ["T010"],
+          "tags": ["application", "use-case"],
+          "completedAt": "2026-01-14T15:00:00Z"
+        },
+        {
+          "id": "T015",
+          "title": "Implementar DeactivateDocumentTypeUseCase",
+          "description": "Use case para cambiar estado activo con tests",
+          "phase": "phase-4",
+          "status": "completed",
+          "priority": "medium",
+          "estimatedHours": 1,
+          "actualHours": 1,
+          "dependencies": ["T010"],
+          "tags": ["application", "use-case"],
+          "completedAt": "2026-01-14T16:00:00Z"
+        }
+      ]
+    },
+    {
+      "id": "phase-5",
+      "name": "Exception Handling & Error Responses",
+      "order": 5,
+      "status": "completed",
+      "tasks": [
+        {
+          "id": "T016",
+          "title": "Crear DTOs para respuestas de error",
+          "description": "ErrorResponseDto con formato estándar (message, error) y tests",
+          "phase": "phase-5",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 1,
+          "actualHours": 1,
+          "tags": ["infrastructure", "dto"],
+          "completedAt": "2026-01-14T17:00:00Z"
+        },
+        {
+          "id": "T017",
+          "title": "Implementar GlobalExceptionHandler",
+          "description": "@ControllerAdvice con mapeo de excepciones a códigos HTTP",
+          "phase": "phase-5",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 3,
+          "actualHours": 3,
+          "dependencies": ["T016"],
+          "tags": ["infrastructure", "exception-handler"],
+          "completedAt": "2026-01-14T21:00:00Z"
+        },
+        {
+          "id": "T018",
+          "title": "Tests de integración de manejo de errores",
+          "description": "Tests de todos los códigos HTTP y formato de ErrorResponseDto",
+          "phase": "phase-5",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 2,
+          "actualHours": 2,
+          "dependencies": ["T017"],
+          "tags": ["test", "integration"],
+          "completedAt": "2026-01-15T10:00:00Z"
+        }
+      ]
+    },
+    {
+      "id": "phase-6",
+      "name": "API Layer - Controllers & DTOs",
+      "order": 6,
+      "status": "completed",
+      "tasks": [
+        {
+          "id": "T019",
+          "title": "Crear DTOs de request/response",
+          "description": "Todos los DTOs con Bean Validation y tests",
+          "phase": "phase-6",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 3,
+          "actualHours": 3,
+          "tags": ["infrastructure", "dto"],
+          "completedAt": "2026-01-15T13:00:00Z"
+        },
+        {
+          "id": "T020",
+          "title": "Crear DocumentTypeDtoMapper",
+          "description": "Mapper con MapStruct para DTOs ↔ domain",
+          "phase": "phase-6",
+          "status": "completed",
+          "priority": "medium",
+          "estimatedHours": 2,
+          "actualHours": 1.5,
+          "dependencies": ["T019"],
+          "tags": ["infrastructure", "mapper"],
+          "completedAt": "2026-01-15T15:00:00Z"
+        },
+        {
+          "id": "T021",
+          "title": "Implementar DocumentTypeController",
+          "description": "Todos los endpoints CRUD con códigos HTTP apropiados",
+          "phase": "phase-6",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 4,
+          "actualHours": 4.5,
+          "dependencies": ["T020"],
+          "tags": ["infrastructure", "controller"],
+          "completedAt": "2026-01-15T20:00:00Z"
+        },
+        {
+          "id": "T022",
+          "title": "Integrar GlobalExceptionHandler con Controller",
+          "description": "Tests de integración Controller + ExceptionHandler",
+          "phase": "phase-6",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 2,
+          "actualHours": 2,
+          "dependencies": ["T021", "T017"],
+          "tags": ["test", "integration"],
+          "completedAt": "2026-01-15T22:00:00Z"
+        }
+      ]
+    },
+    {
+      "id": "phase-7",
+      "name": "Testing & Quality",
+      "order": 7,
+      "status": "completed",
+      "tasks": [
+        {
+          "id": "T023",
+          "title": "Tests unitarios de domain layer",
+          "description": "DocumentTypeTest y DocumentTypeDomainServiceTest con >90% coverage",
+          "phase": "phase-7",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 3,
+          "actualHours": 3,
+          "tags": ["test", "unit"],
+          "completedAt": "2026-01-11T17:00:00Z"
+        },
+        {
+          "id": "T024",
+          "title": "Tests unitarios de application layer",
+          "description": "Todos los use cases con Mockito y >85% coverage",
+          "phase": "phase-7",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 4,
+          "actualHours": 4,
+          "tags": ["test", "unit"],
+          "completedAt": "2026-01-14T20:00:00Z"
+        },
+        {
+          "id": "T025",
+          "title": "Tests de integración de persistence layer",
+          "description": "DocumentTypeRepositoryTest con Testcontainers y >80% coverage",
+          "phase": "phase-7",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 3,
+          "actualHours": 3.5,
+          "tags": ["test", "integration"],
+          "completedAt": "2026-01-13T18:00:00Z"
+        },
+        {
+          "id": "T026",
+          "title": "Tests de integración de API layer",
+          "description": "DocumentTypeControllerTest con MockMvc validando todos los códigos HTTP",
+          "phase": "phase-7",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 4,
+          "actualHours": 5,
+          "tags": ["test", "integration"],
+          "completedAt": "2026-01-15T18:00:00Z"
+        },
+        {
+          "id": "T027",
+          "title": "Tests E2E",
+          "description": "Flujos completos: crear → consultar → actualizar → desactivar",
+          "phase": "phase-7",
+          "status": "completed",
+          "priority": "medium",
+          "estimatedHours": 2,
+          "actualHours": 2,
+          "tags": ["test", "e2e"],
+          "completedAt": "2026-01-15T21:00:00Z"
+        }
+      ]
+    },
+    {
+      "id": "phase-8",
+      "name": "Documentation & Deployment",
+      "order": 8,
+      "status": "completed",
+      "tasks": [
+        {
+          "id": "T028",
+          "title": "Configurar OpenAPI/Swagger",
+          "description": "Annotations completas con ejemplos y códigos HTTP documentados",
+          "phase": "phase-8",
+          "status": "completed",
+          "priority": "medium",
+          "estimatedHours": 2,
+          "actualHours": 2,
+          "tags": ["documentation"],
+          "completedAt": "2026-01-15T23:00:00Z"
+        },
+        {
+          "id": "T029",
+          "title": "Documentación técnica",
+          "description": "README del módulo con ejemplos de uso y manejo de errores",
+          "phase": "phase-8",
+          "status": "completed",
+          "priority": "low",
+          "estimatedHours": 1,
+          "actualHours": 1,
+          "tags": ["documentation"],
+          "completedAt": "2026-01-15T23:30:00Z"
+        },
+        {
+          "id": "T030",
+          "title": "Code quality & security scan",
+          "description": "SonarLint analysis, dependency check y performance profiling",
+          "phase": "phase-8",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 2,
+          "actualHours": 1.5,
+          "tags": ["quality", "security"],
+          "completedAt": "2026-01-15T23:59:00Z"
+        }
+      ]
+    }
+  ]
+}

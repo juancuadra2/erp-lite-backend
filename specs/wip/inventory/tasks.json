@@ -1,0 +1,99 @@
+{
+  "module": "inventory",
+  "totalTasks": 128,
+  "totalStoryPoints": 128,
+  "phases": 11,
+  "estimatedDays": 16,
+  "priority": "P1",
+  "complexity": "HIGH",
+  "description": "Sistema integral de gestión de inventarios con control multi-bodega, concurrencia optimista, transferencias, unidades de medida y kardex completo",
+  "keyFeatures": [
+    "Products with multiple barcodes",
+    "Hierarchical categories",
+    "Multi-warehouse stock control with optimistic locking",
+    "Automatic low stock alerts",
+    "Inventory adjustments with audit",
+    "Warehouse transfers (PENDING → APPROVED → RECEIVED)",
+    "Unit of measure conversions",
+    "Complete kardex tracking"
+  ],
+  "criticalComponents": [
+    {
+      "name": "Stock",
+      "risk": "CRITICAL",
+      "reason": "Optimistic locking required, prevents race conditions"
+    },
+    {
+      "name": "AverageCostCalculator",
+      "risk": "HIGH",
+      "reason": "Must be mathematically accurate for accounting"
+    },
+    {
+      "name": "WarehouseTransfer",
+      "risk": "HIGH",
+      "reason": "Complex state machine, affects multiple warehouses"
+    }
+  ],
+  "dependencies": {
+    "internal": [
+      "document-types (for user tracking)",
+      "units-of-measure (for product base units)",
+      "tax-types (for product taxation)",
+      "warehouses (for stock locations)"
+    ],
+    "blocks": [
+      "sales",
+      "purchases", 
+      "production"
+    ]
+  },
+  "performanceTargets": {
+    "productSearchByBarcode": "< 100ms p95",
+    "stockQuery": "< 200ms p95",
+    "stockUpdate": "< 300ms p95",
+    "kardexQuery1Year": "< 2s p95",
+    "concurrentUpdates": "50 simultaneous without data loss"
+  },
+  "testingRequirements": {
+    "unitTests": "Domain models, calculators, validators",
+    "integrationTests": "Stock concurrency (Testcontainers), transfer flow",
+    "performanceTests": "50 concurrent stock updates, kardex with 100k movements",
+    "coverageTarget": "80%"
+  },
+  "sampleTasks": {
+    "phase1": [
+      {"id": "INV-001", "title": "Crear estructura de carpetas", "sp": 1},
+      {"id": "INV-002", "title": "Configurar dependencias", "sp": 1},
+      {"id": "INV-003", "title": "Crear enums", "sp": 1},
+      {"id": "INV-004", "title": "Crear excepciones", "sp": 1}
+    ],
+    "phase3ProductsUS01": [
+      {"id": "INV-010", "title": "Crear Product domain model", "sp": 2},
+      {"id": "INV-011", "title": "Crear ProductBarcode domain model", "sp": 1},
+      {"id": "INV-018", "title": "Implementar CreateProductUseCase", "sp": 1},
+      {"id": "INV-022", "title": "Crear ProductEntity (JPA)", "sp": 1},
+      {"id": "INV-028", "title": "Crear ProductController (REST)", "sp": 2}
+    ],
+    "phase5StockUS03": [
+      {"id": "INV-042", "title": "Crear Stock domain model (con @Version)", "sp": 2},
+      {"id": "INV-043", "title": "Crear InventoryMovement domain model", "sp": 2},
+      {"id": "INV-044", "title": "Crear AverageCostCalculator service", "sp": 1},
+      {"id": "INV-049", "title": "Implementar InitializeStockUseCase", "sp": 1},
+      {"id": "INV-053", "title": "Integration test concurrencia optimista", "sp": 1}
+    ],
+    "phase8TransfersUS06": [
+      {"id": "INV-071", "title": "Crear WarehouseTransfer domain model", "sp": 2},
+      {"id": "INV-077", "title": "Implementar CreateTransferUseCase", "sp": 1},
+      {"id": "INV-078", "title": "Implementar ApproveTransferUseCase", "sp": 1},
+      {"id": "INV-079", "title": "Implementar ReceiveTransferUseCase", "sp": 2},
+      {"id": "INV-087", "title": "Integration test flujo completo", "sp": 2}
+    ]
+  },
+  "notes": [
+    "Este módulo es significativamente más complejo que los catálogos simples (38 tareas vs 128 tareas)",
+    "Requiere atención especial a control de concurrencia para prevenir inconsistencias",
+    "Testcontainers es crítico para probar escenarios de concurrencia",
+    "El cálculo de costo promedio debe ser validado exhaustivamente",
+    "Ver plan.md para desglose completo de las 128 tareas en 11 fases"
+  ]
+}

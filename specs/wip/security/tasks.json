@@ -1,0 +1,750 @@
+{
+  "module": "security",
+  "totalTasks": 92,
+  "totalStoryPoints": 92,
+  "phases": [
+    {
+      "phase": 1,
+      "name": "Setup",
+      "tasks": [
+        {
+          "id": "SEC-001",
+          "title": "Add Spring Security dependencies (6.2.1)",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": []
+        },
+        {
+          "id": "SEC-002",
+          "title": "Add JWT dependencies (jjwt 0.12.5: api, impl, jackson)",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": []
+        },
+        {
+          "id": "SEC-003",
+          "title": "Add BCrypt dependency (included in Spring Security)",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": []
+        },
+        {
+          "id": "SEC-004",
+          "title": "Create package structure (domain, application, infrastructure)",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": []
+        }
+      ]
+    },
+    {
+      "phase": 2,
+      "name": "Domain Models",
+      "tasks": [
+        {
+          "id": "SEC-005",
+          "title": "Create User domain model",
+          "storyPoints": 2,
+          "status": "pending",
+          "dependencies": ["SEC-004"]
+        },
+        {
+          "id": "SEC-006",
+          "title": "Create Role domain model",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-004"]
+        },
+        {
+          "id": "SEC-007",
+          "title": "Create Permission domain model",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-004"]
+        },
+        {
+          "id": "SEC-008",
+          "title": "Create RefreshToken domain model",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-004"]
+        },
+        {
+          "id": "SEC-009",
+          "title": "Create AuditLog domain model",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-004"]
+        },
+        {
+          "id": "SEC-010",
+          "title": "Create PermissionAction enum (CREATE, READ, etc.)",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-007"]
+        },
+        {
+          "id": "SEC-011",
+          "title": "Create AuditAction enum (LOGIN, LOGOUT, etc.)",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-009"]
+        },
+        {
+          "id": "SEC-012",
+          "title": "Create SecurityException hierarchy",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-004"]
+        },
+        {
+          "id": "SEC-013",
+          "title": "Add factory methods to domain models",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-005", "SEC-006", "SEC-007", "SEC-008", "SEC-009"]
+        }
+      ]
+    },
+    {
+      "phase": 3,
+      "name": "Domain Services",
+      "tasks": [
+        {
+          "id": "SEC-014",
+          "title": "Implement UserDomainService (validations)",
+          "storyPoints": 2,
+          "status": "pending",
+          "dependencies": ["SEC-005"]
+        },
+        {
+          "id": "SEC-015",
+          "title": "Implement PasswordHashingService (BCrypt)",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-001", "SEC-003"]
+        },
+        {
+          "id": "SEC-016",
+          "title": "Implement JwtService (generate, validate, extract)",
+          "storyPoints": 2,
+          "status": "pending",
+          "dependencies": ["SEC-002"]
+        },
+        {
+          "id": "SEC-017",
+          "title": "Implement PermissionEvaluationService (SpEL)",
+          "storyPoints": 2,
+          "status": "pending",
+          "dependencies": ["SEC-007"]
+        }
+      ]
+    },
+    {
+      "phase": 4,
+      "name": "Application Ports",
+      "tasks": [
+        {
+          "id": "SEC-018",
+          "title": "Create authentication ports (LoginUseCase, etc.)",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-004"]
+        },
+        {
+          "id": "SEC-019",
+          "title": "Create user management ports (CreateUser, etc.)",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-004"]
+        },
+        {
+          "id": "SEC-020",
+          "title": "Create role management ports",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-004"]
+        },
+        {
+          "id": "SEC-021",
+          "title": "Create audit ports",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-004"]
+        },
+        {
+          "id": "SEC-022",
+          "title": "Create UserPort (repository interface)",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-005"]
+        },
+        {
+          "id": "SEC-023",
+          "title": "Create RolePort (repository interface)",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-006"]
+        },
+        {
+          "id": "SEC-024",
+          "title": "Create PermissionPort (repository interface)",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-007"]
+        },
+        {
+          "id": "SEC-025",
+          "title": "Create RefreshTokenPort (repository interface)",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-008"]
+        },
+        {
+          "id": "SEC-026",
+          "title": "Create AuditLogPort (repository interface)",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-009"]
+        }
+      ]
+    },
+    {
+      "phase": 5,
+      "name": "Authentication",
+      "tasks": [
+        {
+          "id": "SEC-027",
+          "title": "Implement LoginService",
+          "storyPoints": 2,
+          "status": "pending",
+          "dependencies": ["SEC-014", "SEC-015", "SEC-016", "SEC-017", "SEC-018", "SEC-022"]
+        },
+        {
+          "id": "SEC-028",
+          "title": "Implement RefreshTokenService",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-016", "SEC-025"]
+        },
+        {
+          "id": "SEC-029",
+          "title": "Implement LogoutService (revoke refresh tokens)",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-025"]
+        },
+        {
+          "id": "SEC-030",
+          "title": "Create LoginCommand, LoginResponse DTOs",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-027"]
+        },
+        {
+          "id": "SEC-031",
+          "title": "Create RefreshTokenCommand, Response DTOs",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-028"]
+        },
+        {
+          "id": "SEC-032",
+          "title": "Implement account locking logic in LoginService",
+          "storyPoints": 2,
+          "status": "pending",
+          "dependencies": ["SEC-027"]
+        },
+        {
+          "id": "SEC-033",
+          "title": "Implement failed attempts tracking",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-027"]
+        },
+        {
+          "id": "SEC-034",
+          "title": "Add audit logging to authentication flow",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-026", "SEC-027"]
+        },
+        {
+          "id": "SEC-035",
+          "title": "Unit test LoginService",
+          "storyPoints": 2,
+          "status": "pending",
+          "dependencies": ["SEC-027"]
+        },
+        {
+          "id": "SEC-036",
+          "title": "Unit test RefreshTokenService",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-028"]
+        },
+        {
+          "id": "SEC-037",
+          "title": "Unit test LogoutService",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-029"]
+        }
+      ]
+    },
+    {
+      "phase": 6,
+      "name": "User Management",
+      "tasks": [
+        {
+          "id": "SEC-038",
+          "title": "Implement CreateUserService",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-014", "SEC-015", "SEC-019", "SEC-022"]
+        },
+        {
+          "id": "SEC-039",
+          "title": "Implement UpdateUserService",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-014", "SEC-019", "SEC-022"]
+        },
+        {
+          "id": "SEC-040",
+          "title": "Implement DeleteUserService (soft delete)",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-019", "SEC-022"]
+        },
+        {
+          "id": "SEC-041",
+          "title": "Implement GetUserService",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-019", "SEC-022"]
+        },
+        {
+          "id": "SEC-042",
+          "title": "Implement ListUsersService (pagination)",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-019", "SEC-022"]
+        },
+        {
+          "id": "SEC-043",
+          "title": "Implement UnlockUserService",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-019", "SEC-022"]
+        },
+        {
+          "id": "SEC-044",
+          "title": "Implement ChangePasswordService",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-014", "SEC-015", "SEC-019", "SEC-022"]
+        },
+        {
+          "id": "SEC-045",
+          "title": "Add audit logging to user operations",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-026"]
+        },
+        {
+          "id": "SEC-046",
+          "title": "Unit test CreateUserService",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-038"]
+        },
+        {
+          "id": "SEC-047",
+          "title": "Unit test UpdateUserService",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-039"]
+        }
+      ]
+    },
+    {
+      "phase": 7,
+      "name": "Role & Permissions",
+      "tasks": [
+        {
+          "id": "SEC-048",
+          "title": "Implement CreateRoleService",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-020", "SEC-023"]
+        },
+        {
+          "id": "SEC-049",
+          "title": "Implement UpdateRoleService",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-020", "SEC-023"]
+        },
+        {
+          "id": "SEC-050",
+          "title": "Implement DeleteRoleService (check usage)",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-020", "SEC-023"]
+        },
+        {
+          "id": "SEC-051",
+          "title": "Implement ListRolesService",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-020", "SEC-023"]
+        },
+        {
+          "id": "SEC-052",
+          "title": "Implement AssignRoleToUserService",
+          "storyPoints": 2,
+          "status": "pending",
+          "dependencies": ["SEC-020", "SEC-022", "SEC-023"]
+        },
+        {
+          "id": "SEC-053",
+          "title": "Implement CreatePermissionService",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-020", "SEC-024"]
+        },
+        {
+          "id": "SEC-054",
+          "title": "Implement AssignPermissionToRoleService",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-020", "SEC-023", "SEC-024"]
+        },
+        {
+          "id": "SEC-055",
+          "title": "Implement CheckPermissionService (SpEL evaluation)",
+          "storyPoints": 2,
+          "status": "pending",
+          "dependencies": ["SEC-017", "SEC-024"]
+        }
+      ]
+    },
+    {
+      "phase": 8,
+      "name": "Audit Logging",
+      "tasks": [
+        {
+          "id": "SEC-056",
+          "title": "Implement SaveAuditLogService (async)",
+          "storyPoints": 2,
+          "status": "pending",
+          "dependencies": ["SEC-021", "SEC-026"]
+        },
+        {
+          "id": "SEC-057",
+          "title": "Implement GetAuditLogsService (filter, pagination)",
+          "storyPoints": 2,
+          "status": "pending",
+          "dependencies": ["SEC-021", "SEC-026"]
+        },
+        {
+          "id": "SEC-058",
+          "title": "Create AuditLogFilter DTO",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-057"]
+        },
+        {
+          "id": "SEC-059",
+          "title": "Configure @Async for audit logging",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-001", "SEC-056"]
+        }
+      ]
+    },
+    {
+      "phase": 9,
+      "name": "Infrastructure - Database",
+      "tasks": [
+        {
+          "id": "SEC-060",
+          "title": "Create UserEntity (JPA)",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-005"]
+        },
+        {
+          "id": "SEC-061",
+          "title": "Create RoleEntity (JPA)",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-006"]
+        },
+        {
+          "id": "SEC-062",
+          "title": "Create PermissionEntity (JPA)",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-007"]
+        },
+        {
+          "id": "SEC-063",
+          "title": "Create RefreshTokenEntity (JPA)",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-008"]
+        },
+        {
+          "id": "SEC-064",
+          "title": "Create AuditLogEntity (JPA)",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-009"]
+        },
+        {
+          "id": "SEC-065",
+          "title": "Create UserJpaRepository (Spring Data JPA)",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-060"]
+        },
+        {
+          "id": "SEC-066",
+          "title": "Create RoleJpaRepository",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-061"]
+        },
+        {
+          "id": "SEC-067",
+          "title": "Create PermissionJpaRepository",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-062"]
+        },
+        {
+          "id": "SEC-068",
+          "title": "Create RefreshTokenJpaRepository",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-063"]
+        },
+        {
+          "id": "SEC-069",
+          "title": "Create AuditLogJpaRepository",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-064"]
+        },
+        {
+          "id": "SEC-070",
+          "title": "Create UserMapper (MapStruct: Entity ↔ Domain)",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-005", "SEC-060"]
+        },
+        {
+          "id": "SEC-071",
+          "title": "Create RoleMapper (MapStruct)",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-006", "SEC-061"]
+        },
+        {
+          "id": "SEC-072",
+          "title": "Create PermissionMapper (MapStruct)",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-007", "SEC-062"]
+        },
+        {
+          "id": "SEC-073",
+          "title": "Create RefreshTokenMapper (MapStruct)",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-008", "SEC-063"]
+        },
+        {
+          "id": "SEC-074",
+          "title": "Create AuditLogMapper (MapStruct)",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-009", "SEC-064"]
+        },
+        {
+          "id": "SEC-075",
+          "title": "Implement UserAdapter (Port implementation)",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-022", "SEC-065", "SEC-070"]
+        },
+        {
+          "id": "SEC-076",
+          "title": "Implement RoleAdapter",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-023", "SEC-066", "SEC-071"]
+        },
+        {
+          "id": "SEC-077",
+          "title": "Implement PermissionAdapter",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-024", "SEC-067", "SEC-072"]
+        },
+        {
+          "id": "SEC-078",
+          "title": "Implement RefreshTokenAdapter",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-025", "SEC-068", "SEC-073"]
+        },
+        {
+          "id": "SEC-079",
+          "title": "Implement AuditLogAdapter",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-026", "SEC-069", "SEC-074"]
+        },
+        {
+          "id": "SEC-080",
+          "title": "Create Flyway migration V1.9__create_security_tables.sql",
+          "storyPoints": 2,
+          "status": "pending",
+          "dependencies": []
+        }
+      ]
+    },
+    {
+      "phase": 10,
+      "name": "Security Configuration",
+      "tasks": [
+        {
+          "id": "SEC-081",
+          "title": "Create JwtAuthenticationFilter",
+          "storyPoints": 2,
+          "status": "pending",
+          "dependencies": ["SEC-016"]
+        },
+        {
+          "id": "SEC-082",
+          "title": "Create SecurityConfig (SecurityFilterChain)",
+          "storyPoints": 2,
+          "status": "pending",
+          "dependencies": ["SEC-001", "SEC-081"]
+        },
+        {
+          "id": "SEC-083",
+          "title": "Configure CORS (allow specific origins)",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-082"]
+        }
+      ]
+    },
+    {
+      "phase": 11,
+      "name": "Testing",
+      "tasks": [
+        {
+          "id": "SEC-084",
+          "title": "Unit tests for domain models",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-005", "SEC-006", "SEC-007", "SEC-008", "SEC-009"]
+        },
+        {
+          "id": "SEC-085",
+          "title": "Unit tests for domain services",
+          "storyPoints": 2,
+          "status": "pending",
+          "dependencies": ["SEC-014", "SEC-015", "SEC-016", "SEC-017"]
+        },
+        {
+          "id": "SEC-086",
+          "title": "Unit tests for use cases (LoginService, etc.)",
+          "storyPoints": 2,
+          "status": "pending",
+          "dependencies": ["SEC-027", "SEC-038", "SEC-048", "SEC-055"]
+        },
+        {
+          "id": "SEC-087",
+          "title": "Integration tests for repositories (Testcontainers)",
+          "storyPoints": 2,
+          "status": "pending",
+          "dependencies": ["SEC-065", "SEC-075", "SEC-079"]
+        },
+        {
+          "id": "SEC-088",
+          "title": "Integration tests for REST controllers (MockMvc)",
+          "storyPoints": 2,
+          "status": "pending",
+          "dependencies": ["SEC-090", "SEC-091", "SEC-092"]
+        },
+        {
+          "id": "SEC-089",
+          "title": "End-to-end authentication flow test",
+          "storyPoints": 2,
+          "status": "pending",
+          "dependencies": ["SEC-027", "SEC-028", "SEC-029"]
+        }
+      ]
+    },
+    {
+      "phase": 12,
+      "name": "Documentation",
+      "tasks": [
+        {
+          "id": "SEC-090",
+          "title": "Create AuthController (REST endpoints)",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-027", "SEC-028", "SEC-029"]
+        },
+        {
+          "id": "SEC-091",
+          "title": "Create UserController (REST endpoints)",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-038", "SEC-039", "SEC-040", "SEC-041", "SEC-042", "SEC-043", "SEC-044"]
+        },
+        {
+          "id": "SEC-092",
+          "title": "Create RoleController (REST endpoints)",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-048", "SEC-049", "SEC-050", "SEC-051", "SEC-052", "SEC-053", "SEC-054"]
+        },
+        {
+          "id": "SEC-093",
+          "title": "Add OpenAPI/Swagger annotations",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-090", "SEC-091", "SEC-092"]
+        }
+      ]
+    },
+    {
+      "phase": 13,
+      "name": "Deployment",
+      "tasks": [
+        {
+          "id": "SEC-094",
+          "title": "Configure environment variables (JWT_SECRET, etc.)",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": []
+        },
+        {
+          "id": "SEC-095",
+          "title": "Initial data migration (admin user, default roles)",
+          "storyPoints": 1,
+          "status": "pending",
+          "dependencies": ["SEC-080"]
+        }
+      ]
+    }
+  ]
+}
