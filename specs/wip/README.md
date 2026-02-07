@@ -2,6 +2,19 @@
 
 Esta carpeta contiene features **en desarrollo activo**.
 
+## 📊 Features en WIP
+
+### 🔄 document-types
+**Status**: 🔴 Planning & Documentation  
+**Progress**: 0% (0/32 tasks)  
+**Architecture**: Hexagonal (Aligned with Scaffolding)  
+**Priority**: High  
+**Docs**: [document-types/README.md](document-types/README.md)
+
+Módulo de catálogos de tipos de documentos de identificación (NIT, CC, CE, etc.).
+
+---
+
 ## 📋 Uso
 
 ### Cuando iniciar un nuevo feature:
