@@ -2,19 +2,131 @@
 
 **Feature**: Geography Module (Departments & Municipalities)  
 **Created**: January 10, 2026  
+**Updated**: February 7, 2026  
 **Related**: [functional-spec.md](1-functional-spec.md)  
-**Phase**: PHASE 2 - Draft
+**Phase**: PHASE 2 - Draft  
+**Arquitectura:** Hexagonal (Puertos y Adaptadores)
 
 ---
 
 ## 📐 Technical Overview
 
-Implementación del módulo de Geografía siguiendo **Arquitectura Hexagonal** (Ports & Adapters), con separación estricta entre dominio, aplicación e infraestructura. El módulo gestiona la jerarquía de ubicaciones administrativas (Departamento > Municipio) sin dependencias externas.
+Implementación del módulo de Geografía siguiendo **Arquitectura Hexagonal** (Ports & Adapters) alineada con el nuevo scaffolding, con separación estricta entre dominio, aplicación e infraestructura. Cada feature tiene su propia carpeta dentro de cada capa para mantener el código organizado y escalable.
 
 ### Architecture Style
 - **Pattern**: Hexagonal Architecture (Ports & Adapters)
 - **Layers**: Domain → Application → Infrastructure
 - **Communication**: Inbound/Outbound Ports
+- **Organization**: Feature-based folders within each layer
+
+### Stack Tecnológico
+- **Lenguaje**: Java 21
+- **Framework**: Spring Boot 3.x
+- **ORM**: Spring Data JPA con Hibernate
+- **Base de Datos**: MySQL 8.0+
+- **Migraciones**: Flyway
+- **Mapeo**: MapStruct 1.5.5
+- **Validación**: Hibernate Validator (Bean Validation)
+- **Pruebas**: JUnit 5, Mockito
+- **Documentación de API**: SpringDoc OpenAPI 3
+
+---
+
+## Estructura de Paquetes (Organizada por Features)
+
+**NOTA**: Cada feature tiene su propia carpeta dentro de cada capa para mantener el código organizado y escalable.
+
+```
+com.jcuadrado.erplitebackend/
+│
+├── domain/
+│   ├── model/
+│   │   └── geography/
+│   │       ├── Department.java                      # Raíz Agregada
+│   │       └── Municipality.java                    # Entidad
+│   ├── service/
+│   │   └── geography/
+│   │       ├── GeographyDomainService.java          # Reglas de negocio
+│   │       └── GeographyValidationService.java      # Validación de dominio
+│   ├── port/
+│   │   └── out/
+│   │       └── geography/
+│   │           ├── DepartmentRepository.java        # Puerto de salida
+│   │           └── MunicipalityRepository.java      # Puerto de salida
+│   └── exception/
+│       └── geography/
+│           ├── DepartmentNotFoundException.java
+│           ├── MunicipalityNotFoundException.java
+│           ├── DuplicateCodeException.java
+│           ├── InvalidCodeFormatException.java
+│           └── GeographyConstraintException.java
+│
+├── application/
+│   ├── port/
+│   │   └── in/
+│   │       └── geography/
+│   │           ├── CompareDepartmentsUseCase.java        # Operaciones de consulta
+│   │           ├── ManageDepartmentUseCase.java          # Operaciones de comando
+│   │           ├── CompareMunicipalitiesUseCase.java     # Operaciones de consulta
+│   │           └── ManageMunicipalityUseCase.java        # Operaciones de comando
+│   └── usecase/
+│       └── geography/
+│           ├── CompareDepartmentsUseCaseImpl.java
+│           ├── ManageDepartmentUseCaseImpl.java
+│           ├── CompareMunicipalitiesUseCaseImpl.java
+│           └── ManageMunicipalityUseCaseImpl.java
+│
+└── infrastructure/
+    ├── config/
+    │   └── BeanConfiguration.java                   # Configuración compartida
+    │
+    ├── in/
+    │   └── web/
+    │       ├── controller/
+    │       │   └── geography/
+    │       │       ├── DepartmentController.java
+    │       │       └── MunicipalityController.java
+    │       ├── dto/
+    │       │   └── geography/
+    │       │       ├── CreateDepartmentRequestDto.java
+    │       │       ├── UpdateDepartmentRequestDto.java
+    │       │       ├── DepartmentResponseDto.java
+    │       │       ├── CreateMunicipalityRequestDto.java
+    │       │       ├── UpdateMunicipalityRequestDto.java
+    │       │       └── MunicipalityResponseDto.java
+    │       ├── mapper/
+    │       │   └── geography/
+    │       │       ├── DepartmentDtoMapper.java
+    │       │       └── MunicipalityDtoMapper.java
+    │       └── advice/
+    │           └── GlobalExceptionHandler.java       # Compartido entre features
+    │
+    └── out/
+        └── persistence/
+            ├── adapter/
+            │   └── geography/
+            │       ├── DepartmentRepositoryAdapter.java
+            │       └── MunicipalityRepositoryAdapter.java
+            ├── entity/
+            │   └── geography/
+            │       ├── DepartmentEntity.java
+            │       └── MunicipalityEntity.java
+            ├── mapper/
+            │   └── geography/
+            │       ├── DepartmentEntityMapper.java
+            │       └── MunicipalityEntityMapper.java
+            └── jpa/
+                └── geography/
+                    ├── DepartmentJpaRepository.java
+                    └── MunicipalityJpaRepository.java
+```
+
+**Ventajas de la Estructura por Features:**
+1. **Escalabilidad**: Cada nuevo feature se agrega en su propia carpeta sin afectar otros
+2. **Cohesión**: Todo el código relacionado con geography está agrupado en cada capa
+3. **Mantenibilidad**: Fácil encontrar y modificar código específico del feature
+4. **Claridad**: La estructura refleja los módulos de negocio del sistema
+5. **Independencia**: Cada feature puede evolucionar independientemente
 
 ---
 
@@ -26,7 +138,7 @@ Implementación del módulo de Geografía siguiendo **Arquitectura Hexagonal** (
 
 **Components**:
 
-#### Models (`domain/geography/model/`)
+#### Models (`domain/model/geography/`)
 ```java
 // Department.java - Aggregate Root
 public class Department {
@@ -68,7 +180,7 @@ public class Municipality {
 }
 ```
 
-#### Services (`domain/geography/service/`)
+#### Services (`domain/service/geography/`)
 ```java
 // GeographyDomainService.java
 @Service
@@ -108,7 +220,7 @@ public class GeographyValidationService {
 }
 ```
 
-#### Exceptions (`domain/geography/exception/`)
+#### Exceptions (`domain/exception/geography/`)
 ```java
 public class DepartmentNotFoundException extends DomainException {}
 public class MunicipalityNotFoundException extends DomainException {}
@@ -122,91 +234,134 @@ public class GeographyConstraintException extends BusinessRuleException {}
 
 **Purpose**: Orquestación de casos de uso, lógica de aplicación
 
-**Ports** (`application/port/`):
+#### Input Ports (Use Cases) - `application/port/in/geography/`
 
-#### Input Ports (Use Cases) - `application/port/in/`
-
-**Department Use Cases** (`application/port/in/department/`)
 ```java
-// CreateDepartmentUseCase.java
-public interface CreateDepartmentUseCase {
-    Department execute(CreateDepartmentRequestDto request);
+/**
+ * Use case for querying departments (Queries: get, list, search, compare)
+ */
+public interface CompareDepartmentsUseCase {
+    /**
+     * Get department by UUID
+     */
+    Department getByUuid(UUID uuid);
+    
+    /**
+     * Get department by code
+     */
+    Department getByCode(String code);
+    
+    /**
+     * Get all active departments
+     */
+    List<Department> getAllActive();
+    
+    /**
+     * Find all departments with filters and pagination
+     * @param filters Map with filter criteria (enabled, search, etc.)
+     * @param pageable Pagination and sorting information
+     */
+    Page<Department> findAll(Map<String, Object> filters, Pageable pageable);
 }
 
-// GetDepartmentUseCase.java
-public interface GetDepartmentUseCase {
-    Department execute(UUID uuid);
+/**
+ * Use case for managing departments (Commands: create, update, delete, activate/deactivate)
+ */
+public interface ManageDepartmentUseCase {
+    /**
+     * Create a new department
+     */
+    Department create(Department department);
+    
+    /**
+     * Update an existing department
+     */
+    Department update(UUID uuid, Department department);
+    
+    /**
+     * Delete a department (soft delete)
+     */
+    void delete(UUID uuid);
+    
+    /**
+     * Activate a department
+     */
+    void activate(UUID uuid);
+    
+    /**
+     * Deactivate a department
+     */
+    void deactivate(UUID uuid);
 }
 
-// UpdateDepartmentUseCase.java
-public interface UpdateDepartmentUseCase {
-    Department execute(UUID uuid, UpdateDepartmentRequestDto request);
+/**
+ * Use case for querying municipalities (Queries: get, list, search, compare)
+ */
+public interface CompareMunicipalitiesUseCase {
+    /**
+     * Get municipality by UUID
+     */
+    Municipality getByUuid(UUID uuid);
+    
+    /**
+     * Get municipality by code and department
+     */
+    Municipality getByCodeAndDepartment(String code, Long departmentId);
+    
+    /**
+     * Get all active municipalities
+     */
+    List<Municipality> getAllActive();
+    
+    /**
+     * Find municipalities by department
+     */
+    Page<Municipality> findByDepartment(UUID departmentUuid, Pageable pageable);
+    
+    /**
+     * Find all municipalities with filters and pagination
+     * @param filters Map with filter criteria (departmentId, enabled, search, etc.)
+     * @param pageable Pagination and sorting information
+     */
+    Page<Municipality> findAll(Map<String, Object> filters, Pageable pageable);
 }
 
-// ListDepartmentsUseCase.java
-public interface ListDepartmentsUseCase {
-    Page<Department> execute(Boolean enabled, String name, Pageable pageable);
-}
-
-// DeactivateDepartmentUseCase.java
-public interface DeactivateDepartmentUseCase {
-    void execute(UUID uuid);
-}
-
-// ActivateDepartmentUseCase.java
-public interface ActivateDepartmentUseCase {
-    void execute(UUID uuid);
-}
-
-// DeleteDepartmentUseCase.java
-public interface DeleteDepartmentUseCase {
-    void execute(UUID uuid);
+/**
+ * Use case for managing municipalities (Commands: create, update, delete, activate/deactivate)
+ */
+public interface ManageMunicipalityUseCase {
+    /**
+     * Create a new municipality
+     */
+    Municipality create(Municipality municipality);
+    
+    /**
+     * Update an existing municipality
+     */
+    Municipality update(UUID uuid, Municipality municipality);
+    
+    /**
+     * Delete a municipality (soft delete)
+     */
+    void delete(UUID uuid);
+    
+    /**
+     * Activate a municipality
+     */
+    void activate(UUID uuid);
+    
+    /**
+     * Deactivate a municipality
+     */
+    void deactivate(UUID uuid);
 }
 ```
 
-**Municipality Use Cases** (`application/port/in/municipality/`)
-```java
-// CreateMunicipalityUseCase.java
-public interface CreateMunicipalityUseCase {
-    Municipality execute(CreateMunicipalityRequestDto request);
-}
-
-// GetMunicipalityUseCase.java
-public interface GetMunicipalityUseCase {
-    Municipality execute(UUID uuid);
-}
-
-// UpdateMunicipalityUseCase.java
-public interface UpdateMunicipalityUseCase {
-    Municipality execute(UUID uuid, UpdateMunicipalityRequestDto request);
-}
-
-// ListMunicipalitiesUseCase.java
-public interface ListMunicipalitiesUseCase {
-    Page<Municipality> execute(UUID departmentId, Boolean enabled, String name, Pageable pageable);
-}
-
-// DeactivateMunicipalityUseCase.java
-public interface DeactivateMunicipalityUseCase {
-    void execute(UUID uuid);
-}
-
-// ActivateMunicipalityUseCase.java
-public interface ActivateMunicipalityUseCase {
-    void execute(UUID uuid);
-}
-
-// DeleteMunicipalityUseCase.java
-public interface DeleteMunicipalityUseCase {
-    void execute(UUID uuid);
-}
-```
-
-#### Output Ports (Repository Interfaces) - `application/port/out/`
+#### Output Ports (Repository Interfaces) - `domain/port/out/geography/`
 
 ```java
-// DepartmentPort.java
-public interface DepartmentPort {
+// DepartmentRepository.java
+public interface DepartmentRepository {
     Department save(Department department);
     Optional<Department> findByUuid(UUID uuid);
     Optional<Department> findByCode(String code);
@@ -220,8 +375,8 @@ public interface DepartmentPort {
     long count();
 }
 
-// MunicipalityPort.java
-public interface MunicipalityPort {
+// MunicipalityRepository.java
+public interface MunicipalityRepository {
     Municipality save(Municipality municipality);
     Optional<Municipality> findByUuid(UUID uuid);
     Optional<Municipality> findByCodeAndDepartmentId(String code, Long departmentId);
@@ -236,58 +391,259 @@ public interface MunicipalityPort {
 }
 ```
 
-#### Service Implementations - `application/service/geography/`
+#### Use Case Implementations - `application/usecase/geography/`
 
-**Department Services** (`application/service/geography/department/`)
 ```java
-// CreateDepartmentService.java
+// CompareDepartmentsUseCaseImpl.java
 @Service
 @RequiredArgsConstructor
-public class CreateDepartmentService implements CreateDepartmentUseCase {
-    private final DepartmentPort departmentPort;
-    private final GeographyDomainService domainService;
-    
-    @Override
-    @Transactional
-    public Department execute(CreateDepartmentRequestDto request) {
-        // Implementation
-    }
-}
-
-// GetDepartmentService.java
-@Service
-@RequiredArgsConstructor
-public class GetDepartmentService implements GetDepartmentUseCase {
-    private final DepartmentPort departmentPort;
+public class CompareDepartmentsUseCaseImpl implements CompareDepartmentsUseCase {
+    private final DepartmentRepository departmentRepository;
     
     @Override
     @Transactional(readOnly = true)
-    public Department execute(UUID uuid) {
-        // Implementation
+    public Department getByUuid(UUID uuid) {
+        return departmentRepository.findByUuid(uuid)
+            .orElseThrow(() -> new DepartmentNotFoundException(uuid));
+    }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public Department getByCode(String code) {
+        return departmentRepository.findByCode(code)
+            .orElseThrow(() -> new DepartmentNotFoundException(code));
+    }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public List<Department> getAllActive() {
+        return departmentRepository.findAllEnabled();
+    }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public Page<Department> findAll(Map<String, Object> filters, Pageable pageable) {
+        // Apply dynamic filters based on filter map
+        Boolean enabled = (Boolean) filters.get("enabled");
+        String search = (String) filters.get("search");
+        
+        if (search != null && !search.isBlank()) {
+            return departmentRepository.findByNameContaining(search, pageable);
+        } else if (enabled != null) {
+            return departmentRepository.findByEnabled(enabled, pageable);
+        } else {
+            return departmentRepository.findAll(pageable);
+        }
     }
 }
 
-// UpdateDepartmentService.java, DeactivateDepartmentService.java, etc.
-```
-
-**Municipality Services** (`application/service/geography/municipality/`)
-```java
-// CreateMunicipalityService.java
+// ManageDepartmentUseCaseImpl.java
 @Service
 @RequiredArgsConstructor
-public class CreateMunicipalityService implements CreateMunicipalityUseCase {
-    private final MunicipalityPort municipalityPort;
-    private final DepartmentPort departmentPort;
+public class ManageDepartmentUseCaseImpl implements ManageDepartmentUseCase {
+    private final DepartmentRepository departmentRepository;
     private final GeographyDomainService domainService;
+    private final GeographyValidationService validationService;
     
     @Override
     @Transactional
-    public Municipality execute(CreateMunicipalityRequestDto request) {
-        // Implementation
+    public Department create(Department department) {
+        // Validate domain rules
+        domainService.validateDepartmentCode(department.getCode());
+        validationService.ensureDepartmentCodeUnique(department.getCode(), null);
+        
+        // Set UUID and timestamps
+        department.setUuid(UUID.randomUUID());
+        department.setCreatedAt(LocalDateTime.now());
+        department.setUpdatedAt(LocalDateTime.now());
+        
+        return departmentRepository.save(department);
+    }
+    
+    @Override
+    @Transactional
+    public Department update(UUID uuid, Department updates) {
+        Department existing = departmentRepository.findByUuid(uuid)
+            .orElseThrow(() -> new DepartmentNotFoundException(uuid));
+        
+        // Validate code uniqueness if changed
+        if (!existing.getCode().equals(updates.getCode())) {
+            validationService.ensureDepartmentCodeUnique(updates.getCode(), uuid);
+        }
+        
+        // Update fields
+        existing.setName(updates.getName());
+        existing.setEnabled(updates.getEnabled());
+        existing.setUpdatedAt(LocalDateTime.now());
+        
+        return departmentRepository.save(existing);
+    }
+    
+    @Override
+    @Transactional
+    public void delete(UUID uuid) {
+        Department department = departmentRepository.findByUuid(uuid)
+            .orElseThrow(() -> new DepartmentNotFoundException(uuid));
+        
+        // Check business rules
+        if (!domainService.canDeleteDepartment(department)) {
+            throw new GeographyConstraintException(
+                "Cannot delete department with associated municipalities");
+        }
+        
+        departmentRepository.delete(department);
+    }
+    
+    @Override
+    @Transactional
+    public void activate(UUID uuid) {
+        Department department = departmentRepository.findByUuid(uuid)
+            .orElseThrow(() -> new DepartmentNotFoundException(uuid));
+        department.activate();
+        departmentRepository.save(department);
+    }
+    
+    @Override
+    @Transactional
+    public void deactivate(UUID uuid) {
+        Department department = departmentRepository.findByUuid(uuid)
+            .orElseThrow(() -> new DepartmentNotFoundException(uuid));
+        department.deactivate();
+        departmentRepository.save(department);
     }
 }
 
-// GetMunicipalityService.java, UpdateMunicipalityService.java, etc.
+// CompareMunicipalitiesUseCaseImpl.java
+@Service
+@RequiredArgsConstructor
+public class CompareMunicipalitiesUseCaseImpl implements CompareMunicipalitiesUseCase {
+    private final MunicipalityRepository municipalityRepository;
+    private final DepartmentRepository departmentRepository;
+    
+    @Override
+    @Transactional(readOnly = true)
+    public Municipality getByUuid(UUID uuid) {
+        return municipalityRepository.findByUuid(uuid)
+            .orElseThrow(() -> new MunicipalityNotFoundException(uuid));
+    }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public Municipality getByCodeAndDepartment(String code, Long departmentId) {
+        return municipalityRepository.findByCodeAndDepartmentId(code, departmentId)
+            .orElseThrow(() -> new MunicipalityNotFoundException(code));
+    }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public List<Municipality> getAllActive() {
+        return municipalityRepository.findAllEnabled();
+    }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public Page<Municipality> findByDepartment(UUID departmentUuid, Pageable pageable) {
+        Department department = departmentRepository.findByUuid(departmentUuid)
+            .orElseThrow(() -> new DepartmentNotFoundException(departmentUuid));
+        return municipalityRepository.findByDepartmentId(department.getId(), pageable);
+    }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public Page<Municipality> findAll(Map<String, Object> filters, Pageable pageable) {
+        // Apply dynamic filters
+        Long departmentId = (Long) filters.get("departmentId");
+        Boolean enabled = (Boolean) filters.get("enabled");
+        String search = (String) filters.get("search");
+        
+        if (search != null && !search.isBlank()) {
+            return municipalityRepository.findByNameContaining(search, pageable);
+        } else if (departmentId != null && enabled != null) {
+            return municipalityRepository.findByDepartmentIdAndEnabled(departmentId, enabled, pageable);
+        } else if (departmentId != null) {
+            return municipalityRepository.findByDepartmentId(departmentId, pageable);
+        } else {
+            return municipalityRepository.findAll(pageable);
+        }
+    }
+}
+
+// ManageMunicipalityUseCaseImpl.java
+@Service
+@RequiredArgsConstructor
+public class ManageMunicipalityUseCaseImpl implements ManageMunicipalityUseCase {
+    private final MunicipalityRepository municipalityRepository;
+    private final DepartmentRepository departmentRepository;
+    private final GeographyDomainService domainService;
+    private final GeographyValidationService validationService;
+    
+    @Override
+    @Transactional
+    public Municipality create(Municipality municipality) {
+        // Validate domain rules
+        domainService.validateMunicipalityCode(municipality.getCode());
+        
+        // Verify department exists
+        Department department = departmentRepository.findById(municipality.getDepartment().getId())
+            .orElseThrow(() -> new DepartmentNotFoundException(municipality.getDepartment().getId()));
+        
+        // Validate code uniqueness within department
+        validationService.ensureMunicipalityCodeUniqueInDepartment(
+            department.getUuid(), municipality.getCode(), null);
+        
+        // Set UUID and timestamps
+        municipality.setUuid(UUID.randomUUID());
+        municipality.setCreatedAt(LocalDateTime.now());
+        municipality.setUpdatedAt(LocalDateTime.now());
+        
+        return municipalityRepository.save(municipality);
+    }
+    
+    @Override
+    @Transactional
+    public Municipality update(UUID uuid, Municipality updates) {
+        Municipality existing = municipalityRepository.findByUuid(uuid)
+            .orElseThrow(() -> new MunicipalityNotFoundException(uuid));
+        
+        // Validate code uniqueness if changed
+        if (!existing.getCode().equals(updates.getCode())) {
+            validationService.ensureMunicipalityCodeUniqueInDepartment(
+                existing.getDepartment().getUuid(), updates.getCode(), uuid);
+        }
+        
+        // Update fields
+        existing.setName(updates.getName());
+        existing.setEnabled(updates.getEnabled());
+        existing.setUpdatedAt(LocalDateTime.now());
+        
+        return municipalityRepository.save(existing);
+    }
+    
+    @Override
+    @Transactional
+    public void delete(UUID uuid) {
+        Municipality municipality = municipalityRepository.findByUuid(uuid)
+            .orElseThrow(() -> new MunicipalityNotFoundException(uuid));
+        municipalityRepository.delete(municipality);
+    }
+    
+    @Override
+    @Transactional
+    public void activate(UUID uuid) {
+        Municipality municipality = municipalityRepository.findByUuid(uuid)
+            .orElseThrow(() -> new MunicipalityNotFoundException(uuid));
+        municipality.activate();
+        municipalityRepository.save(municipality);
+    }
+    
+    @Override
+    @Transactional
+    public void deactivate(UUID uuid) {
+        Municipality municipality = municipalityRepository.findByUuid(uuid)
+            .orElseThrow(() -> new MunicipalityNotFoundException(uuid));
+        municipality.deactivate();
+        municipalityRepository.save(municipality);
+    }
 }
 ```
 
@@ -299,7 +655,7 @@ public class CreateMunicipalityService implements CreateMunicipalityUseCase {
 
 #### Output Adapters (Persistence)
 
-**Entities** (`infrastructure/out/geography/persistence/entity/`)
+**Entities** (`infrastructure/out/persistence/entity/geography/`)
 ```java
 @Entity
 @Table(name = "departments")
@@ -402,7 +758,7 @@ public interface MunicipalityJpaRepository
 }
 ```
 
-**Entity Mappers** (`infrastructure/out/geography/mapper/`)
+**Entity Mappers** (`infrastructure/out/persistence/mapper/geography/`)
 ```java
 @Mapper(componentModel = "spring")
 public interface DepartmentEntityMapper {
@@ -423,11 +779,11 @@ public interface MunicipalityEntityMapper {
 }
 ```
 
-**Adapters** (`infrastructure/out/geography/persistence/adapter/`)
+**Adapters** (`infrastructure/out/persistence/adapter/geography/`)
 ```java
 @Component
 @RequiredArgsConstructor
-public class DepartmentRepositoryAdapter implements DepartmentPort {
+public class DepartmentRepositoryAdapter implements DepartmentRepository {
     private final DepartmentJpaRepository jpaRepository;
     private final DepartmentEntityMapper mapper;
     
@@ -449,7 +805,7 @@ public class DepartmentRepositoryAdapter implements DepartmentPort {
 
 @Component
 @RequiredArgsConstructor
-public class MunicipalityRepositoryAdapter implements MunicipalityPort {
+public class MunicipalityRepositoryAdapter implements MunicipalityRepository {
     private final MunicipalityJpaRepository jpaRepository;
     private final MunicipalityEntityMapper mapper;
     
@@ -459,7 +815,7 @@ public class MunicipalityRepositoryAdapter implements MunicipalityPort {
 
 #### Input Adapters (REST API)
 
-**Controllers** (`infrastructure/in/api/geography/rest/`)
+**Controllers** (`infrastructure/in/web/controller/geography/`)
 ```java
 @RestController
 @RequestMapping("/api/geography/departments")
@@ -545,7 +901,7 @@ public record DepartmentResponseDto(
 ) {}
 ```
 
-Municipality DTOs (`infrastructure/in/api/geography/dto/municipality/`)
+**Municipality DTOs** (`infrastructure/in/web/dto/geography/`)
 ```java
 // CreateMunicipalityRequestDto.java
 public record CreateMunicipalityRequestDto(
@@ -573,7 +929,7 @@ public record MunicipalityResponseDto(
 ) {}
 ```
 
-**DTO Mappers** (`infrastructure/in/api/geography/mapper/`)
+**DTO Mappers** (`infrastructure/in/web/mapper/geography/`)
 ```java
 // DepartmentDtoMapper.java
 @Mapper(componentModel = "spring")
@@ -947,11 +1303,6 @@ CREATE TABLE municipalities (
 **Rationale**: Reproducible, auditable, rollback capability  
 **Naming**: `V{major}.{minor}__{description}.sql`
 
-### TD-05: Testcontainers for Integration Tests
-**Decision**: MySQL real via Testcontainers  
-**Rationale**: Tests más confiables que H2 in-memory  
-**Trade-off**: Tiempo de ejecución mayor (acceptable)
-
 ---
 
 ## 📊 Performance Considerations
@@ -1010,25 +1361,14 @@ CREATE TABLE municipalities (
 
 ### Unit Tests
 - **Target**: Domain models, services, validators
-- **Coverage**: > 80%
+- **Coverage**: > 90%
 - **Tools**: JUnit 5, Mockito
 - **Focus**: Business logic, validations
 
-### Integration Tests
-- **Target**: Repositories, adapters
-- **Tools**: Testcontainers (MySQL), Spring Boot Test
-- **Focus**: Database interactions, constraints
-
-### API Tests
+### Controller Tests
 - **Target**: Controllers
-- **Tools**: MockMvc, RestAssured
-- **Focus**: HTTP status, headers, body, error handling
-
-### E2E Tests
-- **Target**: Complete flows
-- **Scenarios**:
-  - Create department → Create municipality → List → Search
-  - Try delete department with municipalities → Verify 409
+- **Tools**: JUnit 5, Mockito
+- **Focus**: Status codes y body (sin MockMvc)
 
 ### Performance Tests
 - **Tool**: JMeter
@@ -1090,11 +1430,6 @@ CREATE TABLE municipalities (
         <scope>test</scope>
     </dependency>
     
-    <dependency>
-        <groupId>org.testcontainers</groupId>
-        <artifactId>mysql</artifactId>
-        <scope>test</scope>
-    </dependency>
 </dependencies>
 ```
 

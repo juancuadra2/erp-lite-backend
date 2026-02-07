@@ -359,7 +359,7 @@ Los siguientes elementos **NO** están incluidos en esta versión:
 ### Reliability
 - Validaciones en múltiples capas (API, dominio, BD)
 - Transacciones para operaciones críticas
-- Tests de cobertura > 80%
+- Tests de cobertura > 90%
 
 ---
 
@@ -383,7 +383,7 @@ Los siguientes elementos **NO** están incluidos en esta versión:
 1. ✅ Todos los 17 endpoints funcionando correctamente
 2. ✅ Validaciones de negocio implementadas
 3. ✅ Importación de datos de Colombia exitosa
-4. ✅ Tests con cobertura > 80%
+4. ✅ Tests con cobertura > 90%
 5. ✅ Documentación API actualizada (Swagger)
 6. ✅ Performance dentro de objetivos
 7. ✅ Auditoría funcionando en todas las operaciones

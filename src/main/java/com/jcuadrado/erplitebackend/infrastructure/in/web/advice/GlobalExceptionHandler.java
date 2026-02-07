@@ -3,6 +3,12 @@ package com.jcuadrado.erplitebackend.infrastructure.in.web.advice;
 import com.jcuadrado.erplitebackend.domain.exception.documenttypes.DocumentTypeNotFoundException;
 import com.jcuadrado.erplitebackend.domain.exception.documenttypes.DuplicateCodeException;
 import com.jcuadrado.erplitebackend.domain.exception.documenttypes.InvalidDocumentTypeException;
+import com.jcuadrado.erplitebackend.domain.exception.geography.DepartmentNotFoundException;
+import com.jcuadrado.erplitebackend.domain.exception.geography.DuplicateDepartmentCodeException;
+import com.jcuadrado.erplitebackend.domain.exception.geography.DuplicateMunicipalityCodeException;
+import com.jcuadrado.erplitebackend.domain.exception.geography.GeographyConstraintException;
+import com.jcuadrado.erplitebackend.domain.exception.geography.InvalidGeographyException;
+import com.jcuadrado.erplitebackend.domain.exception.geography.MunicipalityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -90,6 +96,99 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
+
+    // ==================== Geography Exception Handlers ====================
+
+    /**
+     * Handle DepartmentNotFoundException (404)
+     */
+    @ExceptionHandler(DepartmentNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleDepartmentNotFound(DepartmentNotFoundException ex) {
+        log.error("Department not found: {}", ex.getMessage());
+        ErrorResponse error = ErrorResponse.builder()
+            .timestamp(LocalDateTime.now())
+            .status(HttpStatus.NOT_FOUND.value())
+            .error("Not Found")
+            .message(ex.getMessage())
+            .build();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
+    /**
+     * Handle MunicipalityNotFoundException (404)
+     */
+    @ExceptionHandler(MunicipalityNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleMunicipalityNotFound(MunicipalityNotFoundException ex) {
+        log.error("Municipality not found: {}", ex.getMessage());
+        ErrorResponse error = ErrorResponse.builder()
+            .timestamp(LocalDateTime.now())
+            .status(HttpStatus.NOT_FOUND.value())
+            .error("Not Found")
+            .message(ex.getMessage())
+            .build();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
+    /**
+     * Handle DuplicateDepartmentCodeException (409)
+     */
+    @ExceptionHandler(DuplicateDepartmentCodeException.class)
+    public ResponseEntity<ErrorResponse> handleDuplicateDepartmentCode(DuplicateDepartmentCodeException ex) {
+        log.warn("Duplicate department code: {}", ex.getMessage());
+        ErrorResponse error = ErrorResponse.builder()
+            .timestamp(LocalDateTime.now())
+            .status(HttpStatus.CONFLICT.value())
+            .error("Conflict")
+            .message(ex.getMessage())
+            .build();
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
+    /**
+     * Handle DuplicateMunicipalityCodeException (409)
+     */
+    @ExceptionHandler(DuplicateMunicipalityCodeException.class)
+    public ResponseEntity<ErrorResponse> handleDuplicateMunicipalityCode(DuplicateMunicipalityCodeException ex) {
+        log.warn("Duplicate municipality code: {}", ex.getMessage());
+        ErrorResponse error = ErrorResponse.builder()
+            .timestamp(LocalDateTime.now())
+            .status(HttpStatus.CONFLICT.value())
+            .error("Conflict")
+            .message(ex.getMessage())
+            .build();
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
+    /**
+     * Handle GeographyConstraintException (409)
+     */
+    @ExceptionHandler(GeographyConstraintException.class)
+    public ResponseEntity<ErrorResponse> handleGeographyConstraint(GeographyConstraintException ex) {
+        log.warn("Geography constraint violation: {}", ex.getMessage());
+        ErrorResponse error = ErrorResponse.builder()
+            .timestamp(LocalDateTime.now())
+            .status(HttpStatus.CONFLICT.value())
+            .error("Conflict")
+            .message(ex.getMessage())
+            .build();
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
+    /**
+     * Handle InvalidGeographyException (400)
+     */
+    @ExceptionHandler(InvalidGeographyException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidGeography(InvalidGeographyException ex) {
+        ErrorResponse error = ErrorResponse.builder()
+            .timestamp(LocalDateTime.now())
+            .status(HttpStatus.BAD_REQUEST.value())
+            .error("Bad Request")
+            .message(ex.getMessage())
+            .build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    // ==================== Generic Exception Handlers ====================
 
     /**
      * Handle IllegalStateException (400)
