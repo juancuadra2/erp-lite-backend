@@ -100,6 +100,23 @@ docker-compose down -v
   - Usuario: `erplite`
   - Password: `erplite_pass`
 - **Volumen persistente**: `mysql_data`
+- **Init Scripts**: `docker/mysql-init/` montado en `/docker-entrypoint-initdb.d`
+
+### Migraciones MySQL (Docker Init)
+
+Al iniciar MySQL por primera vez (volumen vacío), se ejecutan automáticamente los scripts SQL en `docker/mysql-init/` en orden alfabético:
+
+| Script | Descripción |
+|--------|-------------|
+| `00_flyway_schema_history.sql` | Crea tabla `flyway_schema_history` con registros V1-V4 para compatibilidad con Flyway |
+| `01_create_document_types_tables.sql` | Crea tabla `document_types` |
+| `02_insert_colombia_document_types.sql` | Inserta tipos de documento colombianos (NIT, CC, CE, PA, TI, RC) |
+| `03_create_geography_tables.sql` | Crea tablas `departments` y `municipalities` |
+| `04_insert_colombia_geography.sql` | Inserta 33 departamentos y municipios principales de Colombia |
+
+> **Nota**: Los scripts solo se ejecutan cuando el volumen `mysql_data` está vacío (primera vez). Para forzar la re-ejecución: `docker-compose down -v && docker-compose up -d`
+
+> **Compatibilidad Flyway**: El script `00_flyway_schema_history.sql` pre-registra las migraciones V1-V4, evitando que Flyway intente re-ejecutarlas cuando la app inicie.
 
 ### Spring Boot Application
 

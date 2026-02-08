@@ -22,9 +22,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Global exception handler for REST controllers
+ * Global exception handler for REST controllers.
+ * Scoped to application controllers only to avoid intercepting third-party controllers (e.g., springdoc).
  */
-@RestControllerAdvice
+@RestControllerAdvice(basePackages = "com.jcuadrado.erplitebackend")
 @Slf4j
 public class GlobalExceptionHandler {
 
@@ -209,6 +210,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
+        log.error("Unhandled exception: {}", ex.getMessage(), ex);
         ErrorResponse error = ErrorResponse.builder()
             .timestamp(LocalDateTime.now())
             .status(HttpStatus.INTERNAL_SERVER_ERROR.value())

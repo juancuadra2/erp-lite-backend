@@ -3,6 +3,7 @@ services:
     image: mysql:8.0
     container_name: erplite-mysql
     restart: unless-stopped
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --default-authentication-plugin=mysql_native_password --init-connect='SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci'
     environment:
       MYSQL_ROOT_PASSWORD: root_password
       MYSQL_DATABASE: cs_solutions_erp_lite
@@ -12,6 +13,7 @@ services:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+      - ./mysql-init:/docker-entrypoint-initdb.d
     networks:
       - erplite-network
     healthcheck:
@@ -24,17 +26,20 @@ services:
   app:
     build:
       context: ..
-      dockerfile: Dockerfile
+      dockerfile: docker/Dockerfile
     container_name: erplite-backend
     restart: unless-stopped
     ports:
       - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/cs_solutions_erp_lite?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/cs_solutions_erp_lite?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&characterEncoding=UTF-8&connectionCollation=utf8mb4_unicode_ci
       SPRING_DATASOURCE_USERNAME: erplite
       SPRING_DATASOURCE_PASSWORD: erplite_pass
-      SPRING_FLYWAY_ENABLED: "true"
-      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
+      SPRING_FLYWAY_ENABLED: "false"
+      SPRING_JPA_HIBERNATE_DDL_AUTO: none
+      LOG_PATH: /var/log
+    volumes:
+      - app_logs:/var/log/erp-lite-backend
     depends_on:
       mysql:
         condition: service_healthy
@@ -49,6 +54,8 @@ services:
 
 volumes:
   mysql_data:
+    driver: local
+  app_logs:
     driver: local
 
 networks:
