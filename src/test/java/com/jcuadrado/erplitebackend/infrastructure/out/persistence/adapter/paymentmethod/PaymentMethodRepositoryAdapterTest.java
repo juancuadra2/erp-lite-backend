@@ -7,6 +7,7 @@ import com.jcuadrado.erplitebackend.infrastructure.out.persistence.PaymentMethod
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -155,7 +156,7 @@ class PaymentMethodRepositoryAdapterTest {
         List<PaymentMethodEntity> entities = Arrays.asList(entity);
         Page<PaymentMethodEntity> entityPage = new PageImpl<>(entities, pageable, 1);
 
-        when(jpaRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(entityPage);
+        when(jpaRepository.findAll(ArgumentMatchers.<Specification<PaymentMethodEntity>>any(), any(Pageable.class))).thenReturn(entityPage);
         when(mapper.toDomain(entity)).thenReturn(domainObject);
 
         // When
@@ -165,7 +166,7 @@ class PaymentMethodRepositoryAdapterTest {
         assertThat(result).isNotNull();
         assertThat(result.getContent()).hasSize(1);
         assertThat(result.getContent().get(0)).isEqualTo(domainObject);
-        verify(jpaRepository).findAll(any(Specification.class), any(Pageable.class));
+        verify(jpaRepository).findAll(ArgumentMatchers.<Specification<PaymentMethodEntity>>any(), any(Pageable.class));
     }
 
     @Test
@@ -175,7 +176,7 @@ class PaymentMethodRepositoryAdapterTest {
         Pageable pageable = PageRequest.of(0, 10);
         Page<PaymentMethodEntity> emptyPage = new PageImpl<>(Collections.emptyList(), pageable, 0);
 
-        when(jpaRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(emptyPage);
+        when(jpaRepository.findAll(ArgumentMatchers.<Specification<PaymentMethodEntity>>any(), any(Pageable.class))).thenReturn(emptyPage);
 
         // When
         Page<PaymentMethod> result = adapter.findAll(filters, pageable);

@@ -27,7 +27,7 @@ public class MDCFilter implements Filter {
 
     private static final String REQUEST_ID = "requestId";
     private static final String CORRELATION_ID = "correlationId";
-    private static final String USER_ID = "userId";
+    //private static final String USER_ID = "userId";
 
     private static final String HEADER_REQUEST_ID = "X-Request-ID";
     private static final String HEADER_CORRELATION_ID = "X-Correlation-ID";

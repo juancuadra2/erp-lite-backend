@@ -209,7 +209,7 @@ class PaymentMethodControllerTest {
         List<PaymentMethod> paymentMethods = Arrays.asList(paymentMethod1, paymentMethod2);
         Page<PaymentMethod> page = new PageImpl<>(paymentMethods);
 
-        when(compareUseCase.findAll(any(Map.class), any(Pageable.class))).thenReturn(page);
+        when(compareUseCase.findAll(anyMap(), any(Pageable.class))).thenReturn(page);
         when(mapper.toResponseDto(any(PaymentMethod.class))).thenAnswer(invocation -> 
             createResponseDto(invocation.getArgument(0)));
 
@@ -219,7 +219,7 @@ class PaymentMethodControllerTest {
         // Then
         assertNotNull(response);
         assertEquals(200, response.getStatusCode().value());
-        verify(compareUseCase).findAll(any(Map.class), any(Pageable.class));
+        verify(compareUseCase).findAll(anyMap(), any(Pageable.class));
     }
 
     @Test
@@ -233,7 +233,7 @@ class PaymentMethodControllerTest {
 
         Page<PaymentMethod> page = new PageImpl<>(Collections.singletonList(paymentMethod));
 
-        when(compareUseCase.findAll(any(Map.class), any(Pageable.class))).thenReturn(page);
+        when(compareUseCase.findAll(anyMap(), any(Pageable.class))).thenReturn(page);
         when(mapper.toResponseDto(any(PaymentMethod.class))).thenAnswer(invocation -> 
             createResponseDto(invocation.getArgument(0)));
 
@@ -259,7 +259,7 @@ class PaymentMethodControllerTest {
 
         Page<PaymentMethod> page = new PageImpl<>(Collections.singletonList(paymentMethod));
 
-        when(compareUseCase.findAll(any(Map.class), any(Pageable.class))).thenReturn(page);
+        when(compareUseCase.findAll(anyMap(), any(Pageable.class))).thenReturn(page);
         when(mapper.toResponseDto(any(PaymentMethod.class))).thenAnswer(invocation -> 
             createResponseDto(invocation.getArgument(0)));
 
@@ -279,7 +279,7 @@ class PaymentMethodControllerTest {
         // Given
         Page<PaymentMethod> page = new PageImpl<>(Collections.emptyList());
 
-        when(compareUseCase.findAll(any(Map.class), any(Pageable.class))).thenReturn(page);
+        when(compareUseCase.findAll(anyMap(), any(Pageable.class))).thenReturn(page);
 
         // When
         ResponseEntity<?> response = controller.list(null, "  ", 0, 10, "code", "asc");
@@ -296,7 +296,7 @@ class PaymentMethodControllerTest {
         // Given
         Page<PaymentMethod> page = new PageImpl<>(Collections.emptyList());
 
-        when(compareUseCase.findAll(any(Map.class), any(Pageable.class))).thenReturn(page);
+        when(compareUseCase.findAll(anyMap(), any(Pageable.class))).thenReturn(page);
 
         // When
         ResponseEntity<?> response = controller.list(null, null, 0, 10, "name", "desc");
@@ -304,7 +304,7 @@ class PaymentMethodControllerTest {
         // Then
         assertNotNull(response);
         assertEquals(200, response.getStatusCode().value());
-        verify(compareUseCase).findAll(any(Map.class), any(Pageable.class));
+        verify(compareUseCase).findAll(anyMap(), any(Pageable.class));
     }
 
     // ==================== getAllActive Tests ====================

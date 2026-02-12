@@ -59,7 +59,7 @@ public class ManageMunicipalityUseCaseImpl implements ManageMunicipalityUseCase 
 
     @Override
     public void delete(UUID uuid) {
-        Municipality existing = municipalityRepository.findByUuid(uuid)
+        municipalityRepository.findByUuid(uuid)
                 .orElseThrow(() -> new MunicipalityNotFoundException(uuid));
 
         municipalityRepository.deleteByUuid(uuid);
