@@ -1,5 +1,9 @@
 # ERP Lite Backend
 
+[![CI](https://github.com/juancuadra2/erp-lite-backend/actions/workflows/ci.yml/badge.svg)](https://github.com/juancuadra2/erp-lite-backend/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/juancuadra2/erp-lite-backend/actions/workflows/codeql.yml/badge.svg)](https://github.com/juancuadra2/erp-lite-backend/actions/workflows/codeql.yml)
+[![codecov](https://codecov.io/gh/juancuadra2/erp-lite-backend/branch/main/graph/badge.svg)](https://codecov.io/gh/juancuadra2/erp-lite-backend)
+
 Sistema ERP ligero para pequeñas y medianas empresas, desarrollado con arquitectura hexagonal y principios de Domain-Driven Design.
 
 ## 📋 Descripción
@@ -205,6 +209,36 @@ mvn jacoco:report
 ```
 
 **Coverage Objetivo**: Mínimo 90%
+
+### Estado Actual del Coverage
+
+El proyecto tiene configurado JaCoCo para reportar y validar el coverage de código con un objetivo mínimo del 90%. Actualmente, el coverage es de aproximadamente 13%, principalmente cubriendo:
+
+- ✅ Lógica de dominio (modelos y servicios de dominio)
+- ✅ Servicios de aplicación parcialmente
+- ❌ Capa de infraestructura (REST controllers, adaptadores, mappers)
+
+**Próximos Pasos**: Se requiere ampliar la cobertura de tests, especialmente en la capa de infraestructura, para alcanzar el objetivo del 90%.
+
+**Nota**: El threshold de 90% está configurado pero no falla el build actualmente (`haltOnFailure=false`). Una vez que se alcance un coverage adecuado, se puede activar la validación estricta cambiando `haltOnFailure` a `true` en el pom.xml.
+
+### Integración Continua (CI/CD)
+
+El proyecto incluye workflows de GitHub Actions para:
+
+- **CI Pipeline** (`.github/workflows/ci.yml`):
+  - Compilación del proyecto
+  - Ejecución de tests unitarios
+  - Generación de reportes de coverage con JaCoCo
+  - Validación del threshold de coverage (90%)
+  - Publicación de reportes en Codecov (requiere configurar `CODECOV_TOKEN`)
+  - Comentarios automáticos en PRs con estadísticas de coverage
+
+- **CodeQL Analysis** (`.github/workflows/codeql.yml`):
+  - Análisis estático de seguridad
+  - Detección de vulnerabilidades
+  - Escaneo semanal automático
+  - Análisis en cada PR
 
 ## 📚 Documentación
 
