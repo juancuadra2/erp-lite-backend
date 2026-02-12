@@ -26,7 +26,7 @@ public class PaymentMethodValidator {
             throw new InvalidPaymentMethodCodeException("Payment method code cannot be empty");
         }
 
-        String trimmedCode = code.trim().toUpperCase();
+        String trimmedCode = code.trim();
 
         if (trimmedCode.length() > CODE_MAX_LENGTH) {
             throw new InvalidPaymentMethodCodeException(
