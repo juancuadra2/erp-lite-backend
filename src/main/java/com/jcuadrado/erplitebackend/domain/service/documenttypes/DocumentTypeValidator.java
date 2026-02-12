@@ -46,7 +46,7 @@ public class DocumentTypeValidator {
      * Rules: 1-200 characters, required
      */
     public void validateName(String name) {
-        if (name == null || name.trim().isEmpty()) {
+        if (name == null) {
             throw new InvalidDocumentTypeException("name", "Name is required");
         }
 

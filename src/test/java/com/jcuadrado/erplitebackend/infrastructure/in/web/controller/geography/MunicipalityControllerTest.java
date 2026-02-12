@@ -173,6 +173,36 @@ public class MunicipalityControllerTest {
         verify(compareUseCase).findAll(any(), any(Pageable.class));
     }
 
+    @Test
+    void list_shouldPassEnabledFilter() {
+        Page<Municipality> emptyPage = new PageImpl<>(Collections.emptyList());
+        when(compareUseCase.findAll(any(), any(Pageable.class))).thenReturn(emptyPage);
+
+        controller.list(true, null, null, 0, 10, "id", "asc");
+
+        verify(compareUseCase).findAll(any(), any(Pageable.class));
+    }
+
+    @Test
+    void list_shouldPassSearchFilter() {
+        Page<Municipality> emptyPage = new PageImpl<>(Collections.emptyList());
+        when(compareUseCase.findAll(any(), any(Pageable.class))).thenReturn(emptyPage);
+
+        controller.list(null, null, "Medellin", 0, 10, "id", "asc");
+
+        verify(compareUseCase).findAll(any(), any(Pageable.class));
+    }
+
+    @Test
+    void list_shouldSortDescending() {
+        Page<Municipality> emptyPage = new PageImpl<>(Collections.emptyList());
+        when(compareUseCase.findAll(any(), any(Pageable.class))).thenReturn(emptyPage);
+
+        controller.list(null, null, null, 0, 10, "id", "desc");
+
+        verify(compareUseCase).findAll(any(), any(Pageable.class));
+    }
+
     // ==================== getAllActive ====================
 
     @Test

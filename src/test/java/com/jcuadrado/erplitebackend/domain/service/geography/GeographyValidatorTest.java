@@ -92,7 +92,7 @@ class GeographyValidatorTest {
     void validateName_shouldThrowWhenNameIsNullOrBlank(String name) {
         assertThatThrownBy(() -> validator.validateName(name))
                 .isInstanceOf(InvalidGeographyException.class)
-                .hasMessageContaining("Name is required");
+                .hasMessageContaining(name == null ? "Name is required" : "Name cannot be empty");
     }
 
     @Test
@@ -130,7 +130,7 @@ class GeographyValidatorTest {
     void validateDepartment_shouldThrowWhenNameIsInvalid() {
         assertThatThrownBy(() -> validator.validateDepartment("05", ""))
                 .isInstanceOf(InvalidGeographyException.class)
-                .hasMessageContaining("Name is required");
+                .hasMessageContaining("Name cannot be empty");
     }
 
     @Test
@@ -149,6 +149,6 @@ class GeographyValidatorTest {
     void validateMunicipality_shouldThrowWhenNameIsInvalid() {
         assertThatThrownBy(() -> validator.validateMunicipality("05001", ""))
                 .isInstanceOf(InvalidGeographyException.class)
-                .hasMessageContaining("Name is required");
+                .hasMessageContaining("Name cannot be empty");
     }
 }

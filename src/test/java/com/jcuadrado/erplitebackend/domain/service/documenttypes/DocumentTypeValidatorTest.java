@@ -93,7 +93,7 @@ class DocumentTypeValidatorTest {
         // When & Then
         assertThatThrownBy(() -> validator.validateName(name))
                 .isInstanceOf(InvalidDocumentTypeException.class)
-                .hasMessageContaining("Name is required");
+                .hasMessageContaining(name == null ? "Name is required" : "Name cannot be empty");
     }
 
     @Test
@@ -186,7 +186,7 @@ class DocumentTypeValidatorTest {
         // When & Then
         assertThatThrownBy(() -> validator.validateAll(code, invalidName, description))
                 .isInstanceOf(InvalidDocumentTypeException.class)
-                .hasMessageContaining("Name is required");
+                .hasMessageContaining("Name cannot be empty");
     }
 
     @Test

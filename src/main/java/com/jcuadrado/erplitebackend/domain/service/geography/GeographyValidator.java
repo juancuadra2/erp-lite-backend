@@ -36,7 +36,7 @@ public class GeographyValidator {
     }
 
     public void validateName(String name) {
-        if (name == null || name.trim().isEmpty()) {
+        if (name == null) {
             throw new InvalidGeographyException("name", "Name is required");
         }
         String trimmedName = name.trim();
