@@ -3,10 +3,13 @@ package com.jcuadrado.erplitebackend.infrastructure.config;
 import com.jcuadrado.erplitebackend.domain.port.documenttypes.DocumentTypeRepository;
 import com.jcuadrado.erplitebackend.domain.port.geography.DepartmentRepository;
 import com.jcuadrado.erplitebackend.domain.port.geography.MunicipalityRepository;
+import com.jcuadrado.erplitebackend.domain.port.paymentmethod.PaymentMethodRepository;
 import com.jcuadrado.erplitebackend.domain.service.documenttypes.DocumentTypeDomainService;
 import com.jcuadrado.erplitebackend.domain.service.documenttypes.DocumentTypeValidator;
 import com.jcuadrado.erplitebackend.domain.service.geography.GeographyDomainService;
 import com.jcuadrado.erplitebackend.domain.service.geography.GeographyValidator;
+import com.jcuadrado.erplitebackend.domain.service.paymentmethod.PaymentMethodDomainService;
+import com.jcuadrado.erplitebackend.domain.service.paymentmethod.PaymentMethodValidator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -53,6 +56,26 @@ public class BeanConfiguration {
             MunicipalityRepository municipalityRepository,
             GeographyValidator geographyValidator) {
         return new GeographyDomainService(departmentRepository, municipalityRepository, geographyValidator);
+    }
+
+    // ==================== Payment Method Beans ====================
+
+    /**
+     * Bean for PaymentMethodValidator
+     */
+    @Bean
+    public PaymentMethodValidator paymentMethodValidator() {
+        return new PaymentMethodValidator();
+    }
+
+    /**
+     * Bean for PaymentMethodDomainService
+     */
+    @Bean
+    public PaymentMethodDomainService paymentMethodDomainService(
+            PaymentMethodRepository repository,
+            PaymentMethodValidator validator) {
+        return new PaymentMethodDomainService(repository, validator);
     }
 }
 

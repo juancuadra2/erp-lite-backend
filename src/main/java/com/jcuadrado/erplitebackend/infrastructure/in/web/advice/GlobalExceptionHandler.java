@@ -9,6 +9,11 @@ import com.jcuadrado.erplitebackend.domain.exception.geography.DuplicateMunicipa
 import com.jcuadrado.erplitebackend.domain.exception.geography.GeographyConstraintException;
 import com.jcuadrado.erplitebackend.domain.exception.geography.InvalidGeographyException;
 import com.jcuadrado.erplitebackend.domain.exception.geography.MunicipalityNotFoundException;
+import com.jcuadrado.erplitebackend.domain.exception.paymentmethod.DuplicatePaymentMethodCodeException;
+import com.jcuadrado.erplitebackend.domain.exception.paymentmethod.InvalidPaymentMethodCodeException;
+import com.jcuadrado.erplitebackend.domain.exception.paymentmethod.InvalidPaymentMethodDataException;
+import com.jcuadrado.erplitebackend.domain.exception.paymentmethod.PaymentMethodConstraintException;
+import com.jcuadrado.erplitebackend.domain.exception.paymentmethod.PaymentMethodNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -187,6 +192,83 @@ public class GlobalExceptionHandler {
             .message(ex.getMessage())
             .build();
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    // ==================== Payment Method Exception Handlers ====================
+
+    /**
+     * Handle PaymentMethodNotFoundException (404)
+     */
+    @ExceptionHandler(PaymentMethodNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handlePaymentMethodNotFound(PaymentMethodNotFoundException ex) {
+        log.error("Payment method not found: {}", ex.getMessage());
+        ErrorResponse error = ErrorResponse.builder()
+            .timestamp(LocalDateTime.now())
+            .status(HttpStatus.NOT_FOUND.value())
+            .error("Not Found")
+            .message(ex.getMessage())
+            .build();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
+    /**
+     * Handle DuplicatePaymentMethodCodeException (409)
+     */
+    @ExceptionHandler(DuplicatePaymentMethodCodeException.class)
+    public ResponseEntity<ErrorResponse> handleDuplicatePaymentMethodCode(DuplicatePaymentMethodCodeException ex) {
+        log.warn("Duplicate payment method code: {}", ex.getMessage());
+        ErrorResponse error = ErrorResponse.builder()
+            .timestamp(LocalDateTime.now())
+            .status(HttpStatus.CONFLICT.value())
+            .error("Conflict")
+            .message(ex.getMessage())
+            .build();
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
+    /**
+     * Handle InvalidPaymentMethodCodeException (400)
+     */
+    @ExceptionHandler(InvalidPaymentMethodCodeException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidPaymentMethodCode(InvalidPaymentMethodCodeException ex) {
+        log.warn("Invalid payment method code: {}", ex.getMessage());
+        ErrorResponse error = ErrorResponse.builder()
+            .timestamp(LocalDateTime.now())
+            .status(HttpStatus.BAD_REQUEST.value())
+            .error("Bad Request")
+            .message(ex.getMessage())
+            .build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    /**
+     * Handle InvalidPaymentMethodDataException (400)
+     */
+    @ExceptionHandler(InvalidPaymentMethodDataException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidPaymentMethodData(InvalidPaymentMethodDataException ex) {
+        log.warn("Invalid payment method data: {}", ex.getMessage());
+        ErrorResponse error = ErrorResponse.builder()
+            .timestamp(LocalDateTime.now())
+            .status(HttpStatus.BAD_REQUEST.value())
+            .error("Bad Request")
+            .message(ex.getMessage())
+            .build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    /**
+     * Handle PaymentMethodConstraintException (409)
+     */
+    @ExceptionHandler(PaymentMethodConstraintException.class)
+    public ResponseEntity<ErrorResponse> handlePaymentMethodConstraint(PaymentMethodConstraintException ex) {
+        log.warn("Payment method constraint violation: {}", ex.getMessage());
+        ErrorResponse error = ErrorResponse.builder()
+            .timestamp(LocalDateTime.now())
+            .status(HttpStatus.CONFLICT.value())
+            .error("Conflict")
+            .message(ex.getMessage())
+            .build();
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
 
     // ==================== Generic Exception Handlers ====================
