@@ -1,0 +1,416 @@
+{
+  "feature": "payment-methods",
+  "version": "1.0.0",
+  "lastUpdated": "2026-02-11T00:00:00Z",
+  "summary": {
+    "total": 29,
+    "completed": 0,
+    "inProgress": 0,
+    "blocked": 0,
+    "pending": 29
+  },
+  "phases": [
+    {
+      "id": "phase-0",
+      "name": "Pre-Implementation Validation",
+      "order": 0,
+      "status": "pending",
+      "tasks": [
+        {
+          "id": "T000",
+          "title": "Validar alineación y aprobación de specs",
+          "description": "Confirmar que 1-functional-spec.md y 2-technical-spec.md están alineados y aprobados antes de iniciar la implementación",
+          "phase": "phase-0",
+          "status": "pending",
+          "priority": "high",
+          "estimatedHours": 1,
+          "dependencies": [],
+          "tags": ["validation", "spec"]
+        }
+      ]
+    },
+    {
+      "id": "phase-1",
+      "name": "Foundation & Domain Models",
+      "order": 1,
+      "status": "pending",
+      "tasks": [
+        {
+          "id": "T001",
+          "title": "Crear entidad de dominio PaymentMethod",
+          "description": "Crear modelo de dominio puro PaymentMethod (Aggregate Root) en domain/model/paymentmethod/. Incluir atributos según spec (code, name, enabled + audit), métodos de negocio (activate, deactivate, isActive)",
+          "phase": "phase-1",
+          "status": "pending",
+          "priority": "high",
+          "estimatedHours": 2,
+          "dependencies": [],
+          "tags": ["domain", "model"]
+        },
+        {
+          "id": "T002",
+          "title": "Crear excepciones específicas del dominio",
+          "description": "Crear excepciones en domain/exception/paymentmethod/: PaymentMethodNotFoundException, DuplicatePaymentMethodCodeException, InvalidPaymentMethodCodeException, InvalidPaymentMethodDataException, PaymentMethodConstraintException",
+          "phase": "phase-1",
+          "status": "pending",
+          "priority": "high",
+          "estimatedHours": 1,
+          "dependencies": ["T001"],
+          "tags": ["domain", "exception"]
+        },
+        {
+          "id": "T003",
+          "title": "Implementar PaymentMethodDomainService",
+          "description": "Crear PaymentMethodDomainService con reglas de negocio: validateCode (formato, max 30, uppercase+numbers+_), validateName (obligatorio, max 100), canBeDeleted (verificar transacciones). Incluir tests unitarios > 90%",
+          "phase": "phase-1",
+          "status": "pending",
+          "priority": "high",
+          "estimatedHours": 2,
+          "dependencies": ["T001", "T002"],
+          "tags": ["domain", "service"]
+        },
+        {
+          "id": "T004",
+          "title": "Implementar PaymentMethodValidationService",
+          "description": "Crear PaymentMethodValidationService con método: ensureCodeIsUnique. Incluir tests unitarios",
+          "phase": "phase-1",
+          "status": "pending",
+          "priority": "high",
+          "estimatedHours": 2,
+          "dependencies": ["T003"],
+          "tags": ["domain", "service", "validation"]
+        }
+      ]
+    },
+    {
+      "id": "phase-2",
+      "name": "Database Schema & Migrations",
+      "order": 2,
+      "status": "pending",
+      "tasks": [
+        {
+          "id": "T005",
+          "title": "Crear migración V1.5 para tabla payment_methods",
+          "description": "Crear V1.5__create_payment_methods_table.sql con tabla payment_methods (id, uuid, code, name, enabled + audit), índices (uuid, code, enabled), constraints (UNIQUE)",
+          "phase": "phase-2",
+          "status": "pending",
+          "priority": "high",
+          "estimatedHours": 2,
+          "dependencies": ["T004"],
+          "tags": ["database", "migration"]
+        },
+        {
+          "id": "T006",
+          "title": "Crear migración V1.6 con seed data de Colombia",
+          "description": "Crear V1.6__insert_colombia_payment_methods.sql con 7 métodos de pago iniciales (solo code + name): CASH (Efectivo), CC (Tarjeta de Crédito), DC (Tarjeta Débito), TRANSFER (Transferencia Bancaria), PSE, CHECK (Cheque), CREDIT (Crédito). Con INSERT ON DUPLICATE KEY UPDATE para idempotencia",
+          "phase": "phase-2",
+          "status": "pending",
+          "priority": "high",
+          "estimatedHours": 1,
+          "dependencies": ["T005"],
+          "tags": ["database", "migration", "seed-data"]
+        }
+      ]
+    },
+    {
+      "id": "phase-3",
+      "name": "Domain Ports & Application Layer",
+      "order": 3,
+      "status": "pending",
+      "tasks": [
+        {
+          "id": "T007",
+          "title": "Crear puerto de salida PaymentMethodRepository",
+          "description": "Crear interfaz PaymentMethodRepository en domain/port/out/paymentmethod/ con métodos: save, findByUuid, findByCode, delete, findAll, findByEnabled, findByNameContaining, existsByCode, existsByCodeAndUuidNot, countTransactionsWithPaymentMethod",
+          "phase": "phase-3",
+          "status": "pending",
+          "priority": "high",
+          "estimatedHours": 1,
+          "dependencies": ["T004"],
+          "tags": ["domain", "port", "repository"]
+        },
+        {
+          "id": "T008",
+          "title": "Crear puertos de entrada (Use Cases) - CQRS",
+          "description": "Crear 2 interfaces en application/port/in/paymentmethod/: ComparePaymentMethodsUseCase (getByUuid, getByCode, getAllActive, findAll, searchByName) y ManagePaymentMethodUseCase (create, update, activate, deactivate, delete)",
+          "phase": "phase-3",
+          "status": "pending",
+          "priority": "high",
+          "estimatedHours": 1,
+          "dependencies": ["T007"],
+          "tags": ["application", "port", "use-case", "cqrs"]
+        },
+        {
+          "id": "T009",
+          "title": "Implementar ComparePaymentMethodsUseCaseImpl",
+          "description": "Implementar casos de uso de consulta (Query side) en application/usecase/paymentmethod/. Con @Transactional(readOnly=true). Incluir tests unitarios con mocks",
+          "phase": "phase-3",
+          "status": "pending",
+          "priority": "high",
+          "estimatedHours": 2,
+          "dependencies": ["T008"],
+          "tags": ["application", "use-case", "query"]
+        },
+        {
+          "id": "T010",
+          "title": "Implementar ManagePaymentMethodUseCaseImpl",
+          "description": "Implementar casos de uso de comando (Command side) con validaciones completas. Con @Transactional. Incluir tests unitarios con mocks",
+          "phase": "phase-3",
+          "status": "pending",
+          "priority": "high",
+          "estimatedHours": 3,
+          "dependencies": ["T008"],
+          "tags": ["application", "use-case", "command"]
+        }
+      ]
+    },
+    {
+      "id": "phase-4",
+      "name": "Infrastructure - Persistence Layer",
+      "order": 4,
+      "status": "pending",
+      "tasks": [
+        {
+          "id": "T011",
+          "title": "Crear PaymentMethodEntity (JPA)",
+          "description": "Crear entidad JPA en infrastructure/out/persistence/entity/paymentmethod/ con anotaciones, índices, @PrePersist, @PreUpdate. Incluir tests unitarios básicos",
+          "phase": "phase-4",
+          "status": "pending",
+          "priority": "high",
+          "estimatedHours": 2,
+          "dependencies": ["T005"],
+          "tags": ["infrastructure", "persistence", "entity"]
+        },
+        {
+          "id": "T012",
+          "title": "Crear PaymentMethodJpaRepository",
+          "description": "Crear repositorio JPA en infrastructure/out/persistence/repository/paymentmethod/ extendiendo JpaRepository y JpaSpecificationExecutor. Con métodos custom y queries de conteo (countSalesWithPaymentMethod, countPurchasesWithPaymentMethod)",
+          "phase": "phase-4",
+          "status": "pending",
+          "priority": "high",
+          "estimatedHours": 1,
+          "dependencies": ["T011"],
+          "tags": ["infrastructure", "persistence", "repository"]
+        },
+        {
+          "id": "T013",
+          "title": "Crear PaymentMethodEntityMapper (MapStruct)",
+          "description": "Crear mapper MapStruct bidireccional en infrastructure/out/persistence/mapper/paymentmethod/ para conversión PaymentMethod <-> PaymentMethodEntity. Incluir tests",
+          "phase": "phase-4",
+          "status": "pending",
+          "priority": "high",
+          "estimatedHours": 1,
+          "dependencies": ["T011"],
+          "tags": ["infrastructure", "mapper", "mapstruct"]
+        },
+        {
+          "id": "T014",
+          "title": "Crear PaymentMethodSpecificationUtil",
+          "description": "Crear util en infrastructure/out/persistence/util/paymentmethod/ con métodos para construcción dinámica de Specifications (buildSpecification, hasEnabled, nameContains). Incluir tests",
+          "phase": "phase-4",
+          "status": "pending",
+          "priority": "high",
+          "estimatedHours": 2,
+          "dependencies": ["T012"],
+          "tags": ["infrastructure", "persistence", "util"]
+        },
+        {
+          "id": "T015",
+          "title": "Implementar PaymentMethodRepositoryAdapter",
+          "description": "Crear adapter @Component en infrastructure/out/persistence/adapter/paymentmethod/ implementando PaymentMethodRepository. Usar mapper y JpaRepository. Incluir tests unitarios con mocks",
+          "phase": "phase-4",
+          "status": "pending",
+          "priority": "high",
+          "estimatedHours": 2,
+          "dependencies": ["T012", "T013", "T014"],
+          "tags": ["infrastructure", "adapter", "persistence"]
+        }
+      ]
+    },
+    {
+      "id": "phase-5",
+      "name": "Infrastructure - Web/REST Layer",
+      "order": 5,
+      "status": "pending",
+      "tasks": [
+        {
+          "id": "T016",
+          "title": "Crear DTOs (Request y Response)",
+          "description": "Crear DTOs simplificados en infrastructure/in/web/dto/paymentmethod/: CreatePaymentMethodRequestDto (code, name), UpdatePaymentMethodRequestDto (code, name, enabled), PaymentMethodResponseDto (uuid, code, name, enabled, createdAt, updatedAt). Con validaciones Jakarta (@NotBlank, @Size, @Pattern)",
+          "phase": "phase-5",
+          "status": "pending",
+          "priority": "high",
+          "estimatedHours": 2,
+          "dependencies": [],
+          "tags": ["infrastructure", "web", "dto"]
+        },
+        {
+          "id": "T017",
+          "title": "Crear PaymentMethodDtoMapper (MapStruct)",
+          "description": "Crear mapper MapStruct en infrastructure/in/web/mapper/paymentmethod/ para conversión DTOs <-> Domain. Incluir tests",
+          "phase": "phase-5",
+          "status": "pending",
+          "priority": "high",
+          "estimatedHours": 1,
+          "dependencies": ["T016"],
+          "tags": ["infrastructure", "web", "mapper", "mapstruct"]
+        },
+        {
+          "id": "T018",
+          "title": "Implementar PaymentMethodController",
+          "description": "Crear controller REST en infrastructure/in/web/controller/paymentmethod/ con 8 endpoints (create, getByUuid, update, activate, deactivate, delete, list, search). Con anotaciones Swagger (@Operation, @ApiResponses, @Parameter). Incluir tests con MockMvc",
+          "phase": "phase-5",
+          "status": "pending",
+          "priority": "high",
+          "estimatedHours": 3,
+          "dependencies": ["T008", "T016", "T017"],
+          "tags": ["infrastructure", "web", "controller"]
+        }
+      ]
+    },
+    {
+      "id": "phase-6",
+      "name": "Configuration & Integration",
+      "order": 6,
+      "status": "pending",
+      "tasks": [
+        {
+          "id": "T019",
+          "title": "Actualizar BeanConfiguration",
+          "description": "Agregar beans de PaymentMethodDomainService y PaymentMethodValidationService a infrastructure/config/BeanConfiguration.java",
+          "phase": "phase-6",
+          "status": "pending",
+          "priority": "high",
+          "estimatedHours": 0.5,
+          "dependencies": ["T003", "T004"],
+          "tags": ["infrastructure", "config"]
+        },
+        {
+          "id": "T020",
+          "title": "Actualizar GlobalExceptionHandler",
+          "description": "Agregar manejo de excepciones de PaymentMethod a infrastructure/in/web/advice/GlobalExceptionHandler.java (PaymentMethodNotFoundException -> 404, DuplicatePaymentMethodCodeException -> 409, PaymentMethodConstraintException -> 409, InvalidPaymentMethodCodeException -> 400, etc.)",
+          "phase": "phase-6",
+          "status": "pending",
+          "priority": "high",
+          "estimatedHours": 1,
+          "dependencies": ["T002"],
+          "tags": ["infrastructure", "exception-handler"]
+        },
+        {
+          "id": "T021",
+          "title": "Ejecutar migraciones Flyway y verificar seed data",
+          "description": "Ejecutar aplicación, verificar que migraciones V1.5 y V1.6 se ejecutan correctamente, verificar que existen 7 métodos de pago en BD",
+          "phase": "phase-6",
+          "status": "pending",
+          "priority": "high",
+          "estimatedHours": 0.5,
+          "dependencies": ["T005", "T006", "T019"],
+          "tags": ["database", "verification"]
+        },
+        {
+          "id": "T022",
+          "title": "Verificar build Maven exitoso",
+          "description": "Ejecutar 'mvn clean compile' y verificar que no hay errores de compilación. Verificar que MapStruct genera correctamente los mappers durante la compilación",
+          "phase": "phase-6",
+          "status": "pending",
+          "priority": "high",
+          "estimatedHours": 0.5,
+          "dependencies": ["T019", "T020"],
+          "tags": ["build", "verification"]
+        }
+      ]
+    },
+    {
+      "id": "phase-7",
+      "name": "Testing - Unit Tests",
+      "order": 7,
+      "status": "pending",
+      "tasks": [
+        {
+          "id": "T023",
+          "title": "Tests unitarios de Domain Layer (model + services)",
+          "description": "Crear tests en test/.../domain/: PaymentMethodTest (métodos de negocio), PaymentMethodDomainServiceTest (todas las validaciones), PaymentMethodValidationServiceTest (ensureCodeIsUnique con mock repository). Target: > 95% coverage domain",
+          "phase": "phase-7",
+          "status": "pending",
+          "priority": "high",
+          "estimatedHours": 3,
+          "dependencies": ["T003", "T004"],
+          "tags": ["test", "unit", "domain"]
+        },
+        {
+          "id": "T024",
+          "title": "Tests unitarios de Application Layer (use cases)",
+          "description": "Crear tests en test/.../application/usecase/: ComparePaymentMethodsUseCaseTest, ManagePaymentMethodUseCaseTest. Con mocks del repository. Cubrir escenarios success y error. Target: > 90% coverage application",
+          "phase": "phase-7",
+          "status": "pending",
+          "priority": "high",
+          "estimatedHours": 4,
+          "dependencies": ["T009", "T010"],
+          "tags": ["test", "unit", "application"]
+        },
+        {
+          "id": "T025",
+          "title": "Tests unitarios de Infrastructure Layer (adapters, mappers, utils, controller)",
+          "description": "Crear tests en test/.../infrastructure/: PaymentMethodRepositoryAdapterTest (con mocks), PaymentMethodEntityMapperTest, PaymentMethodDtoMapperTest, PaymentMethodSpecificationUtilTest, PaymentMethodControllerTest (con MockMvc). Target: > 85% coverage infrastructure",
+          "phase": "phase-7",
+          "status": "pending",
+          "priority": "high",
+          "estimatedHours": 5,
+          "dependencies": ["T013", "T014", "T015", "T017", "T018"],
+          "tags": ["test", "unit", "infrastructure"]
+        },
+        {
+          "id": "T026",
+          "title": "Ejecutar todos los tests y verificar cobertura",
+          "description": "Ejecutar 'mvn clean test' y 'mvn jacoco:report'. Verificar que todos los tests pasan (0 fallos, 0 errores) y que la cobertura general es >= 85%. Verificar reporte HTML en target/site/jacoco/index.html",
+          "phase": "phase-7",
+          "status": "pending",
+          "priority": "high",
+          "estimatedHours": 1,
+          "dependencies": ["T023", "T024", "T025"],
+          "tags": ["test", "verification", "coverage"]
+        }
+      ]
+    },
+    {
+      "id": "phase-8",
+      "name": "Documentation & Final Verification",
+      "order": 8,
+      "status": "pending",
+      "tasks": [
+        {
+          "id": "T027",
+          "title": "Verificar documentación OpenAPI",
+          "description": "Iniciar aplicación y verificar Swagger UI en http://localhost:8080/swagger-ui.html. Verificar que todos los endpoints de PaymentMethod están documentados con descripciones, ejemplos, responses codes (200, 201, 400, 404, 409)",
+          "phase": "phase-8",
+          "status": "pending",
+          "priority": "high",
+          "estimatedHours": 1,
+          "dependencies": ["T018", "T021"],
+          "tags": ["documentation", "swagger", "verification"]
+        },
+        {
+          "id": "T028",
+          "title": "Crear README.md del módulo Payment Methods",
+          "description": "Crear README.md en specs/wip/payment-methods/ con: descripción del módulo, business rules, endpoints, estructura de código, ejemplos de uso, comandos útiles",
+          "phase": "phase-8",
+          "status": "pending",
+          "priority": "medium",
+          "estimatedHours": 1,
+          "dependencies": ["T027"],
+          "tags": ["documentation"]
+        },
+        {
+          "id": "T029",
+          "title": "Actualizar status.md final",
+          "description": "Actualizar status.md indicando que el módulo Payment Methods está 100% completo con todas las tareas finalizadas, número de tests, build status, y deployment readiness",
+          "phase": "phase-8",
+          "status": "pending",
+          "priority": "high",
+          "estimatedHours": 0.5,
+          "dependencies": ["T028"],
+          "tags": ["documentation", "tracking"]
+        }
+      ]
+    }
+  ]
+}
