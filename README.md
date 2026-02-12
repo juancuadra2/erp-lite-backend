@@ -204,7 +204,7 @@ mvn verify
 mvn jacoco:report
 ```
 
-**Coverage Objetivo**: Mínimo 80%
+**Coverage Objetivo**: Mínimo 90%
 
 ## 📚 Documentación
 
@@ -263,7 +263,7 @@ specs/
 - **Usuarios Concurrentes**: 50+
 - **Tiempo de Respuesta**: < 200ms (p95)
 - **Disponibilidad**: 99.5%
-- **Coverage de Tests**: > 80%
+- **Coverage de Tests**: > 90%
 
 ## 📈 Estado del Proyecto
 
