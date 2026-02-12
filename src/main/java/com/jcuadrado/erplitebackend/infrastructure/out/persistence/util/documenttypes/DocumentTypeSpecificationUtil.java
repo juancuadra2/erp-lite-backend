@@ -13,6 +13,10 @@ import java.util.Map;
  */
 public class DocumentTypeSpecificationUtil {
 
+    private DocumentTypeSpecificationUtil() {
+        throw new UnsupportedOperationException("Utility class cannot be instantiated");
+    }
+
     /**
      * Build specification from filter map
      * @param filters Map with filter criteria

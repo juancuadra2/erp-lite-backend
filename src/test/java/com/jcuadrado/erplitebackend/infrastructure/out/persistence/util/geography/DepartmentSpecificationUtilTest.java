@@ -11,10 +11,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -50,6 +53,20 @@ class DepartmentSpecificationUtilTest {
         lenient().when(criteriaBuilder.or(any(Predicate[].class))).thenReturn(predicate);
         lenient().when(criteriaBuilder.and(any(Predicate[].class))).thenReturn(predicate);
         lenient().when(criteriaBuilder.conjunction()).thenReturn(predicate);
+    }
+
+    @Test
+    @DisplayName("Should throw exception when trying to instantiate utility class")
+    void testPrivateConstructor() throws NoSuchMethodException {
+        // Given
+        Constructor<DepartmentSpecificationUtil> constructor = DepartmentSpecificationUtil.class.getDeclaredConstructor();
+        constructor.setAccessible(true);
+
+        // Then
+        assertThatThrownBy(constructor::newInstance)
+                .isInstanceOf(InvocationTargetException.class)
+                .hasCauseInstanceOf(UnsupportedOperationException.class)
+                .hasRootCauseMessage("Utility class cannot be instantiated");
     }
 
     @Test
@@ -194,6 +211,21 @@ class DepartmentSpecificationUtilTest {
     }
 
     @Test
+    @DisplayName("Should skip search filter when null")
+    void testExecuteSpecification_withNullSearch() {
+        // Given
+        Map<String, Object> filters = new HashMap<>();
+        filters.put("search", null);
+
+        // When
+        Specification<DepartmentEntity> spec = DepartmentSpecificationUtil.buildSpecification(filters);
+        spec.toPredicate(root, query, criteriaBuilder);
+
+        // Then
+        verify(criteriaBuilder, never()).like(ArgumentMatchers.<Expression<String>>any(), anyString());
+    }
+
+    @Test
     @DisplayName("Should skip search filter when empty")
     void testExecuteSpecification_withEmptySearch() {
         // Given
@@ -239,6 +271,21 @@ class DepartmentSpecificationUtilTest {
     }
 
     @Test
+    @DisplayName("Should skip code filter when whitespace")
+    void testExecuteSpecification_withWhitespaceCode() {
+        // Given
+        Map<String, Object> filters = new HashMap<>();
+        filters.put("code", "   ");
+
+        // When
+        Specification<DepartmentEntity> spec = DepartmentSpecificationUtil.buildSpecification(filters);
+        spec.toPredicate(root, query, criteriaBuilder);
+
+        // Then
+        verify(criteriaBuilder, never()).equal(path, "   ");
+    }
+
+    @Test
     @DisplayName("Should skip code filter when null")
     void testExecuteSpecification_withNullCode() {
         // Given
@@ -281,5 +328,65 @@ class DepartmentSpecificationUtilTest {
 
         // Then
         verify(criteriaBuilder).equal(path, "05");
+    }
+
+    @Test
+    @DisplayName("Should skip name filter when null")
+    void testExecuteSpecification_withNullName() {
+        // Given
+        Map<String, Object> filters = new HashMap<>();
+        filters.put("name", null);
+
+        // When
+        Specification<DepartmentEntity> spec = DepartmentSpecificationUtil.buildSpecification(filters);
+        spec.toPredicate(root, query, criteriaBuilder);
+
+        // Then
+        verify(criteriaBuilder, never()).like(ArgumentMatchers.<Expression<String>>any(), anyString());
+    }
+
+    @Test
+    @DisplayName("Should skip name filter when empty")
+    void testExecuteSpecification_withEmptyName() {
+        // Given
+        Map<String, Object> filters = new HashMap<>();
+        filters.put("name", "");
+
+        // When
+        Specification<DepartmentEntity> spec = DepartmentSpecificationUtil.buildSpecification(filters);
+        spec.toPredicate(root, query, criteriaBuilder);
+
+        // Then
+        verify(criteriaBuilder, never()).like(ArgumentMatchers.<Expression<String>>any(), anyString());
+    }
+
+    @Test
+    @DisplayName("Should skip name filter when whitespace")
+    void testExecuteSpecification_withWhitespaceName() {
+        // Given
+        Map<String, Object> filters = new HashMap<>();
+        filters.put("name", "   ");
+
+        // When
+        Specification<DepartmentEntity> spec = DepartmentSpecificationUtil.buildSpecification(filters);
+        spec.toPredicate(root, query, criteriaBuilder);
+
+        // Then
+        verify(criteriaBuilder, never()).like(ArgumentMatchers.<Expression<String>>any(), anyString());
+    }
+
+    @Test
+    @DisplayName("Should trim and lowercase name value")
+    void testExecuteSpecification_withNameValueWithSpaces() {
+        // Given
+        Map<String, Object> filters = new HashMap<>();
+        filters.put("name", "  Antioquia  ");
+
+        // When
+        Specification<DepartmentEntity> spec = DepartmentSpecificationUtil.buildSpecification(filters);
+        spec.toPredicate(root, query, criteriaBuilder);
+
+        // Then
+        verify(criteriaBuilder).like(ArgumentMatchers.<Expression<String>>any(), eq("%antioquia%"));
     }
 }

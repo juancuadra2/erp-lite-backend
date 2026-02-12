@@ -11,10 +11,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -50,6 +53,20 @@ class DocumentTypeSpecificationUtilTest {
         lenient().when(criteriaBuilder.or(any(Predicate[].class))).thenReturn(predicate);
         lenient().when(criteriaBuilder.and(any(Predicate[].class))).thenReturn(predicate);
         lenient().when(criteriaBuilder.conjunction()).thenReturn(predicate);
+    }
+
+    @Test
+    @DisplayName("Should throw exception when trying to instantiate utility class")
+    void testPrivateConstructor() throws NoSuchMethodException {
+        // Given
+        Constructor<DocumentTypeSpecificationUtil> constructor = DocumentTypeSpecificationUtil.class.getDeclaredConstructor();
+        constructor.setAccessible(true);
+
+        // Then
+        assertThatThrownBy(constructor::newInstance)
+                .isInstanceOf(InvocationTargetException.class)
+                .hasCauseInstanceOf(UnsupportedOperationException.class)
+                .hasRootCauseMessage("Utility class cannot be instantiated");
     }
 
     @Test
@@ -191,6 +208,21 @@ class DocumentTypeSpecificationUtilTest {
 
         // Then
         verify(criteriaBuilder, never()).equal(any(), any());
+    }
+
+    @Test
+    @DisplayName("Should skip search filter when null")
+    void testExecuteSpecification_withNullSearch() {
+        // Given
+        Map<String, Object> filters = new HashMap<>();
+        filters.put("search", null);
+
+        // When
+        Specification<DocumentTypeEntity> spec = DocumentTypeSpecificationUtil.buildSpecification(filters);
+        spec.toPredicate(root, query, criteriaBuilder);
+
+        // Then
+        verify(criteriaBuilder, never()).like(ArgumentMatchers.<Expression<String>>any(), anyString());
     }
 
     @Test

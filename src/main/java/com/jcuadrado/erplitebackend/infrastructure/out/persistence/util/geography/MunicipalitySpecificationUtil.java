@@ -10,6 +10,10 @@ import java.util.Map;
 
 public class MunicipalitySpecificationUtil {
 
+    private MunicipalitySpecificationUtil() {
+        throw new UnsupportedOperationException("Utility class cannot be instantiated");
+    }
+
     public static Specification<MunicipalityEntity> buildSpecification(Map<String, Object> filters) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
