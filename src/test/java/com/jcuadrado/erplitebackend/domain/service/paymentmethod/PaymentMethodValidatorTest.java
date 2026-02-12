@@ -174,6 +174,17 @@ class PaymentMethodValidatorTest {
     }
 
     @Test
+    void validateName_shouldThrowExceptionWhenNameIsNonWhitespaceButTrimsToEmpty() {
+        // Given
+        String name = "\u0000";
+
+        // When & Then
+        assertThatThrownBy(() -> validator.validateName(name))
+                .isInstanceOf(InvalidPaymentMethodDataException.class)
+                .hasMessageContaining("cannot be empty");
+    }
+
+    @Test
     void validateName_shouldThrowExceptionWhenNameExceedsMaxLength() {
         // Given
         String name = "A".repeat(101); // 101 characters

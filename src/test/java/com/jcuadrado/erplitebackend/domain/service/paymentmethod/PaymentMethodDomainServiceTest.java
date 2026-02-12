@@ -248,6 +248,28 @@ class PaymentMethodDomainServiceTest {
     }
 
     @Test
+    void prepareForCreation_shouldKeepExistingUuidAndEnabled() {
+        // Given
+        UUID existingUuid = UUID.randomUUID();
+        PaymentMethod paymentMethod = PaymentMethod.builder()
+                .uuid(existingUuid)
+                .code("CASH")
+                .name("Efectivo")
+                .enabled(false)
+                .build();
+
+        when(repository.existsByCode("CASH")).thenReturn(false);
+        doNothing().when(validator).validateAll(anyString(), anyString());
+
+        // When
+        domainService.prepareForCreation(paymentMethod);
+
+        // Then
+        assertThat(paymentMethod.getUuid()).isEqualTo(existingUuid);
+        assertThat(paymentMethod.getEnabled()).isFalse();
+    }
+
+    @Test
     void prepareForCreation_shouldThrowExceptionWhenCodeExists() {
         // Given
         PaymentMethod paymentMethod = PaymentMethod.builder()

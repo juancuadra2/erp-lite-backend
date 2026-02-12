@@ -20,6 +20,7 @@ import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -332,5 +333,138 @@ class PaymentMethodRepositoryAdapterTest {
         // Then
         assertThat(result).isZero();
         verify(jpaRepository).countTransactionsWithPaymentMethod(testUuid);
+    }
+
+    // ==================== findById Tests ====================
+
+    @Test
+    void findById_whenExists_shouldReturnOptionalWithDomainObject() {
+        // Given
+        when(jpaRepository.findById(1L)).thenReturn(Optional.of(entity));
+        when(mapper.toDomain(entity)).thenReturn(domainObject);
+
+        // When
+        Optional<PaymentMethod> result = adapter.findById(1L);
+
+        // Then
+        assertThat(result).isPresent().contains(domainObject);
+        verify(jpaRepository).findById(1L);
+        verify(mapper).toDomain(entity);
+    }
+
+    @Test
+    void findById_whenNotExists_shouldReturnEmptyOptional() {
+        // Given
+        when(jpaRepository.findById(999L)).thenReturn(Optional.empty());
+
+        // When
+        Optional<PaymentMethod> result = adapter.findById(999L);
+
+        // Then
+        assertThat(result).isEmpty();
+        verify(jpaRepository).findById(999L);
+    }
+
+    // ==================== findByEnabled Tests ====================
+
+    @Test
+    void findByEnabled_whenTrue_shouldReturnOnlyEnabledPaymentMethods() {
+        // Given
+        List<PaymentMethodEntity> entities = Arrays.asList(entity);
+        when(jpaRepository.findByEnabledTrue()).thenReturn(entities);
+        when(mapper.toDomain(entity)).thenReturn(domainObject);
+
+        // When
+        List<PaymentMethod> result = adapter.findByEnabled(Boolean.TRUE);
+
+        // Then
+        assertThat(result).hasSize(1).contains(domainObject);
+        verify(jpaRepository).findByEnabledTrue();
+        verify(mapper).toDomain(entity);
+    }
+
+    @Test
+    void findByEnabled_whenFalse_shouldReturnOnlyDisabledPaymentMethods() {
+        // Given
+        PaymentMethodEntity disabledEntity = PaymentMethodEntity.builder()
+                .id(2L)
+                .uuid(UUID.randomUUID())
+                .code("OLD")
+                .name("Old Method")
+                .enabled(false)
+                .build();
+        PaymentMethod disabledDomain = PaymentMethod.builder()
+                .id(2L)
+                .code("OLD")
+                .name("Old Method")
+                .enabled(false)
+                .build();
+
+        when(jpaRepository.findAll()).thenReturn(Arrays.asList(entity, disabledEntity));
+        when(mapper.toDomain(disabledEntity)).thenReturn(disabledDomain);
+
+        // When
+        List<PaymentMethod> result = adapter.findByEnabled(Boolean.FALSE);
+
+        // Then
+        assertThat(result).hasSize(1).contains(disabledDomain);
+        verify(jpaRepository).findAll();
+    }
+
+    @Test
+    void findByEnabled_whenNull_shouldReturnAllPaymentMethods() {
+        // Given
+        PaymentMethodEntity disabledEntity = PaymentMethodEntity.builder()
+                .id(2L)
+                .uuid(UUID.randomUUID())
+                .code("OLD")
+                .name("Old Method")
+                .enabled(false)
+                .build();
+        PaymentMethod disabledDomain = PaymentMethod.builder()
+                .id(2L)
+                .code("OLD")
+                .name("Old Method")
+                .enabled(false)
+                .build();
+
+        when(jpaRepository.findAll()).thenReturn(Arrays.asList(entity, disabledEntity));
+        when(mapper.toDomain(entity)).thenReturn(domainObject);
+        when(mapper.toDomain(disabledEntity)).thenReturn(disabledDomain);
+
+        // When
+        List<PaymentMethod> result = adapter.findByEnabled(null);
+
+        // Then
+        assertThat(result).hasSize(2).contains(domainObject, disabledDomain);
+        verify(jpaRepository).findAll();
+    }
+
+    // ==================== delete Tests ====================
+
+    @Test
+    void delete_whenPaymentMethodExists_shouldDeleteIt() {
+        // Given
+        when(jpaRepository.findByUuid(testUuid)).thenReturn(Optional.of(entity));
+
+        // When
+        adapter.delete(testUuid);
+
+        // Then
+        verify(jpaRepository).findByUuid(testUuid);
+        verify(jpaRepository).delete(entity);
+    }
+
+    @Test
+    void delete_whenPaymentMethodNotExists_shouldNotDelete() {
+        // Given
+        when(jpaRepository.findByUuid(testUuid)).thenReturn(Optional.empty());
+
+        // When
+        adapter.delete(testUuid);
+
+        // Then
+        verify(jpaRepository).findByUuid(testUuid);
+        verify(jpaRepository, never()).delete(any(PaymentMethodEntity.class));
     }
 }

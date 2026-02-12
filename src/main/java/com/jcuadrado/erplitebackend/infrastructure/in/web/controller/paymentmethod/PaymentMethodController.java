@@ -199,7 +199,7 @@ public class PaymentMethodController {
 
     @Operation(summary = "Activate payment method", description = "Activates a payment method")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Payment method activated successfully"),
+        @ApiResponse(responseCode = "204", description = "Payment method activated successfully"),
         @ApiResponse(responseCode = "404", description = "Payment method not found")
     })
     @PatchMapping("/{uuid}/activate")
@@ -207,12 +207,12 @@ public class PaymentMethodController {
             @Parameter(description = "UUID of the payment method", required = true)
             @PathVariable UUID uuid) {
         manageUseCase.activate(uuid);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "Deactivate payment method", description = "Deactivates a payment method")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Payment method deactivated successfully"),
+        @ApiResponse(responseCode = "204", description = "Payment method deactivated successfully"),
         @ApiResponse(responseCode = "404", description = "Payment method not found")
     })
     @PatchMapping("/{uuid}/deactivate")
@@ -220,6 +220,6 @@ public class PaymentMethodController {
             @Parameter(description = "UUID of the payment method", required = true)
             @PathVariable UUID uuid) {
         manageUseCase.deactivate(uuid);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 }

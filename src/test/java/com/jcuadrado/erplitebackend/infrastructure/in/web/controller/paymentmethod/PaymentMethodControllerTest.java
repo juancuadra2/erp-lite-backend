@@ -24,6 +24,7 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
 /**
@@ -214,6 +215,91 @@ class PaymentMethodControllerTest {
 
         // When
         ResponseEntity<?> response = controller.list(null, null, 0, 10, "code", "asc");
+
+        // Then
+        assertNotNull(response);
+        assertEquals(200, response.getStatusCode().value());
+        verify(compareUseCase).findAll(any(Map.class), any(Pageable.class));
+    }
+
+    @Test
+    void list_withEnabledFilter_shouldApplyFilter() {
+        // Given
+        PaymentMethod paymentMethod = PaymentMethod.builder()
+                .code("CASH")
+                .name("Efectivo")
+                .enabled(true)
+                .build();
+
+        Page<PaymentMethod> page = new PageImpl<>(Collections.singletonList(paymentMethod));
+
+        when(compareUseCase.findAll(any(Map.class), any(Pageable.class))).thenReturn(page);
+        when(mapper.toResponseDto(any(PaymentMethod.class))).thenAnswer(invocation -> 
+            createResponseDto(invocation.getArgument(0)));
+
+        // When
+        ResponseEntity<?> response = controller.list(Boolean.TRUE, null, 0, 10, "code", "asc");
+
+        // Then
+        assertNotNull(response);
+        assertEquals(200, response.getStatusCode().value());
+        verify(compareUseCase).findAll(argThat(filters -> 
+            filters.containsKey("enabled") && Boolean.TRUE.equals(filters.get("enabled"))), 
+            any(Pageable.class));
+    }
+
+    @Test
+    void list_withSearchFilter_shouldApplyFilter() {
+        // Given
+        PaymentMethod paymentMethod = PaymentMethod.builder()
+                .code("CASH")
+                .name("Efectivo")
+                .enabled(true)
+                .build();
+
+        Page<PaymentMethod> page = new PageImpl<>(Collections.singletonList(paymentMethod));
+
+        when(compareUseCase.findAll(any(Map.class), any(Pageable.class))).thenReturn(page);
+        when(mapper.toResponseDto(any(PaymentMethod.class))).thenAnswer(invocation -> 
+            createResponseDto(invocation.getArgument(0)));
+
+        // When
+        ResponseEntity<?> response = controller.list(null, "efectivo", 0, 10, "code", "asc");
+
+        // Then
+        assertNotNull(response);
+        assertEquals(200, response.getStatusCode().value());
+        verify(compareUseCase).findAll(argThat(filters -> 
+            filters.containsKey("search") && "efectivo".equals(filters.get("search"))), 
+            any(Pageable.class));
+    }
+
+    @Test
+    void list_withEmptySearch_shouldNotApplySearchFilter() {
+        // Given
+        Page<PaymentMethod> page = new PageImpl<>(Collections.emptyList());
+
+        when(compareUseCase.findAll(any(Map.class), any(Pageable.class))).thenReturn(page);
+
+        // When
+        ResponseEntity<?> response = controller.list(null, "  ", 0, 10, "code", "asc");
+
+        // Then
+        assertNotNull(response);
+        assertEquals(200, response.getStatusCode().value());
+        verify(compareUseCase).findAll(argThat(filters -> !filters.containsKey("search")), 
+            any(Pageable.class));
+    }
+
+    @Test
+    void list_withDescSortDirection_shouldSortDescending() {
+        // Given
+        Page<PaymentMethod> page = new PageImpl<>(Collections.emptyList());
+
+        when(compareUseCase.findAll(any(Map.class), any(Pageable.class))).thenReturn(page);
+
+        // When
+        ResponseEntity<?> response = controller.list(null, null, 0, 10, "name", "desc");
 
         // Then
         assertNotNull(response);
