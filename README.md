@@ -204,7 +204,16 @@ mvn verify
 mvn jacoco:report
 ```
 
-**Coverage Objetivo**: Mínimo 80%
+### Requisitos de Cobertura
+
+Para mantener la calidad del código, se aplican las siguientes reglas de cobertura:
+
+- **Cobertura Total**: Mínimo 90% para todo el proyecto
+- **Código Nuevo/Modificado**: 100% de cobertura obligatoria
+
+Estas reglas se validan automáticamente mediante GitHub Actions en cada Pull Request a la rama `main`. Los PRs que no cumplan con estos requisitos no podrán ser mergeados.
+
+Para más información sobre la configuración de validación, ver [.github/BRANCH_PROTECTION.md](.github/BRANCH_PROTECTION.md)
 
 ## 📚 Documentación
 
@@ -247,7 +256,7 @@ specs/
 
 1. Crear especificaciones en `specs/wip/[feature-name]/`
 2. Implementar siguiendo arquitectura hexagonal
-3. Crear tests con coverage > 80%
+3. Crear tests con 100% de cobertura para código nuevo
 4. Actualizar `STATUS.md` continuamente
 5. Al completar, mover a `specs/features/[XX-feature-name]/`
 
