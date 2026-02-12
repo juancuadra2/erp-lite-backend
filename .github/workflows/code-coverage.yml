@@ -55,7 +55,7 @@ jobs:
         
         # Check if coverage meets minimum threshold of 90%
         THRESHOLD=90
-        if (( $(echo "$COVERAGE < $THRESHOLD" | bc -l) )); then
+        if awk -v cov="$COVERAGE" -v thr="$THRESHOLD" 'BEGIN {exit !(cov < thr)}'; then
           echo "❌ Total coverage ${COVERAGE}% is below the required ${THRESHOLD}%"
           echo "status=failed" >> $GITHUB_OUTPUT
           exit 1
@@ -92,7 +92,10 @@ jobs:
           CLASS=$(echo "$CLASS_PATH" | sed 's|.*/||')
           
           # Search for the class in JaCoCo CSV report
-          COVERAGE_LINE=$(grep ",$PACKAGE,$CLASS," target/site/jacoco/jacoco.csv || echo "")
+          # Escape special regex characters in package and class names
+          PACKAGE_ESC=$(echo "$PACKAGE" | sed 's/[.[\*^$]/\\&/g')
+          CLASS_ESC=$(echo "$CLASS" | sed 's/[.[\*^$]/\\&/g')
+          COVERAGE_LINE=$(grep ",$PACKAGE_ESC,$CLASS_ESC," target/site/jacoco/jacoco.csv || echo "")
           
           if [ -z "$COVERAGE_LINE" ]; then
             echo "⚠️  No coverage data found for $CLASS_PATH (might be an interface, abstract class, or not compiled)"
@@ -110,7 +113,7 @@ jobs:
             continue
           fi
           
-          COVERAGE=$((COVERED * 100 / TOTAL))
+          COVERAGE=$(awk -v covered="$COVERED" -v total="$TOTAL" 'BEGIN {printf "%.0f", (covered * 100 / total)}')
           
           echo "Coverage for $CLASS_PATH: ${COVERAGE}% (${COVERED}/${TOTAL} instructions)"
           
@@ -138,19 +141,24 @@ jobs:
       uses: actions/github-script@v7
       with:
         script: |
-          const coverage = '${{ steps.total-coverage.outputs.coverage }}' || 'N/A';
-          const totalStatus = '${{ steps.total-coverage.outputs.status }}' || 'unknown';
-          const changedStatus = '${{ steps.changed-coverage.outputs.status }}' || 'unknown';
+          const coverage = '${{ steps.total-coverage.outputs.coverage }}';
+          const totalStatus = '${{ steps.total-coverage.outputs.status }}';
+          const changedStatus = '${{ steps.changed-coverage.outputs.status }}';
           
-          const totalIcon = totalStatus === 'passed' ? '✅' : totalStatus === 'failed' ? '❌' : '⚠️';
-          const changedIcon = changedStatus === 'passed' ? '✅' : changedStatus === 'failed' ? '❌' : changedStatus === 'skipped' ? '⏭️' : '⚠️';
+          // Use default values if outputs are not set
+          const coverageValue = coverage || 'N/A';
+          const totalStatusValue = totalStatus || 'unknown';
+          const changedStatusValue = changedStatus || 'unknown';
+          
+          const totalIcon = totalStatusValue === 'passed' ? '✅' : totalStatusValue === 'failed' ? '❌' : '⚠️';
+          const changedIcon = changedStatusValue === 'passed' ? '✅' : changedStatusValue === 'failed' ? '❌' : changedStatusValue === 'skipped' ? '⏭️' : '⚠️';
           
           const comment = `## 📊 Code Coverage Report
           
-          **Total Coverage:** ${coverage}% ${totalIcon}
+          **Total Coverage:** ${coverageValue}% ${totalIcon}
           
           ### Requirements
-          - ${totalIcon} Total coverage must be ≥ 90% (Current: ${coverage}%)
+          - ${totalIcon} Total coverage must be ≥ 90% (Current: ${coverageValue}%)
           - ${changedIcon} New/changed files must have 100% coverage
           
           For detailed coverage report, check the [workflow logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}).
