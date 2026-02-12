@@ -1,7 +1,7 @@
 # ERP Lite Backend - Estado General
 
-**Última actualización**: 2026-02-01  
-**Sprint actual**: Sprint 5 (2026-01-29 → 2026-02-11)
+**Última actualización**: 2026-02-06  
+**Sprint actual**: Sprint 6 (2026-02-05 → 2026-02-18)
 
 ---
 
@@ -9,53 +9,68 @@
 
 ### Resumen de Features
 - **Total features planeados**: 10
-- **Completados**: 1 (10%)
-- **En preparación**: 1 (10%) - Awaiting approvals
-- **En desarrollo activo**: 0 (0%)
-- **Pendientes**: 8 (80%)
+- **Completados**: 0 (0%) - *Revertidos por ajuste arquitectónico*
+- **En preparación**: 0 (0%)
+- **En desarrollo activo**: 1 (10%) - *Architecture redesign*
+- **Pendientes**: 9 (90%)
 
 ### Progreso General del Proyecto
 ```
-██░░░░░░░░░░░░░░░░░░░░░░░ 10% completado
+█░░░░░░░░░░░░░░░░░░░░░░░░ 5% completado
 ```
 
 ### Métricas Clave
-- **Test Coverage Global**: 85%
-- **Features en producción**: 1
+- **Test Coverage Global**: 0% (proyecto reiniciado)
+- **Features en producción**: 0
 - **Blockers activos**: 0
-- **Technical Debt**: Bajo
+- **Technical Debt**: Ninguno (nueva arquitectura)
 
 ---
 
-## ✅ Features Completados
+## 🔄 Cambios Arquitectónicos Recientes
 
-### 01-document-types (Tipos de Documento)
-- **Estado**: ✅ Completado y en Producción
-- **Fecha completado**: 2026-01-15
-- **Developer**: Development Team
-- **Test Coverage**: 85%+
-- **Endpoints**: 7 REST APIs
-- **Tareas completadas**: 30/30 (100%)
-- **Documentación**: [features/01-document-types/](features/01-document-types/)
-- **Notas**: Catálogo base independiente, seed data de Colombia incluido (6 tipos)
+### 2026-02-06: Ajuste a Hexagonal Architecture
+**Decisión**: Migrar todos los módulos al nuevo scaffolding hexagonal
+
+**Impacto**:
+- ✅ `document-types` ajustado a nueva arquitectura
+- ✅ Documentación completa actualizada
+- ⚠️ Código implementado anterior debe ser revisado/refactorizado
+- 📝 Features movidos de `features/` a `wip/` para ajuste
+
+**Beneficios**:
+- Mayor aislamiento del dominio
+- Mejor testabilidad
+- Independencia de frameworks
+- Consistencia con scaffolding estándar
 
 ---
 
 ## 🟡 Features En Desarrollo (WIP)
 
-### 02-geography (Departamentos y Municipios)
-- **Estado**: ⚪ En Preparación (PHASE 1-4: Awaiting Approvals)
-- **Developer**: Por asignar
-- **Progress**: 0/29 tareas (0%)
-- **ETA**: 2026-02-22 (pendiente aprobaciones e inicio)
-- **Blocker**: **PENDING APPROVALS** 
-  - [ ] PHASE 1: Functional Spec (Product Owner)
-  - [ ] PHASE 2: Technical Spec (Tech Lead)
-  - [ ] PHASE 3: Plan (Team Lead)
-  - [ ] PHASE 4: Tasks validation (Team Lead)
+### document-types (Tipos de Documento) - v2.0.0
+- **Estado**: 🔴 Planning & Documentation (Architecture Redesign)
+- **Developer**: Development Team
+- **Progress**: 0/32 tareas (0%)
+- **Architecture**: Hexagonal (Aligned with Scaffolding)
+- **ETA**: 2026-03-06 (4-5 semanas)
+- **Priority**: 🔴 High
+- **Documentación**: [wip/document-types/](wip/document-types/)
+- **Tracking**: [wip/document-types/STATUS.md](wip/document-types/status.md)
+- **Cambios v2.0**:
+  - Repository interface en `domain/port/out/`
+  - Use cases CQRS: Compare (Query) y Manage (Command)
+  - Infrastructure separado en `in/` y `out/`
+  - BeanConfiguration para DI manual
+  - Validators y Utils según scaffolding
+
+### geography (Departamentos y Municipios) - ❌ ELIMINADO
+- **Estado**: ❌ ELIMINADO (2026-02-06)
+- **Razón**: Implementación removida del proyecto
+- **Progress**: N/A (módulo eliminado)
+- **Nota**: La implementación completa fue eliminada. Solo se conserva documentación de especificaciones para referencia.
 - **Documentación**: [wip/geography/](wip/geography/)
-- **Tracking**: [wip/geography/STATUS.md](wip/geography/STATUS.md)
-- **Approvals**: [wip/geography/APPROVALS.md](wip/geography/APPROVALS.md)
+- **README**: [wip/geography/README.md](wip/geography/README.md) - Detalles de eliminación
 
 ---
 
@@ -153,24 +168,31 @@ _No hay blockers globales actualmente_
 
 ## 📝 Decisiones Recientes
 
+### 2026-02-06: Ajuste Arquitectónico Global
+- 🔄 **Migración a Hexagonal Architecture** con scaffolding estandarizado
+- 🔄 `document-types` movido de `features/` a `wip/` para rediseño (v2.0.0)
+- ✅ Documentación completa actualizada según nuevo scaffolding
+- ✅ 32 tareas nuevas definidas en 8 fases
+- ✅ Separación CQRS en use cases (Compare/Manage)
+- ✅ Repository interface movido a `domain/port/out/`
+- ✅ Infrastructure separado en `in/` (web) y `out/` (persistence)
+- ⚠️ Código anterior debe ser refactorizado para alinearse
+
 ### 2026-02-01
 - ✅ Migración al framework SDD completada
-- ✅ Document Types (01) movido a features/ con documentación completa
+- ✅ Document Types (01) movido a features/ con documentación completa (v1.0.0 - deprecado)
 - ✅ Estructura features/ y wip/ creada
 - ✅ Orden de implementación definido según análisis de dependencias
-
-### 2026-01-15
-- ✅ Document Types implementado y en producción
-- ✅ 85%+ test coverage alcanzado
-- ✅ 6 tipos de documento colombianos cargados
-
----
-
 - ✅ **Geography (02)** movido a `wip/geography/` siguiendo framework
 - ✅ Geography specs separadas en functional + technical (PHASE 1-2)
 - ✅ Geography plan y tasks.json creados (PHASE 3-4)
 - ✅ Geography STATUS.md y APPROVALS.md inicializados
 - ⚠️ Geography esperando aprobaciones antes de iniciar PHASE 5
+
+### 2026-01-15
+- ✅ Document Types implementado y en producción (v1.0.0 - arquitectura anterior)
+- ✅ 85%+ test coverage alcanzado
+- ✅ 6 tipos de documento colombianos cargados
 ## 📊 Grafo de Dependencias
 
 ```

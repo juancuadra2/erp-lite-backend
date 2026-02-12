@@ -1,0 +1,42 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# IDE
+.idea
+.vscode
+*.iml
+*.ipr
+*.iws
+.settings
+.project
+.classpath
+
+# Build artifacts
+target/
+build/
+out/
+bin/
+
+# Documentation
+*.md
+docs/
+specs/
+
+# Docker (not needed inside the image)
+docker/
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*~
+
+# OS
+.DS_Store
+Thumbs.db

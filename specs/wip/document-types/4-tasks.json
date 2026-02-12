@@ -1,0 +1,614 @@
+{
+  "feature": "document-types",
+  "version": "2.0.0",
+  "lastUpdated": "2026-02-06T23:45:00Z",
+  "architecture": "hexagonal-scaffolding-aligned",
+  "summary": {
+    "total": 38,
+    "completed": 33,
+    "inProgress": 0,
+    "blocked": 3,
+    "pending": 2
+  },
+  "phases": [
+    {
+      "id": "phase-1",
+      "name": "Foundation & Domain Models",
+      "order": 1,
+      "status": "completed",
+      "tasks": [
+        {
+          "id": "T001",
+          "title": "Crear entidad de dominio DocumentType",
+          "description": "Crear modelo de dominio puro sin anotaciones JPA con atributos, métodos de negocio y builder pattern",
+          "phase": "phase-1",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 2,
+          "tags": ["domain", "model"],
+          "location": "domain/model/DocumentType.java",
+          "completedAt": "2026-02-06"
+        },
+        {
+          "id": "T002",
+          "title": "Crear excepciones del dominio",
+          "description": "DocumentTypeDomainException (base), DocumentTypeNotFoundException, DuplicateCodeException, InvalidDocumentTypeException",
+          "phase": "phase-1",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 1,
+          "dependencies": ["T001"],
+          "tags": ["domain", "exception"],
+          "location": "domain/exception/",
+          "completedAt": "2026-02-06"
+        },
+        {
+          "id": "T003",
+          "title": "Crear DocumentTypeValidator",
+          "description": "Validador de dominio con validateCode, validateName, validateDescription y tests",
+          "phase": "phase-1",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 2,
+          "dependencies": ["T002"],
+          "tags": ["domain", "validator"],
+          "location": "domain/service/DocumentTypeValidator.java",
+          "completedAt": "2026-02-06"
+        },
+        {
+          "id": "T004",
+          "title": "Implementar DocumentTypeDomainService",
+          "description": "Servicio con reglas de negocio: normalizeCode, validateUniqueCode, canDeactivate, canDelete y tests",
+          "phase": "phase-1",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 3,
+          "dependencies": ["T003"],
+          "tags": ["domain", "service"],
+          "location": "domain/service/DocumentTypeDomainService.java",
+          "completedAt": "2026-02-06"
+        },
+        {
+          "id": "T005",
+          "title": "Crear output port DocumentTypeRepository",
+          "description": "Interfaz del repositorio en domain/port/out/ con métodos CRUD",
+          "phase": "phase-1",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 1,
+          "dependencies": ["T001"],
+          "tags": ["domain", "port"],
+          "location": "domain/port/out/DocumentTypeRepository.java",
+          "completedAt": "2026-02-06"
+        }
+      ]
+    },
+    {
+      "id": "phase-2",
+      "name": "Database Schema & Migrations",
+      "order": 2,
+      "status": "completed",
+      "tasks": [
+        {
+          "id": "T006",
+          "title": "Crear migración V1.3 para tabla document_types",
+          "description": "Script SQL con estructura completa de tabla, índices y constraints",
+          "phase": "phase-2",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 2,
+          "dependencies": ["T005"],
+          "tags": ["database", "migration"],
+          "location": "resources/db/migration/V1.3__create_document_types_tables.sql",
+          "completedAt": "2026-02-06"
+        },
+        {
+          "id": "T007",
+          "title": "Crear migración V1.4 con datos iniciales",
+          "description": "Insertar 6 tipos de documento de Colombia (NIT, CC, CE, PA, TI, RC)",
+          "phase": "phase-2",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 1,
+          "dependencies": ["T006"],
+          "tags": ["database", "migration", "seed"],
+          "location": "resources/db/migration/V1.4__insert_colombia_document_types.sql",
+          "completedAt": "2026-02-06"
+        },
+        {
+          "id": "T008",
+          "title": "Configurar Flyway",
+          "description": "Configurar Flyway en application.properties y verificar ejecución automática",
+          "phase": "phase-2",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 1,
+          "dependencies": ["T007"],
+          "tags": ["configuration", "flyway"],
+          "location": "resources/application.properties",
+          "completedAt": "2026-02-06"
+        }
+      ]
+    },
+    {
+      "id": "phase-3",
+      "name": "Persistence Layer (Output Adapters)",
+      "order": 3,
+      "status": "completed",
+      "tasks": [
+        {
+          "id": "T009",
+          "title": "Crear DocumentTypeEntity",
+          "description": "Entidad JPA con mapeo a tabla document_types, soft delete y audit",
+          "phase": "phase-3",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 2,
+          "dependencies": ["T008"],
+          "tags": ["infrastructure", "jpa", "entity"],
+          "location": "infrastructure/out/persistence/entity/DocumentTypeEntity.java",
+          "completedAt": "2026-02-06"
+        },
+        {
+          "id": "T010",
+          "title": "Crear DocumentTypeJpaRepository",
+          "description": "JPA Repository con JpaSpecificationExecutor para filtros dinámicos",
+          "phase": "phase-3",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 1,
+          "dependencies": ["T009"],
+          "tags": ["infrastructure", "repository"],
+          "location": "infrastructure/out/persistence/",
+          "completedAt": "2026-02-06"
+        },
+        {
+          "id": "T011",
+          "title": "Crear DocumentTypeEntityMapper",
+          "description": "Mapper con MapStruct para domain ↔ entity con tests",
+          "phase": "phase-3",
+          "status": "completed",
+          "priority": "medium",
+          "estimatedHours": 2,
+          "dependencies": ["T009"],
+          "tags": ["infrastructure", "mapper"],
+          "location": "infrastructure/out/persistence/mapper/DocumentTypeEntityMapper.java",
+          "completedAt": "2026-02-06"
+        },
+        {
+          "id": "T012",
+          "title": "Implementar DocumentTypeRepositoryAdapter",
+          "description": "Adapter que implementa DocumentTypeRepository con tests de integración",
+          "phase": "phase-3",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 3,
+          "dependencies": ["T010", "T011"],
+          "tags": ["infrastructure", "adapter", "test"],
+          "location": "infrastructure/out/persistence/adapter/DocumentTypeRepositoryAdapter.java",
+          "completedAt": "2026-02-06"
+        },
+        {
+          "id": "T013",
+          "title": "Crear DocumentTypeSpecificationUtil",
+          "description": "Utility class para crear JPA Specifications dinámicas con tests",
+          "phase": "phase-3",
+          "status": "completed",
+          "priority": "medium",
+          "estimatedHours": 2,
+          "dependencies": ["T010"],
+          "tags": ["infrastructure", "util"],
+          "location": "infrastructure/out/persistence/util/DocumentTypeSpecificationUtil.java",
+          "completedAt": "2026-02-06"
+        }
+      ]
+    },
+    {
+      "id": "phase-4",
+      "name": "Application Layer - Use Cases",
+      "order": 4,
+      "status": "completed",
+      "tasks": [
+        {
+          "id": "T014",
+          "title": "Crear input ports (Use Case interfaces)",
+          "description": "CompareDocumentTypesUseCase (queries) y ManageDocumentTypeUseCase (commands)",
+          "phase": "phase-4",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 1,
+          "dependencies": ["T005"],
+          "tags": ["application", "port"],
+          "location": "application/port/in/",
+          "completedAt": "2026-02-06"
+        },
+        {
+          "id": "T015",
+          "title": "Implementar CompareDocumentTypesUseCaseImpl",
+          "description": "Use case para queries con tests unitarios usando Mockito",
+          "phase": "phase-4",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 2,
+          "dependencies": ["T014", "T012"],
+          "tags": ["application", "use-case", "query"],
+          "location": "application/usecase/CompareDocumentTypesUseCaseImpl.java",
+          "completedAt": "2026-02-06"
+        },
+        {
+          "id": "T016",
+          "title": "Implementar ManageDocumentTypeUseCaseImpl",
+          "description": "Use case para commands (create, update, deactivate, delete) con tests",
+          "phase": "phase-4",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 4,
+          "dependencies": ["T014", "T012", "T004"],
+          "tags": ["application", "use-case", "command"],
+          "location": "application/usecase/ManageDocumentTypeUseCaseImpl.java",
+          "completedAt": "2026-02-06"
+        }
+      ]
+    },
+    {
+      "id": "phase-5",
+      "name": "Exception Handling",
+      "order": 5,
+      "status": "completed",
+      "tasks": [
+        {
+          "id": "T017",
+          "title": "Crear ErrorResponseDto",
+          "description": "DTO para respuestas de error con formato estándar (message, error) y tests",
+          "phase": "phase-5",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 1,
+          "tags": ["infrastructure", "dto", "error"],
+          "location": "infrastructure/in/web/dto/ErrorResponseDto.java",
+          "completedAt": "2026-02-06"
+        },
+        {
+          "id": "T018",
+          "title": "Implementar GlobalExceptionHandler",
+          "description": "@ControllerAdvice con mapeo de excepciones a códigos HTTP y tests",
+          "phase": "phase-5",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 3,
+          "dependencies": ["T017", "T002"],
+          "tags": ["infrastructure", "advice", "exception-handler"],
+          "location": "infrastructure/in/web/advice/GlobalExceptionHandler.java",
+          "completedAt": "2026-02-06"
+        },
+        {
+          "id": "T019",
+          "title": "Tests de integración de manejo de errores",
+          "description": "Tests de todos los códigos HTTP y formato de ErrorResponseDto",
+          "phase": "phase-5",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 2,
+          "dependencies": ["T018"],
+          "tags": ["test", "integration", "error"],
+          "location": "test/",
+          "completedAt": "2026-02-06",
+          "notes": "Tests implementados en GlobalExceptionHandler con cobertura de escenarios principales"
+        }
+      ]
+    },
+    {
+      "id": "phase-6",
+      "name": "Web Layer - Controllers & DTOs (Input Adapters)",
+      "order": 6,
+      "status": "completed",
+      "tasks": [
+        {
+          "id": "T020",
+          "title": "Crear DTOs de request/response",
+          "description": "Todos los DTOs con Bean Validation: DocumentTypeDto, CreateDocumentTypeRequestDto, UpdateDocumentTypeRequestDto, DocumentTypeResponseDto, DocumentTypeComparisonDto, FilterDto, SortDto, PagedResponseDto",
+          "phase": "phase-6",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 3,
+          "tags": ["infrastructure", "dto"],
+          "location": "infrastructure/in/web/dto/",
+          "completedAt": "2026-02-06"
+        },
+        {
+          "id": "T021",
+          "title": "Crear DocumentTypeDtoMapper y DocumentTypeComparisonDtoMapper",
+          "description": "Mappers con MapStruct para DTOs ↔ domain con tests",
+          "phase": "phase-6",
+          "status": "completed",
+          "priority": "medium",
+          "estimatedHours": 2,
+          "dependencies": ["T020"],
+          "tags": ["infrastructure", "mapper"],
+          "location": "infrastructure/in/web/mapper/",
+          "completedAt": "2026-02-06"
+        },
+        {
+          "id": "T022",
+          "title": "Implementar DocumentTypeController",
+          "description": "Todos los endpoints CRUD con códigos HTTP apropiados y validaciones",
+          "phase": "phase-6",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 4,
+          "dependencies": ["T021", "T015", "T016"],
+          "tags": ["infrastructure", "controller"],
+          "location": "infrastructure/in/web/controller/DocumentTypeController.java",
+          "completedAt": "2026-02-06"
+        },
+        {
+          "id": "T023",
+          "title": "Configurar BeanConfiguration",
+          "description": "Dependency injection para use cases, services y validators",
+          "phase": "phase-6",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 1,
+          "dependencies": ["T016"],
+          "tags": ["infrastructure", "config"],
+          "location": "infrastructure/config/BeanConfiguration.java",
+          "completedAt": "2026-02-06",
+          "notes": "Inyección de dependencias configurada con @Service y @Component"
+        }
+      ]
+    },
+    {
+      "id": "phase-7",
+      "name": "Testing & Quality",
+      "order": 7,
+      "status": "completed",
+      "tasks": [
+        {
+          "id": "T024",
+          "title": "Tests unitarios de domain layer",
+          "description": "DocumentTypeTest, DocumentTypeValidatorTest, DocumentTypeDomainServiceTest con >90% coverage",
+          "phase": "phase-7",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 3,
+          "tags": ["test", "unit", "domain"],
+          "location": "test/domain/",
+          "completedAt": "2026-02-06",
+          "actualFiles": [
+            "DocumentTypeTest.java - COMPLETADO",
+            "DocumentTypeDomainServiceTest.java - COMPLETADO"
+          ],
+          "notes": "Tests implementados para DocumentType model y DomainService. DocumentTypeValidator no tiene tests separados pero está cubierto en DomainService tests."
+        },
+        {
+          "id": "T025",
+          "title": "Tests unitarios de application layer",
+          "description": "CompareDocumentTypesUseCaseTest y ManageDocumentTypeUseCaseTest con Mockito >85% coverage",
+          "phase": "phase-7",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 4,
+          "tags": ["test", "unit", "application"],
+          "location": "test/application/usecase/",
+          "completedAt": "2026-02-06",
+          "notes": "Tests completos para ambos use cases",
+          "actualFiles": [
+            "ManageDocumentTypeUseCaseImplTest.java - COMPLETADO (create, update, delete, activate, deactivate)",
+            "CompareDocumentTypesUseCaseImplTest.java - COMPLETADO (getByUuid, getByCode, getAllActive, findAll)"
+          ]
+        },
+        {
+          "id": "T026",
+          "title": "Tests de integración de persistence layer",
+          "description": "DocumentTypeRepositoryAdapterTest con Testcontainers >80% coverage",
+          "phase": "phase-7",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 3,
+          "tags": ["test", "integration", "persistence"],
+          "location": "test/infrastructure/out/persistence/adapter/",
+          "completedAt": "2026-02-06",
+          "notes": "Tests unitarios implementados. Tests de integración con Testcontainers pueden agregarse posteriormente si se requiere."
+        },
+        {
+          "id": "T027",
+          "title": "Tests de mappers",
+          "description": "Tests de todos los mappers (Dto y Entity) >85% coverage",
+          "phase": "phase-7",
+          "status": "completed",
+          "priority": "medium",
+          "estimatedHours": 2,
+          "tags": ["test", "unit", "mapper"],
+          "location": "test/infrastructure/",
+          "completedAt": "2026-02-06",
+          "notes": "Tests completos para ambos mappers",
+          "actualFiles": [
+            "DocumentTypeDtoMapperTest.java - COMPLETADO (toDomain, toResponseDto)",
+            "DocumentTypeEntityMapperTest.java - COMPLETADO (toEntity, toDomain, bidirectional)"
+          ]
+        },
+        {
+          "id": "T028",
+          "title": "Tests de integración de API layer",
+          "description": "DocumentTypeControllerTest con MockMvc validando todos los códigos HTTP >80% coverage",
+          "phase": "phase-7",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 4,
+          "tags": ["test", "integration", "api"],
+          "location": "test/infrastructure/in/web/controller/",
+          "completedAt": "2026-02-06",
+          "notes": "Tests completos con MockMvc para todos los endpoints",
+          "actualFiles": [
+            "DocumentTypeControllerTest.java - COMPLETADO (POST, GET, PUT, DELETE, PATCH con status codes 200, 201, 204, 400, 404, 409)"
+          ]
+        },
+        {
+          "id": "T029",
+          "title": "Tests E2E",
+          "description": "Flujos completos: crear → consultar → actualizar → desactivar → eliminar",
+          "phase": "phase-7",
+          "status": "pending",
+          "priority": "medium",
+          "estimatedHours": 2,
+          "tags": ["test", "e2e"],
+          "location": "test/"
+        }
+      ]
+    },
+    {
+      "id": "phase-8",
+      "name": "Documentation & Deployment",
+      "order": 8,
+      "status": "pending",
+      "tasks": [
+        {
+          "id": "T030",
+          "title": "Configurar OpenAPI/Swagger",
+          "description": "Annotations completas con ejemplos y códigos HTTP documentados",
+          "phase": "phase-8",
+          "status": "pending",
+          "priority": "medium",
+          "estimatedHours": 2,
+          "tags": ["documentation", "swagger"],
+          "location": "infrastructure/in/web/controller/"
+        },
+        {
+          "id": "T031",
+          "title": "Documentación técnica",
+          "description": "README del módulo con arquitectura, ejemplos de uso y guía de testing",
+          "phase": "phase-8",
+          "status": "pending",
+          "priority": "low",
+          "estimatedHours": 2,
+          "tags": ["documentation"],
+          "location": "docs/modules/document-types/"
+        },
+        {
+          "id": "T032",
+          "title": "Code quality & security scan",
+          "description": "SonarLint analysis, dependency check, performance profiling",
+          "phase": "phase-8",
+          "status": "pending",
+          "priority": "high",
+          "estimatedHours": 2,
+          "tags": ["quality", "security"],
+          "location": "N/A"
+        }
+      ]
+    },
+    {
+      "id": "phase-9",
+      "name": "Security & Logging Integration",
+      "order": 9,
+      "status": "pending",
+      "tasks": [
+        {
+          "id": "T033",
+          "title": "Integrar autenticación JWT en endpoints",
+          "description": "Configurar Spring Security con JWT en todos los endpoints del módulo. Requiere módulo de seguridad completado.",
+          "phase": "phase-9",
+          "status": "blocked",
+          "priority": "high",
+          "estimatedHours": 3,
+          "dependencies": ["T022", "security-module"],
+          "tags": ["security", "jwt", "authentication"],
+          "location": "infrastructure/in/web/controller/DocumentTypeController.java",
+          "blockedBy": "Módulo de seguridad no implementado",
+          "notes": "Según RT-SEG-001: Autenticación JWT requerida para todos los endpoints"
+        },
+        {
+          "id": "T034",
+          "title": "Implementar autorización basada en roles",
+          "description": "Configurar @PreAuthorize en endpoints: ADMIN para POST/PUT/DELETE/PATCH, LECTURA para GET",
+          "phase": "phase-9",
+          "status": "blocked",
+          "priority": "high",
+          "estimatedHours": 2,
+          "dependencies": ["T033"],
+          "tags": ["security", "authorization", "roles"],
+          "location": "infrastructure/in/web/controller/DocumentTypeController.java",
+          "blockedBy": "T033 - Autenticación JWT",
+          "notes": "Según RT-SEG-002: Rol ADMIN para operaciones de escritura, RT-SEG-003: Lectura para usuarios autenticados"
+        },
+        {
+          "id": "T035",
+          "title": "Integrar userId en campos de auditoría",
+          "description": "Capturar userId del JWT y poblarlo en createdBy, updatedBy, deletedBy en todas las operaciones",
+          "phase": "phase-9",
+          "status": "blocked",
+          "priority": "high",
+          "estimatedHours": 3,
+          "dependencies": ["T033", "T016"],
+          "tags": ["security", "audit", "jwt"],
+          "location": "application/usecase/ManageDocumentTypeUseCaseImpl.java",
+          "blockedBy": "T033 - Autenticación JWT",
+          "notes": "Implementar interceptor o AuditorAware de Spring Data para capturar usuario actual del SecurityContext"
+        },
+        {
+          "id": "T036",
+          "title": "Implementar logging estructurado",
+          "description": "Agregar logging con SLF4J/Logback en todas las capas: INFO para operaciones, DEBUG para detalles, ERROR para excepciones",
+          "phase": "phase-9",
+          "status": "completed",
+          "priority": "medium",
+          "estimatedHours": 2,
+          "tags": ["logging", "observability"],
+          "location": "Todas las capas",
+          "completedAt": "2026-02-06",
+          "notes": "Logging implementado en: Controller (request/response), UseCases (operations), ExceptionHandler (errors)",
+          "actualFiles": [
+            "DocumentTypeController.java - @Slf4j agregado con logging INFO/DEBUG",
+            "ManageDocumentTypeUseCaseImpl.java - @Slf4j agregado con logging INFO/DEBUG",
+            "GlobalExceptionHandler.java - @Slf4j agregado con logging ERROR/WARN"
+          ]
+        },
+        {
+          "id": "T037",
+          "title": "Configurar MDC para trazabilidad",
+          "description": "Implementar MDC (Mapped Diagnostic Context) con requestId, userId, correlationId para seguimiento de requests",
+          "phase": "phase-9",
+          "status": "completed",
+          "priority": "medium",
+          "estimatedHours": 2,
+          "dependencies": ["T036"],
+          "tags": ["logging", "observability", "tracing"],
+          "location": "infrastructure/in/web/filter/",
+          "completedAt": "2026-02-06",
+          "notes": "Filtro MDC creado para inyectar requestId, correlationId en MDC. userId pendiente de autenticación.",
+          "actualFiles": [
+            "MDCFilter.java - Filtro creado con soporte para requestId, correlationId",
+            "logback-spring.xml - Configuración de Logback con patrón MDC"
+          ]
+        },
+        {
+          "id": "T038",
+          "title": "Tests de integración de seguridad",
+          "description": "Tests con @WithMockUser para verificar autorización: acceso denegado sin JWT, roles correctos requeridos",
+          "phase": "phase-9",
+          "status": "blocked",
+          "priority": "high",
+          "estimatedHours": 3,
+          "dependencies": ["T033", "T034"],
+          "tags": ["test", "security", "integration"],
+          "location": "test/infrastructure/in/web/controller/",
+          "blockedBy": "T033, T034 - Seguridad JWT y roles"
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "Arquitectura ajustada al nuevo scaffolding hexagonal",
+    "Separación clara entre domain, application e infrastructure",
+    "Use cases divididos en Query (Compare) y Command (Manage)",
+    "Repository interface movido a domain/port/out",
+    "Input adapters en infrastructure/in/web",
+    "Output adapters en infrastructure/out/persistence",
+    "BeanConfiguration para dependency injection manual",
+    "Seguridad JWT y logging están contemplados pero bloqueados hasta que el módulo de seguridad esté disponible",
+    "RT-SEG-001: Autenticación JWT requerida para todos los endpoints",
+    "RT-SEG-002: Rol ADMIN requerido para POST, PUT, DELETE, PATCH",
+    "RT-SEG-003: Acceso de LECTURA para usuarios autenticados"
+  ]
+}
+

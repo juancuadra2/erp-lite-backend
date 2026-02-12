@@ -1,0 +1,397 @@
+{
+  "feature": "geography",
+  "version": "1.0.0",
+  "lastUpdated": "2026-02-07T00:00:00Z",
+  "summary": {
+    "total": 29,
+    "completed": 29,
+    "inProgress": 0,
+    "blocked": 0,
+    "pending": 0
+  },
+  "phases": [
+    {
+      "id": "phase-0",
+      "name": "Pre-Implementation Validation",
+      "order": 0,
+      "status": "completed",
+      "tasks": [
+        {
+          "id": "T000",
+          "title": "Validar alineacion y aprobacion de specs",
+          "description": "Confirmar que 1-functional-spec.md y 2-technical-spec.md estan alineados y aprobados antes de iniciar la implementacion",
+          "phase": "phase-0",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 1,
+          "dependencies": [],
+          "tags": ["validation", "spec"]
+        }
+      ]
+    },
+    {
+      "id": "phase-1",
+      "name": "Foundation & Domain Models",
+      "order": 1,
+      "status": "completed",
+      "tasks": [
+        {
+          "id": "T001",
+          "title": "Crear entidades de dominio Department y Municipality",
+          "description": "Crear modelos de dominio puro (Department, Municipality) sin anotaciones JPA en domain/geography/model/. Incluir atributos según spec, métodos de negocio (activate, deactivate, validateUniqueness), relación Department → List<Municipality>",
+          "phase": "phase-1",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 3,
+          "dependencies": [],
+          "tags": ["domain", "model"]
+        },
+        {
+          "id": "T002",
+          "title": "Crear excepciones específicas del dominio",
+          "description": "Crear excepciones en domain/geography/exception/: DepartmentNotFoundException, MunicipalityNotFoundException, DuplicateCodeException, GeographyConstraintException",
+          "phase": "phase-1",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 1,
+          "dependencies": ["T001"],
+          "tags": ["domain", "exception"]
+        },
+        {
+          "id": "T003",
+          "title": "Implementar GeographyDomainService",
+          "description": "Crear GeographyDomainService con reglas de negocio: validateDepartmentCode (2 dígitos), validateMunicipalityCode (5 dígitos), canDeleteDepartment. Incluir tests unitarios > 90%",
+          "phase": "phase-1",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 2,
+          "dependencies": ["T001", "T002"],
+          "tags": ["domain", "service"]
+        },
+        {
+          "id": "T004",
+          "title": "Implementar GeographyValidationService",
+          "description": "Crear GeographyValidationService con métodos: ensureDepartmentCodeUnique, ensureMunicipalityCodeUniqueInDepartment. Incluir tests unitarios",
+          "phase": "phase-1",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 2,
+          "dependencies": ["T003"],
+          "tags": ["domain", "service", "validation"]
+        }
+      ]
+    },
+    {
+      "id": "phase-2",
+      "name": "Database Schema & Migrations",
+      "order": 2,
+      "status": "completed",
+      "tasks": [
+        {
+          "id": "T005",
+          "title": "Crear migración V1.1 para tablas geography",
+          "description": "Crear V1.1__create_geography_tables.sql con tablas departments y municipalities, índices (code, name, uuid, enabled, department_id), constraints (FK, UNIQUE)",
+          "phase": "phase-2",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 2,
+          "dependencies": ["T004"],
+          "tags": ["database", "migration"]
+        },
+        {
+          "id": "T006",
+          "title": "Crear migración V1.2 con datos de Colombia",
+          "description": "Crear V1.2__insert_colombia_geography.sql con 32 departamentos y 1,100+ municipios de Colombia con códigos DANE reales",
+          "phase": "phase-2",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 3,
+          "dependencies": ["T005"],
+          "tags": ["database", "seed-data"]
+        },
+        {
+          "id": "T007",
+          "title": "Documentar modelo de base de datos",
+          "description": "Crear diagrama ER (Department 1:N Municipality), documentar índices, constraints y plan de mantenimiento",
+          "phase": "phase-2",
+          "status": "completed",
+          "priority": "medium",
+          "estimatedHours": 1,
+          "dependencies": ["T006"],
+          "tags": ["documentation", "database"]
+        }
+      ]
+    },
+    {
+      "id": "phase-3",
+      "name": "Persistence Layer (Output Adapters)",
+      "order": 3,
+      "status": "completed",
+      "tasks": [
+        {
+          "id": "T008",
+          "title": "Crear JPA entities",
+          "description": "Crear DepartmentEntity y MunicipalityEntity con anotaciones JPA en infrastructure/out/geography/persistence/entity/. Incluir relaciones @OneToMany/@ManyToOne y campos de auditoría",
+          "phase": "phase-3",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 2,
+          "dependencies": ["T007"],
+          "tags": ["infrastructure", "jpa", "entity"]
+        },
+        {
+          "id": "T009",
+          "title": "Crear Spring Data JPA repositories",
+          "description": "Crear DepartmentJpaRepository y MunicipalityJpaRepository con queries personalizadas (findByCode, findByUuid, findByEnabled, findByNameContaining, etc.)",
+          "phase": "phase-3",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 2,
+          "dependencies": ["T008"],
+          "tags": ["infrastructure", "repository"]
+        },
+        {
+          "id": "T010",
+          "title": "Crear mappers con MapStruct",
+          "description": "Crear DepartmentEntityMapper y MunicipalityEntityMapper para conversión Domain ↔ Entity usando MapStruct",
+          "phase": "phase-3",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 2,
+          "dependencies": ["T009"],
+          "tags": ["infrastructure", "mapper"]
+        },
+        {
+          "id": "T011",
+          "title": "Implementar repository adapters",
+          "description": "Crear DepartmentRepositoryAdapter y MunicipalityRepositoryAdapter implementando DepartmentPort y MunicipalityPort. Incluir tests unitarios con Mockito",
+          "phase": "phase-3",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 4,
+          "dependencies": ["T010"],
+          "tags": ["infrastructure", "adapter", "test"]
+        }
+      ]
+    },
+    {
+      "id": "phase-4",
+      "name": "Application Layer (Use Cases)",
+      "order": 4,
+      "status": "completed",
+      "tasks": [
+        {
+          "id": "T012",
+          "title": "Definir puertos de salida (repository interfaces)",
+          "description": "Crear DepartmentPort y MunicipalityPort en application/port/out/ con métodos: save, findByUuid, findByCode, findAll, delete, etc.",
+          "phase": "phase-4",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 2,
+          "dependencies": ["T011"],
+          "tags": ["application", "port"]
+        },
+        {
+          "id": "T013",
+          "title": "Implementar use cases de Department",
+          "description": "Crear CreateDepartmentUseCase, UpdateDepartmentUseCase, GetDepartmentUseCase, ListDepartmentsUseCase, DeactivateDepartmentUseCase, SearchDepartmentsUseCase en application/port/in/department/",
+          "phase": "phase-4",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 6,
+          "dependencies": ["T012"],
+          "tags": ["application", "use-case"]
+        },
+        {
+          "id": "T014",
+          "title": "Implementar use cases de Municipality",
+          "description": "Crear CreateMunicipalityUseCase, UpdateMunicipalityUseCase, GetMunicipalityUseCase, ListMunicipalitiesUseCase, SearchMunicipalitiesUseCase, AutocompleteMunicipalitiesUseCase en application/port/in/municipality/",
+          "phase": "phase-4",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 6,
+          "dependencies": ["T012"],
+          "tags": ["application", "use-case"]
+        },
+        {
+          "id": "T015",
+          "title": "Implementar validaciones transversales",
+          "description": "Validar que departamento exista antes de crear municipio, validar códigos únicos, validar que departamento no tenga municipios antes de eliminar",
+          "phase": "phase-4",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 2,
+          "dependencies": ["T013", "T014"],
+          "tags": ["application", "validation"]
+        },
+        {
+          "id": "T016",
+          "title": "Tests unitarios de use cases",
+          "description": "Tests unitarios de todos los use cases mockeando puertos de salida. Verificar lógica de negocio. Cobertura > 90%",
+          "phase": "phase-4",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 4,
+          "dependencies": ["T015"],
+          "tags": ["test", "unit"]
+        },
+        {
+          "id": "T017",
+          "title": "Documentar casos de uso",
+          "description": "Crear diagramas de secuencia para flujos principales y documentar reglas de negocio por caso de uso",
+          "phase": "phase-4",
+          "status": "completed",
+          "priority": "medium",
+          "estimatedHours": 2,
+          "dependencies": ["T016"],
+          "tags": ["documentation"]
+        }
+      ]
+    },
+    {
+      "id": "phase-5",
+      "name": "REST API Layer (Input Adapters)",
+      "order": 5,
+      "status": "completed",
+      "tasks": [
+        {
+          "id": "T018",
+          "title": "Crear DTOs",
+          "description": "Crear DTOs en infrastructure/in/api/geography/dto/: CreateDepartmentRequestDto, UpdateDepartmentRequestDto, DepartmentResponseDto, CreateMunicipalityRequestDto, UpdateMunicipalityRequestDto, MunicipalityResponseDto, MunicipalityAutocompleteDto con anotaciones de validación",
+          "phase": "phase-5",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 2,
+          "dependencies": ["T017"],
+          "tags": ["infrastructure", "dto"]
+        },
+        {
+          "id": "T019",
+          "title": "Crear mappers DTO con MapStruct",
+          "description": "Crear DepartmentDtoMapper y MunicipalityDtoMapper para conversión Request/Response ↔ Domain",
+          "phase": "phase-5",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 2,
+          "dependencies": ["T018"],
+          "tags": ["infrastructure", "mapper"]
+        },
+        {
+          "id": "T020",
+          "title": "Implementar DepartmentController",
+          "description": "Crear DepartmentController con 8 endpoints: POST, GET list, GET by uuid, PUT, DELETE, PATCH deactivate, PATCH activate, GET search",
+          "phase": "phase-5",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 3,
+          "dependencies": ["T019"],
+          "tags": ["infrastructure", "controller"]
+        },
+        {
+          "id": "T021",
+          "title": "Implementar MunicipalityController",
+          "description": "Crear MunicipalityController con 9 endpoints: POST, GET list, GET by uuid, PUT, DELETE, PATCH deactivate, PATCH activate, GET search, GET autocomplete",
+          "phase": "phase-5",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 3,
+          "dependencies": ["T019"],
+          "tags": ["infrastructure", "controller"]
+        },
+        {
+          "id": "T022",
+          "title": "Implementar manejo global de excepciones",
+          "description": "Crear @ControllerAdvice para excepciones del módulo: DepartmentNotFoundException → 404, MunicipalityNotFoundException → 404, DuplicateCodeException → 409, GeographyConstraintException → 409",
+          "phase": "phase-5",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 2,
+          "dependencies": ["T020", "T021"],
+          "tags": ["infrastructure", "exception-handler"]
+        }
+      ]
+    },
+    {
+      "id": "phase-6",
+      "name": "Testing & Quality",
+      "order": 6,
+      "status": "completed",
+      "tasks": [
+        {
+          "id": "T023",
+          "title": "Tests unitarios de controllers con Mockito",
+          "description": "Tests unitarios de DepartmentControllerTest y MunicipalityControllerTest usando Mockito para los casos de éxito y error. Verificar status codes y body",
+          "phase": "phase-6",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 3,
+          "dependencies": ["T022"],
+          "tags": ["test", "unit", "controller"]
+        },
+        {
+          "id": "T024",
+          "title": "Verificar compilacion, tests unitarios y cobertura 90%",
+          "description": "Compilar la aplicacion y ejecutar tests unitarios exitosamente. Verificar cobertura minima de 90% con JaCoCo antes de continuar",
+          "phase": "phase-6",
+          "status": "completed",
+          "priority": "high",
+          "estimatedHours": 2,
+          "dependencies": ["T023"],
+          "tags": ["quality", "test", "coverage"]
+        },
+        {
+          "id": "T025",
+          "title": "Análisis de cobertura y performance",
+          "description": "JaCoCo: cobertura > 90% en capas domain, application, controllers y mappers. Verificar tiempos de respuesta aceptables",
+          "phase": "phase-6",
+          "status": "completed",
+          "priority": "medium",
+          "estimatedHours": 2,
+          "dependencies": ["T024"],
+          "tags": ["quality", "performance"]
+        }
+      ]
+    },
+    {
+      "id": "phase-7",
+      "name": "Documentation & Deployment",
+      "order": 7,
+      "status": "completed",
+      "tasks": [
+        {
+          "id": "T026",
+          "title": "Documentar API con OpenAPI (Springdoc)",
+          "description": "Agregar anotaciones @Operation, @ApiResponses, @Parameter en controllers. Documentar status codes y descripciones de endpoints",
+          "phase": "phase-7",
+          "status": "completed",
+          "priority": "medium",
+          "estimatedHours": 2,
+          "dependencies": ["T025"],
+          "tags": ["documentation", "api"]
+        },
+        {
+          "id": "T027",
+          "title": "Crear documentación del módulo Geography",
+          "description": "Crear README.md del módulo con descripción general, arquitectura hexagonal, uso de endpoints, ejemplos de requests/responses, reglas de negocio, y estructura de tests",
+          "phase": "phase-7",
+          "status": "completed",
+          "priority": "medium",
+          "estimatedHours": 2,
+          "dependencies": ["T026"],
+          "tags": ["documentation"]
+        },
+        {
+          "id": "T028",
+          "title": "Verificar configuracion de deployment",
+          "description": "Verificar que Dockerfile, docker-compose.yml, Actuator health check y Flyway estan configurados correctamente para el módulo geography",
+          "phase": "phase-7",
+          "status": "completed",
+          "priority": "medium",
+          "estimatedHours": 1,
+          "dependencies": ["T027"],
+          "tags": ["deployment"]
+        }
+      ]
+    }
+  ]
+}

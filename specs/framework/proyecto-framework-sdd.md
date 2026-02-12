@@ -521,18 +521,18 @@ Code → Test → Complete
 # 1. Crear estructura en wip/
 specs/wip/
 └── nueva-feature/
-    ├── functional-spec.md
-    ├── technical-spec.md
-    ├── plan.md
-    ├── tasks.json
-    └── STATUS.md
+    ├── 1-1-1-functional-spec.md
+    ├── 2-2-2-technical-spec.md
+    ├── 3-3-3-plan.md
+    ├── 4-4-4-tasks.json
+    └── status.md
 
-# 2. Escribir especificación funcional en functional-spec.md
-# 3. Escribir especificación técnica en technical-spec.md
-# 4. Crear plan de tareas en plan.md
-# 5. Generar tasks.json desde plan.md (o crear manualmente)
-# 6. Inicializar STATUS.md con template
-# 7. Actualizar STATUS.md general en specs/STATUS.md
+# 2. Escribir especificación funcional en 1-1-1-functional-spec.md
+# 3. Escribir especificación técnica en 2-2-2-technical-spec.md
+# 4. Crear plan de tareas en 3-3-3-plan.md
+# 5. Generar 4-4-4-tasks.json desde 3-3-3-plan.md (o crear manualmente)
+# 6. Inicializar status.md con template
+# 7. Actualizar status.md general en specs/status.md
 ```
 
 ### 2. Durante el Desarrollo
@@ -548,15 +548,15 @@ specs/wip/
 
 ```bash
 # 1. Verificar que todas las tareas estén completadas
-# 2. Crear IMPLEMENTED.md con resumen
+# 2. Crear status.md con resumen
 # 3. Mover de wip/ a features/ con número secuencial
 mv wip/nueva-feature/ features/0X-nueva-feature/
 
-# 4. Eliminar STATUS.md del feature (ya no se necesita)
-rm features/05-nueva-feature/STATUS.md
+# 4. Eliminar status.md del feature (ya no se necesita)
+rm features/05-nueva-feature/status.md
 
 # 5. Actualizar PROJECT_INFO.md con la nueva feature
-# 6. Actualizar STATUS.md general (mover de WIP a Completados)
+# 6. Actualizar status.md general (mover de WIP a Completados)
 ```
 
 ---
@@ -775,7 +775,7 @@ ls specs/features/
 ### ¿Qué se está desarrollando ahora?
 ```bash
 ls specs/wip/
-cat specs/wip/*/STATUS.md
+cat specs/wip/*/status.md
 ```
 
 ### ¿Cuál es el próximo número de feature?
