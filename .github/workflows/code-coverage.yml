@@ -28,14 +28,8 @@ jobs:
     - name: Run tests with coverage
       run: mvn clean test jacoco:report
       
-    - name: Generate JaCoCo Badge
-      id: jacoco
-      uses: cicirello/jacoco-badge-generator@v2
-      with:
-        generate-branches-badge: true
-        jacoco-csv-file: target/site/jacoco/jacoco.csv
-        
     - name: Check total coverage
+      id: total-coverage
       run: |
         # Extract total coverage from JaCoCo CSV
         COVERAGE=$(awk -F, '
@@ -56,18 +50,22 @@ jobs:
           }
         }' target/site/jacoco/jacoco.csv)
         
+        echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
         echo "Total coverage: ${COVERAGE}%"
         
         # Check if coverage meets minimum threshold of 90%
         THRESHOLD=90
         if (( $(echo "$COVERAGE < $THRESHOLD" | bc -l) )); then
           echo "❌ Total coverage ${COVERAGE}% is below the required ${THRESHOLD}%"
+          echo "status=failed" >> $GITHUB_OUTPUT
           exit 1
         else
           echo "✅ Total coverage ${COVERAGE}% meets the minimum ${THRESHOLD}% requirement"
+          echo "status=passed" >> $GITHUB_OUTPUT
         fi
         
     - name: Check coverage for changed files
+      id: changed-coverage
       run: |
         # Get list of changed Java files
         git fetch origin main
@@ -75,6 +73,7 @@ jobs:
         
         if [ -z "$CHANGED_FILES" ]; then
           echo "No Java source files changed in this PR"
+          echo "status=skipped" >> $GITHUB_OUTPUT
           exit 0
         fi
         
@@ -126,10 +125,12 @@ jobs:
         if [ "$FAILED" -eq 1 ]; then
           echo ""
           echo "❌ Some changed files do not have 100% coverage"
+          echo "status=failed" >> $GITHUB_OUTPUT
           exit 1
         else
           echo ""
           echo "✅ All changed files have 100% coverage"
+          echo "status=passed" >> $GITHUB_OUTPUT
         fi
         
     - name: Comment PR
@@ -137,19 +138,22 @@ jobs:
       uses: actions/github-script@v7
       with:
         script: |
-          const coverage = '${{ steps.jacoco.outputs.coverage }}';
-          const branches = '${{ steps.jacoco.outputs.branches }}';
+          const coverage = '${{ steps.total-coverage.outputs.coverage }}' || 'N/A';
+          const totalStatus = '${{ steps.total-coverage.outputs.status }}' || 'unknown';
+          const changedStatus = '${{ steps.changed-coverage.outputs.status }}' || 'unknown';
+          
+          const totalIcon = totalStatus === 'passed' ? '✅' : totalStatus === 'failed' ? '❌' : '⚠️';
+          const changedIcon = changedStatus === 'passed' ? '✅' : changedStatus === 'failed' ? '❌' : changedStatus === 'skipped' ? '⏭️' : '⚠️';
           
           const comment = `## 📊 Code Coverage Report
           
-          **Total Coverage:** ${coverage}%
-          **Branch Coverage:** ${branches}%
+          **Total Coverage:** ${coverage}% ${totalIcon}
           
           ### Requirements
-          - ✅ Total coverage must be ≥ 90%
-          - ✅ New/changed files must have 100% coverage
+          - ${totalIcon} Total coverage must be ≥ 90% (Current: ${coverage}%)
+          - ${changedIcon} New/changed files must have 100% coverage
           
-          For detailed coverage report, check the workflow logs.
+          For detailed coverage report, check the [workflow logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}).
           `;
           
           github.rest.issues.createComment({
