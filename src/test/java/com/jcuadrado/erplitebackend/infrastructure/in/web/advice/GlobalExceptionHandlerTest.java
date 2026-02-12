@@ -9,6 +9,11 @@ import com.jcuadrado.erplitebackend.domain.exception.geography.DuplicateMunicipa
 import com.jcuadrado.erplitebackend.domain.exception.geography.GeographyConstraintException;
 import com.jcuadrado.erplitebackend.domain.exception.geography.InvalidGeographyException;
 import com.jcuadrado.erplitebackend.domain.exception.geography.MunicipalityNotFoundException;
+import com.jcuadrado.erplitebackend.domain.exception.paymentmethod.DuplicatePaymentMethodCodeException;
+import com.jcuadrado.erplitebackend.domain.exception.paymentmethod.InvalidPaymentMethodCodeException;
+import com.jcuadrado.erplitebackend.domain.exception.paymentmethod.InvalidPaymentMethodDataException;
+import com.jcuadrado.erplitebackend.domain.exception.paymentmethod.PaymentMethodConstraintException;
+import com.jcuadrado.erplitebackend.domain.exception.paymentmethod.PaymentMethodNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -210,6 +215,91 @@ class GlobalExceptionHandlerTest {
         assertThat(response.getBody().getStatus()).isEqualTo(400);
         assertThat(response.getBody().getError()).isEqualTo("Bad Request");
         assertThat(response.getBody().getMessage()).isEqualTo("Invalid geography");
+    }
+
+    @Test
+    void handlePaymentMethodNotFound_shouldReturnNotFound() {
+        // Given
+        PaymentMethodNotFoundException exception = new PaymentMethodNotFoundException("01");
+
+        // When
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response = 
+            exceptionHandler.handlePaymentMethodNotFound(exception);
+
+        // Then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(404);
+        assertThat(response.getBody().getError()).isEqualTo("Not Found");
+        assertThat(response.getBody().getMessage()).contains("01");
+    }
+
+    @Test
+    void handleDuplicatePaymentMethodCode_shouldReturnConflict() {
+        // Given
+        DuplicatePaymentMethodCodeException exception = new DuplicatePaymentMethodCodeException("01");
+
+        // When
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response = 
+            exceptionHandler.handleDuplicatePaymentMethodCode(exception);
+
+        // Then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(409);
+        assertThat(response.getBody().getError()).isEqualTo("Conflict");
+        assertThat(response.getBody().getMessage()).contains("01");
+    }
+
+    @Test
+    void handleInvalidPaymentMethodCode_shouldReturnBadRequest() {
+        // Given
+        InvalidPaymentMethodCodeException exception = new InvalidPaymentMethodCodeException("invalid");
+
+        // When
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response = 
+            exceptionHandler.handleInvalidPaymentMethodCode(exception);
+
+        // Then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(400);
+        assertThat(response.getBody().getError()).isEqualTo("Bad Request");
+        assertThat(response.getBody().getMessage()).contains("invalid");
+    }
+
+    @Test
+    void handleInvalidPaymentMethodData_shouldReturnBadRequest() {
+        // Given
+        InvalidPaymentMethodDataException exception = new InvalidPaymentMethodDataException("Invalid data");
+
+        // When
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response = 
+            exceptionHandler.handleInvalidPaymentMethodData(exception);
+
+        // Then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(400);
+        assertThat(response.getBody().getError()).isEqualTo("Bad Request");
+        assertThat(response.getBody().getMessage()).isEqualTo("Invalid data");
+    }
+
+    @Test
+    void handlePaymentMethodConstraint_shouldReturnConflict() {
+        // Given
+        PaymentMethodConstraintException exception = new PaymentMethodConstraintException("Constraint violation");
+
+        // When
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response = 
+            exceptionHandler.handlePaymentMethodConstraint(exception);
+
+        // Then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(409);
+        assertThat(response.getBody().getError()).isEqualTo("Conflict");
+        assertThat(response.getBody().getMessage()).isEqualTo("Constraint violation");
     }
 
     @Test
