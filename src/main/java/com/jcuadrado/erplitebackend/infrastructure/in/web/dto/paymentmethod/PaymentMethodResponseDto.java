@@ -1,5 +1,6 @@
 package com.jcuadrado.erplitebackend.infrastructure.in.web.dto.paymentmethod;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,8 +27,13 @@ public class PaymentMethodResponseDto {
     // Audit fields
     private Long createdBy;
     private Long updatedBy;
+    
+    @JsonIgnore
     private Long deletedBy;
+    
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    
+    @JsonIgnore
     private LocalDateTime deletedAt;
 }

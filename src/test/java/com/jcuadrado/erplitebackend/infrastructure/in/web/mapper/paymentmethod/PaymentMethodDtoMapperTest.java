@@ -1,5 +1,7 @@
 package com.jcuadrado.erplitebackend.infrastructure.in.web.mapper.paymentmethod;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.jcuadrado.erplitebackend.domain.model.paymentmethod.PaymentMethod;
 import com.jcuadrado.erplitebackend.infrastructure.in.web.dto.paymentmethod.CreatePaymentMethodRequestDto;
 import com.jcuadrado.erplitebackend.infrastructure.in.web.dto.paymentmethod.PaymentMethodResponseDto;
@@ -328,5 +330,51 @@ class PaymentMethodDtoMapperTest {
         assertThat(result.getCreatedAt()).isEqualTo(createdAt);
         assertThat(result.getUpdatedAt()).isEqualTo(updatedAt);
         // Internal fields not exposed in DTO
+    }
+
+    // ==================== JSON Serialization Tests ====================
+
+    @Test
+    void toResponseDto_shouldExcludeDeletedFieldsFromJsonSerialization() throws Exception {
+        // Given - PaymentMethod with all audit fields populated
+        UUID uuid = UUID.randomUUID();
+        LocalDateTime now = LocalDateTime.now();
+        PaymentMethod paymentMethod = PaymentMethod.builder()
+                .id(1L)
+                .uuid(uuid)
+                .code("CASH")
+                .name("Efectivo")
+                .enabled(true)
+                .createdBy(100L)
+                .updatedBy(200L)
+                .deletedBy(300L)  // This should be excluded
+                .createdAt(now.minusDays(10))
+                .updatedAt(now.minusDays(5))
+                .deletedAt(now)  // This should be excluded
+                .build();
+
+        // When
+        PaymentMethodResponseDto result = mapper.toResponseDto(paymentMethod);
+
+        // Then - Serialize to JSON
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        String json = objectMapper.writeValueAsString(result);
+
+        // Verify deletedBy and deletedAt are NOT present in JSON
+        assertThat(json).doesNotContain("deletedBy");
+        assertThat(json).doesNotContain("deletedAt");
+
+        // Verify other audit fields ARE present
+        assertThat(json).contains("createdBy");
+        assertThat(json).contains("updatedBy");
+        assertThat(json).contains("createdAt");
+        assertThat(json).contains("updatedAt");
+
+        // Verify core fields are present
+        assertThat(json).contains("uuid");
+        assertThat(json).contains("code");
+        assertThat(json).contains("name");
+        assertThat(json).contains("enabled");
     }
 }
