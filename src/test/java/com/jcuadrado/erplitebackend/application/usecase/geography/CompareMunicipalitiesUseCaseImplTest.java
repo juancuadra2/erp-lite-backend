@@ -1,8 +1,10 @@
 package com.jcuadrado.erplitebackend.application.usecase.geography;
 
+import com.jcuadrado.erplitebackend.domain.exception.geography.DepartmentNotFoundException;
 import com.jcuadrado.erplitebackend.domain.exception.geography.MunicipalityNotFoundException;
 import com.jcuadrado.erplitebackend.domain.model.geography.Department;
 import com.jcuadrado.erplitebackend.domain.model.geography.Municipality;
+import com.jcuadrado.erplitebackend.domain.port.geography.DepartmentRepository;
 import com.jcuadrado.erplitebackend.domain.port.geography.MunicipalityRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,12 +22,14 @@ import java.util.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
-
 @ExtendWith(MockitoExtension.class)
 class CompareMunicipalitiesUseCaseImplTest {
 
     @Mock
     private MunicipalityRepository repository;
+
+    @Mock
+    private DepartmentRepository departmentRepository;
 
     @InjectMocks
     private CompareMunicipalitiesUseCaseImpl useCase;
@@ -34,9 +38,13 @@ class CompareMunicipalitiesUseCaseImplTest {
     private Municipality sampleMunicipality2;
     private UUID sampleUuid1;
     private UUID sampleUuid2;
+    private Department sampleDepartment;
 
     @BeforeEach
     void setUp() {
+        sampleDepartment = Department.builder()
+                .id(1L).uuid(UUID.randomUUID()).code("05").name("Antioquia").enabled(true).build();
+
         sampleUuid1 = UUID.randomUUID();
         sampleUuid2 = UUID.randomUUID();
         Department dept = Department.builder().id(1L).code("05").name("Antioquia").build();
@@ -137,5 +145,43 @@ class CompareMunicipalitiesUseCaseImplTest {
 
         assertThat(result.getContent()).hasSize(1);
         verify(repository).findAll(filters, pageable);
+    }
+
+    @Test
+    void getAllByDepartment_shouldReturnMunicipalitiesWhenDepartmentExists() {
+        UUID departmentUuid = sampleDepartment.getUuid();
+        when(departmentRepository.findByUuid(departmentUuid)).thenReturn(Optional.of(sampleDepartment));
+        when(repository.findAllByDepartmentIdAndEnabled(1L, true))
+                .thenReturn(List.of(sampleMunicipality1, sampleMunicipality2));
+
+        List<Municipality> result = useCase.getAllByDepartment(departmentUuid);
+
+        assertThat(result).hasSize(2);
+        assertThat(result).containsExactly(sampleMunicipality1, sampleMunicipality2);
+        verify(departmentRepository, times(2)).findByUuid(departmentUuid);
+        verify(repository).findAllByDepartmentIdAndEnabled(1L, true);
+    }
+
+    @Test
+    void getAllByDepartment_shouldThrowWhenDepartmentNotFound() {
+        UUID departmentUuid = UUID.randomUUID();
+        when(departmentRepository.findByUuid(departmentUuid)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> useCase.getAllByDepartment(departmentUuid))
+                .isInstanceOf(DepartmentNotFoundException.class);
+        verify(departmentRepository).findByUuid(departmentUuid);
+        verify(repository, never()).findAllByDepartmentIdAndEnabled(any(), any());
+    }
+
+    @Test
+    void getAllByDepartment_shouldReturnEmptyListWhenNoMunicipalities() {
+        UUID departmentUuid = sampleDepartment.getUuid();
+        when(departmentRepository.findByUuid(departmentUuid)).thenReturn(Optional.of(sampleDepartment));
+        when(repository.findAllByDepartmentIdAndEnabled(1L, true)).thenReturn(Collections.emptyList());
+
+        List<Municipality> result = useCase.getAllByDepartment(departmentUuid);
+
+        assertThat(result).isEmpty();
+        verify(repository).findAllByDepartmentIdAndEnabled(1L, true);
     }
 }

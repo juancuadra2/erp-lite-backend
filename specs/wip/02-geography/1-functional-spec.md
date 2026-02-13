@@ -2,8 +2,14 @@
 
 **Feature**: Geography Module (Departments & Municipalities)  
 **Created**: January 10, 2026  
+**Updated**: February 12, 2026  
 **Module Type**: Independent Catalog (Sin dependencias)  
 **Phase**: PHASE 1 - Draft
+
+**Latest Update (2026-02-12)**: Agregado endpoint para obtener municipios por departamento sin paginación
+- ✅ Nuevo Scenario 2.9 - Para uso en dropdowns/selects del frontend
+- ✅ Respuesta simplificada sin campos de auditoría ni objeto department
+- ✅ No afecta endpoints existentes
 
 ---
 
@@ -168,6 +174,14 @@ El módulo de Geografía gestiona la jerarquía de ubicaciones administrativas d
 - **When** envío PATCH /api/municipalities/{uuid}/deactivate
 - **Then** recibo status 200 con enabled=false
 
+#### Scenario 2.9: Obtener todos los municipios por departamento (sin paginación)
+- **Given** departamento "Antioquia" con uuid tiene 125 municipios activos
+- **When** envío GET /api/departments/{departmentUuid}/municipalities
+- **Then** recibo status 200 con lista completa de 125 municipios
+- **And** cada municipio incluye información básica (uuid, code, name) sin campos de auditoría ni objeto department
+- **And** los municipios están ordenados alfabéticamente por nombre
+- **And** solo retorna municipios activos (enabled=true)
+
 ---
 
 ### User Story 3: Carga Inicial de Datos Geográficos (Priority: P1)
@@ -253,6 +267,7 @@ El módulo de Geografía gestiona la jerarquía de ubicaciones administrativas d
 - ✅ Eliminar municipio
 - ✅ Buscar por nombre con autocompletado
 - ✅ Autocompletado para formularios (query rápida)
+- ✅ Obtener todos los municipios de un departamento (sin paginación)
 
 ### FR-03: Importación Masiva
 - ✅ Importar datos de Colombia (32 departamentos + 1,100+ municipios)
@@ -317,6 +332,7 @@ Los siguientes elementos **NO** están incluidos en esta versión:
 | PATCH | /api/municipalities/{uuid}/activate | Activar |
 | GET | /api/municipalities/search | Búsqueda por nombre |
 | GET | /api/municipalities/autocomplete | Autocompletado |
+| GET | /api/departments/{uuid}/municipalities | Obtener todos los municipios de un departamento |
 
 ### Importación
 

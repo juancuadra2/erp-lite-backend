@@ -1,13 +1,17 @@
 package com.jcuadrado.erplitebackend.infrastructure.in.web.controller.geography;
 
 import com.jcuadrado.erplitebackend.application.port.geography.CompareDepartmentsUseCase;
+import com.jcuadrado.erplitebackend.application.port.geography.CompareMunicipalitiesUseCase;
 import com.jcuadrado.erplitebackend.application.port.geography.ManageDepartmentUseCase;
 import com.jcuadrado.erplitebackend.domain.model.geography.Department;
+import com.jcuadrado.erplitebackend.domain.model.geography.Municipality;
 import com.jcuadrado.erplitebackend.infrastructure.in.web.dto.geography.CreateDepartmentRequestDto;
 import com.jcuadrado.erplitebackend.infrastructure.in.web.dto.geography.DepartmentResponseDto;
+import com.jcuadrado.erplitebackend.infrastructure.in.web.dto.geography.MunicipalitySimplifiedDto;
 import com.jcuadrado.erplitebackend.infrastructure.in.web.dto.geography.UpdateDepartmentRequestDto;
 import com.jcuadrado.erplitebackend.infrastructure.in.web.dto.documenttypes.PagedResponseDto;
 import com.jcuadrado.erplitebackend.infrastructure.in.web.mapper.geography.DepartmentDtoMapper;
+import com.jcuadrado.erplitebackend.infrastructure.in.web.mapper.geography.MunicipalityDtoMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -39,7 +43,9 @@ public class DepartmentController {
 
     private final ManageDepartmentUseCase manageUseCase;
     private final CompareDepartmentsUseCase compareUseCase;
+    private final CompareMunicipalitiesUseCase compareMunicipalitiesUseCase;
     private final DepartmentDtoMapper mapper;
+    private final MunicipalityDtoMapper municipalityMapper;
 
     @Operation(summary = "Create department", description = "Creates a new Colombian department with the provided DANE code and name")
     @ApiResponses(value = {
@@ -199,5 +205,19 @@ public class DepartmentController {
             @PathVariable UUID uuid) {
         manageUseCase.deactivate(uuid);
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "Get all municipalities by department", description = "Retrieves all active municipalities for a department without pagination")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Municipalities retrieved successfully"),
+        @ApiResponse(responseCode = "404", description = "Department not found")
+    })
+    @GetMapping("/{uuid}/municipalities")
+    public ResponseEntity<List<MunicipalitySimplifiedDto>> getAllMunicipalitiesByDepartment(
+            @Parameter(description = "UUID of the department", required = true)
+            @PathVariable UUID uuid) {
+        List<Municipality> municipalities = compareMunicipalitiesUseCase.getAllByDepartment(uuid);
+        List<MunicipalitySimplifiedDto> response = municipalityMapper.toSimplifiedDtoList(municipalities);
+        return ResponseEntity.ok(response);
     }
 }

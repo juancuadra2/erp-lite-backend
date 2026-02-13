@@ -24,5 +24,7 @@ public interface MunicipalityJpaRepository extends
 
     List<MunicipalityEntity> findByEnabledTrue();
 
+    List<MunicipalityEntity> findByDepartmentIdAndEnabledOrderByNameAsc(Long departmentId, Boolean enabled);
+
     long countByDepartmentId(Long departmentId);
 }

@@ -1,8 +1,8 @@
 # Status - Geography Module
 
-**Ultima actualizacion**: 2026-02-07  
+**Ultima actualizacion**: 2026-02-12  
 **Developer**: GitHub Copilot (AI Assistant)  
-**Estado general**: Implementacion completada - Todas las tareas finalizadas (29/29)
+**Estado general**: Specs actualizados - Nuevo endpoint agregado
 
 ---
 
@@ -13,10 +13,21 @@
 - Compilacion exitosa, build SUCCESS.
 - Migraciones Flyway V3 (schema) y V4 (seed data Colombia) creadas.
 - BeanConfiguration y GlobalExceptionHandler actualizados.
+- **NUEVO**: Specs actualizados para incluir endpoint de municipios por departamento sin paginación.
 
 ---
 
 ## Cambios recientes
+
+**2026-02-12**:
+- Actualización de specs para agregar endpoint GET /api/geography/departments/{uuid}/municipalities
+- Nuevo scenario 2.9 en spec funcional: Obtener todos los municipios por departamento (sin paginación)
+- Actualización del spec técnico con nuevo método en CompareMunicipalitiesUseCase: `getAllByDepartment(UUID)`
+- Actualización de repository para incluir método `findAllByDepartmentIdAndEnabled(Long, Boolean)`
+- Documentación de nuevo endpoint REST con ejemplo de response
+- **Decisión de diseño**: Crear DTO ultra-simplificado `MunicipalitySimplifiedDto` (solo uuid, code, name) sin campos de auditoría ni objeto department para optimizar respuesta destinada a dropdowns/selects en frontend
+
+**2026-02-07**:
 
 1. Modelos de dominio: Department (Aggregate Root), Municipality (Entity).
 2. 7 excepciones de dominio especificas.
@@ -44,10 +55,10 @@
 
 | Documento | Estado | Ultima actualizacion |
 |-----------|--------|----------------------|
-| 1-functional-spec.md | Actualizado | 2026-02-07 |
-| 2-technical-spec.md | Actualizado | 2026-02-07 |
+| 1-functional-spec.md | Actualizado | 2026-02-12 |
+| 2-technical-spec.md | Actualizado | 2026-02-12 |
 | 3-tasks.json | Actualizado | 2026-02-07 |
-| status.md | Actualizado | 2026-02-07 |
+| status.md | Actualizado | 2026-02-12 |
 
 ---
 
@@ -79,6 +90,8 @@
 - Repository adapters (2)
 - DTOs (6), DTO mappers (2), Controllers (2)
 
+**Nota**: Los números reflejan la implementación actual. El nuevo endpoint requerirá agregar 1 DTO adicional (MunicipalitySimplifiedDto).
+
 ### Migrations (2 archivos)
 - V3__create_geography_tables.sql
 - V4__insert_colombia_geography.sql
@@ -105,4 +118,30 @@
 
 ## Pendientes
 
-Ninguno. Todas las tareas del módulo están completadas.
+### Nuevo endpoint a implementar (Funcionalidad adicional - No modifica código existente)
+
+**GET /api/geography/departments/{uuid}/municipalities**: Obtener todos los municipios de un departamento sin paginación
+
+#### Archivos nuevos a crear:
+- `MunicipalitySimplifiedDto.java` - Nuevo DTO simplificado (uuid, code, name)
+
+#### Archivos existentes a modificar (solo agregar métodos nuevos):
+- `CompareMunicipalitiesUseCase.java` - Agregar método `getAllByDepartment(UUID)`
+- `CompareMunicipalitiesUseCaseImpl.java` - Implementar método `getAllByDepartment(UUID)`
+- `MunicipalityRepository.java` - Agregar método `findAllByDepartmentIdAndEnabled(Long, Boolean)`
+- `MunicipalityRepositoryAdapter.java` - Implementar método `findAllByDepartmentIdAndEnabled(Long, Boolean)`
+- `MunicipalityJpaRepository.java` - Agregar query method
+- `MunicipalityDtoMapper.java` - Agregar métodos `toSimplifiedDto()` y `toSimplifiedDtoList()`
+- `DepartmentController.java` - Agregar endpoint GET /{uuid}/municipalities
+  - Inyectar `CompareMunicipalitiesUseCase` y `MunicipalityDtoMapper`
+
+#### Tests a agregar:
+- Test unitario para `MunicipalitySimplifiedDto`
+- Test para nuevo método en `CompareMunicipalitiesUseCaseImpl`
+- Test para nuevo método en mapper
+- Test para nuevo endpoint en `DepartmentController`
+
+#### Documentación:
+- Actualizar OpenAPI en `DepartmentController`
+
+**Nota importante**: `MunicipalityController` NO se modifica. El nuevo endpoint se agrega en `DepartmentController`.

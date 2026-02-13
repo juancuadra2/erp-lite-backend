@@ -1,8 +1,10 @@
 package com.jcuadrado.erplitebackend.application.usecase.geography;
 
 import com.jcuadrado.erplitebackend.application.port.geography.CompareMunicipalitiesUseCase;
+import com.jcuadrado.erplitebackend.domain.exception.geography.DepartmentNotFoundException;
 import com.jcuadrado.erplitebackend.domain.exception.geography.MunicipalityNotFoundException;
 import com.jcuadrado.erplitebackend.domain.model.geography.Municipality;
+import com.jcuadrado.erplitebackend.domain.port.geography.DepartmentRepository;
 import com.jcuadrado.erplitebackend.domain.port.geography.MunicipalityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -20,6 +22,7 @@ import java.util.UUID;
 public class CompareMunicipalitiesUseCaseImpl implements CompareMunicipalitiesUseCase {
 
     private final MunicipalityRepository repository;
+    private final DepartmentRepository departmentRepository;
 
     @Override
     public Municipality getByUuid(UUID uuid) {
@@ -30,6 +33,14 @@ public class CompareMunicipalitiesUseCaseImpl implements CompareMunicipalitiesUs
     @Override
     public List<Municipality> getAllActive() {
         return repository.findAllEnabled();
+    }
+
+    @Override
+    public List<Municipality> getAllByDepartment(UUID departmentUuid) {
+        departmentRepository.findByUuid(departmentUuid)
+                .orElseThrow(() -> new DepartmentNotFoundException(departmentUuid));
+        Long departmentId = departmentRepository.findByUuid(departmentUuid).get().getId();
+        return repository.findAllByDepartmentIdAndEnabled(departmentId, true);
     }
 
     @Override

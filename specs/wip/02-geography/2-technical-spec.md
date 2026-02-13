@@ -2,10 +2,16 @@
 
 **Feature**: Geography Module (Departments & Municipalities)  
 **Created**: January 10, 2026  
-**Updated**: February 7, 2026  
+**Updated**: February 12, 2026  
 **Related**: [functional-spec.md](1-functional-spec.md)  
 **Phase**: PHASE 2 - Draft  
 **Arquitectura:** Hexagonal (Puertos y Adaptadores)
+
+**Latest Update (2026-02-12)**: Agregado endpoint GET /api/geography/departments/{uuid}/municipalities
+- ✅ Funcionalidad **ADICIONAL** - No modifica implementación existente
+- ✅ Nuevo DTO simplificado: `MunicipalitySimplifiedDto` (uuid, code, name)
+- ✅ Nuevos métodos en use case, repository y mapper
+- ✅ Nuevo endpoint en `DepartmentController` (no modifica `MunicipalityController`)
 
 ---
 
@@ -93,7 +99,8 @@ com.jcuadrado.erplitebackend/
     │       │       ├── DepartmentResponseDto.java
     │       │       ├── CreateMunicipalityRequestDto.java
     │       │       ├── UpdateMunicipalityRequestDto.java
-    │       │       └── MunicipalityResponseDto.java
+    │       │       ├── MunicipalityResponseDto.java
+    │       │       └── MunicipalitySimplifiedDto.java           # Simplified DTO without audit fields
     │       ├── mapper/
     │       │   └── geography/
     │       │       ├── DepartmentDtoMapper.java
@@ -314,9 +321,18 @@ public interface CompareMunicipalitiesUseCase {
     List<Municipality> getAllActive();
     
     /**
-     * Find municipalities by department
+     * Find municipalities by department (paginated)
      */
     Page<Municipality> findByDepartment(UUID departmentUuid, Pageable pageable);
+    
+    /**
+     * Get all municipalities by department (non-paginated, for dropdowns/selects)
+     * Returns simplified data without audit fields for better performance
+     * @param departmentUuid Department UUID
+     * @return List of all active municipalities for the department, sorted by name
+     * @apiNote NEW METHOD - Does not affect existing implementation
+     */
+    List<Municipality> getAllByDepartment(UUID departmentUuid);
     
     /**
      * Find all municipalities with filters and pagination
@@ -382,6 +398,10 @@ public interface MunicipalityRepository {
     Optional<Municipality> findByCodeAndDepartmentId(String code, Long departmentId);
     Page<Municipality> findByDepartmentId(Long departmentId, Pageable pageable);
     Page<Municipality> findByDepartmentIdAndEnabled(Long departmentId, Boolean enabled, Pageable pageable);
+    
+    // NEW METHOD - Returns all active municipalities for a department (non-paginated)
+    List<Municipality> findAllByDepartmentIdAndEnabled(Long departmentId, Boolean enabled);
+    
     Page<Municipality> findByNameContaining(String name, Pageable pageable);
     Page<Municipality> findAll(Pageable pageable);
     List<Municipality> findAllEnabled();
@@ -830,6 +850,10 @@ public class DepartmentController {
     private final DeleteDepartmentUseCase deleteUseCase;
     private final DepartmentDtoMapper dtoMapper;
     
+    // NEW DEPENDENCY - For new endpoint getAllMunicipalitiesByDepartment
+    private final CompareMunicipalitiesUseCase compareMunicipalitiesUseCase;
+    private final MunicipalityDtoMapper municipalityDtoMapper;
+    
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public DepartmentResponseDto create(
@@ -853,13 +877,23 @@ public class DepartmentController {
         return departments.map(dtoMapper::toResponseDto);
     }
     
-    // Other endpoints...
+    // NEW ENDPOINT - Get all municipalities by department (non-paginated)
+    @GetMapping("/{uuid}/municipalities")
+    public List<MunicipalitySimplifiedDto> getAllMunicipalitiesByDepartment(@PathVariable UUID uuid) {
+        List<Municipality> municipalities = compareMunicipalitiesUseCase.getAllByDepartment(uuid);
+        return municipalityDtoMapper.toSimplifiedDtoList(municipalities);
+    }
+    
+    // Other existing endpoints...
 }
 
 @RestController
 @RequestMapping("/api/geography/municipalities")
 @RequiredArgsConstructor
 public class MunicipalityController {
+    // EXISTING CONTROLLER - No modifications required for new endpoint
+    // New endpoint is added to DepartmentController instead
+    
     private final CreateMunicipalityUseCase createUseCase;
     private final GetMunicipalityUseCase getUseCase;
     private final UpdateMunicipalityUseCase updateUseCase;
@@ -873,9 +907,8 @@ public class MunicipalityController {
 }
 ```
 
-**DTOs** (`infrastructure/in/api/geography/dto/`)
+**DTOs** (`infrastructure/in/web/dto/geography/`)
 
-Department DTOs (`infrastructure/in/api/geography/dto/department/`)
 ```java
 // CreateDepartmentRequestDto.java
 public record CreateDepartmentRequestDto(
@@ -892,59 +925,6 @@ public record UpdateDepartmentRequestDto(
 
 // DepartmentResponseDto.java
 public record DepartmentResponseDto(
-    UUID uuid,
-    String code,
-    String name,
-    Boolean enabled,
-    LocalDateTime createdAt,
-    LocalDateTime updatedAt
-) {}
-```
-
-**Municipality DTOs** (`infrastructure/in/web/dto/geography/`)
-```java
-// CreateMunicipalityRequestDto.java
-public record CreateMunicipalityRequestDto(
-    @NotNull Long departmentId,
-    @NotBlank @Pattern(regexp = "\\d{5}") String code,
-    @NotBlank @Size(max = 100) String name,
-    @NotNull Boolean enabled
-) {}
-
-// UpdateMunicipalityRequestDto.java
-public record UpdateMunicipalityRequestDto(
-    @NotBlank @Size(max = 100) String name,
-    @NotNull Boolean enabled
-) {}
-
-// MunicipalityResponseDto.java
-public record MunicipalityResponseDto(
-    UUID uuid,
-    String code,
-    String name,
-    DepartmentResponseDto department,
-    Boolean enabled,
-    LocalDateTime createdAt,
-    LocalDateTime updatedAt
-) {}
-```
-
-**DTO Mappers** (`infrastructure/in/web/mapper/geography/`)
-```java
-// DepartmentDtoMapper.java
-@Mapper(componentModel = "spring")
-public interface DepartmentDtoMapper {
-    DepartmentResponseDto toResponseDto(Department department);
-    List<DepartmentResponseDto> toResponseDtoList(List<Department> departments);
-}
-
-// MunicipalityDtoMapper.java
-@Mapper(componentModel = "spring", uses = {DepartmentDtoMapper.class})
-public interface MunicipalityDtoMapper {
-    MunicipalityResponseDto toResponseDto(Municipality municipality);
-    List<MunicipalityResponseDto> toResponseDtoList(List<Municipality> municipalities);
-}
-public record DepartmentResponseDto(
     Long id,
     UUID uuid,
     String code,
@@ -960,6 +940,12 @@ public record DepartmentResponseDto(
 public record CreateMunicipalityRequestDto(
     @NotNull UUID departmentId,
     @NotBlank @Pattern(regexp = "\\d{5}") String code,
+    @NotBlank @Size(max = 100) String name,
+    @NotNull Boolean enabled
+) {}
+
+// UpdateMunicipalityRequestDto.java
+public record UpdateMunicipalityRequestDto(
     @NotBlank @Size(max = 100) String name,
     @NotNull Boolean enabled
 ) {}
@@ -984,6 +970,37 @@ public record MunicipalityAutocompleteDto(
     String name,
     String departmentName
 ) {}
+
+// MunicipalitySimplifiedDto.java - For non-paginated lists (dropdowns/selects)
+// NEW DTO - Does not replace MunicipalityResponseDto
+// Excludes department object since it's redundant when querying by department
+public record MunicipalitySimplifiedDto(
+    UUID uuid,
+    String code,
+    String name
+) {}
+```
+
+**DTO Mappers** (`infrastructure/in/web/mapper/geography/`)
+```java
+// DepartmentDtoMapper.java
+@Mapper(componentModel = "spring")
+public interface DepartmentDtoMapper {
+    DepartmentResponseDto toResponseDto(Department department);
+    List<DepartmentResponseDto> toResponseDtoList(List<Department> departments);
+}
+
+// MunicipalityDtoMapper.java
+@Mapper(componentModel = "spring", uses = {DepartmentDtoMapper.class})
+public interface MunicipalityDtoMapper {
+    // EXISTING METHODS - Do not modify
+    MunicipalityResponseDto toResponseDto(Municipality municipality);
+    List<MunicipalityResponseDto> toResponseDtoList(List<Municipality> municipalities);
+    
+    // NEW METHODS - Simplified mapping for non-paginated lists (without audit fields)
+    MunicipalitySimplifiedDto toSimplifiedDto(Municipality municipality);
+    List<MunicipalitySimplifiedDto> toSimplifiedDtoList(List<Municipality> municipalities);
+}
 ```
 
 ---
@@ -1063,6 +1080,12 @@ Response (200 OK):
 | PATCH | `/{uuid}/deactivate` | Desactivar municipio | 200, 404 |
 | GET | `/` | Listar municipios (paginado) | 200 |
 
+**Base Path**: `/api/geography/departments`
+
+| Method | Endpoint | Description | Status Codes |
+|--------|----------|-------------|---------------|
+| GET | `/{uuid}/municipalities` | **[NUEVO]** Obtener todos los municipios de un departamento (sin paginación, respuesta simplificada) | 200, 404 |
+
 #### Ejemplos de Requests/Responses
 
 **POST /api/geography/municipalities**
@@ -1122,6 +1145,29 @@ Response (200 OK):
   "totalPages": 3
 }
 ```
+
+**GET /api/geography/departments/{departmentUuid}/municipalities**
+```json
+Response (200 OK):
+[
+  {
+    "uuid": "660e8400-e29b-41d4-a716-446655440001",
+    "code": "05001",
+    "name": "Medellín"
+  },
+  {
+    "uuid": "660e8400-e29b-41d4-a716-446655440002",
+    "code": "05002",
+    "name": "Abejorral"
+  },
+  {
+    "uuid": "660e8400-e29b-41d4-a716-446655440003",
+    "code": "05004",
+    "name": "Abriaquí"
+  }
+]
+```
+Note: Retorna todos los municipios activos del departamento sin paginación, ordenados alfabéticamente por nombre. **Respuesta ultra-simplificada** sin campos de auditoría (enabled, createdAt, updatedAt) ni objeto department (redundante al consultar por departamento específico). Optimizada para dropdowns/selects.
 
 ### Error Responses
 

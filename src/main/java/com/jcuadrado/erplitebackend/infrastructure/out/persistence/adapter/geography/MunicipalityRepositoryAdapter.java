@@ -60,6 +60,13 @@ public class MunicipalityRepositoryAdapter implements MunicipalityRepository {
     }
 
     @Override
+    public List<Municipality> findAllByDepartmentIdAndEnabled(Long departmentId, Boolean enabled) {
+        return jpaRepository.findByDepartmentIdAndEnabledOrderByNameAsc(departmentId, enabled).stream()
+                .map(mapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public boolean existsByCodeAndDepartmentId(String code, Long departmentId) {
         return jpaRepository.existsByCodeAndDepartmentId(code, departmentId);
     }
