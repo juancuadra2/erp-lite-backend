@@ -1,8 +1,5 @@
 package com.jcuadrado.erplitebackend.domain.exception.paymentmethod;
 
-/**
- * Exception thrown when a payment method is not found
- */
 public class PaymentMethodNotFoundException extends RuntimeException {
     
     public PaymentMethodNotFoundException(String message) {

@@ -15,11 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-/**
- * Implementation of ComparePaymentMethodsUseCase
- * Orchestrates repository for query operations
- * CQRS - Query side with readOnly transactions
- */
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)

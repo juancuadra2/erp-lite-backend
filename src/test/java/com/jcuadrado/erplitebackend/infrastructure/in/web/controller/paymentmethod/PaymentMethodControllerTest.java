@@ -93,7 +93,7 @@ class PaymentMethodControllerTest {
         assertNotNull(response);
         assertEquals(201, response.getStatusCode().value());
         assertNotNull(response.getBody());
-        assertEquals(createdUuid, response.getBody().getUuid());
+        assertEquals(createdUuid, response.getBody().uuid());
         verify(manageUseCase).create(domainModel);
     }
 
@@ -145,7 +145,7 @@ class PaymentMethodControllerTest {
         assertNotNull(response);
         assertEquals(200, response.getStatusCode().value());
         assertNotNull(response.getBody());
-        assertEquals(uuid, response.getBody().getUuid());
+        assertEquals(uuid, response.getBody().uuid());
         verify(compareUseCase).getByUuid(uuid);
     }
 
@@ -185,7 +185,7 @@ class PaymentMethodControllerTest {
         assertNotNull(response);
         assertEquals(200, response.getStatusCode().value());
         assertNotNull(response.getBody());
-        assertEquals(code, response.getBody().getCode());
+        assertEquals(code, response.getBody().code());
         verify(compareUseCase).getByCode(code);
     }
 
@@ -395,7 +395,7 @@ class PaymentMethodControllerTest {
         assertNotNull(response);
         assertEquals(200, response.getStatusCode().value());
         assertNotNull(response.getBody());
-        assertEquals("Efectivo Actualizado", response.getBody().getName());
+        assertEquals("Efectivo Actualizado", response.getBody().name());
         verify(manageUseCase).update(uuid, domainModel);
     }
 
@@ -419,34 +419,56 @@ class PaymentMethodControllerTest {
     // ==================== activate Tests ====================
 
     @Test
-    void activate_shouldReturn204() {
+    void activate_shouldReturn200WithPaymentMethod() {
         // Given
         UUID uuid = UUID.randomUUID();
-        doNothing().when(manageUseCase).activate(uuid);
+        PaymentMethod activated = PaymentMethod.builder()
+                .uuid(uuid)
+                .code("CASH")
+                .name("Efectivo")
+                .enabled(true)
+                .build();
+
+        when(manageUseCase.activate(uuid)).thenReturn(activated);
+        when(mapper.toResponseDto(activated)).thenAnswer(invocation ->
+            createResponseDto(invocation.getArgument(0)));
 
         // When
-        ResponseEntity<Void> response = controller.activate(uuid);
+        ResponseEntity<PaymentMethodResponseDto> response = controller.activate(uuid);
 
         // Then
         assertNotNull(response);
-        assertEquals(204, response.getStatusCode().value());
+        assertEquals(200, response.getStatusCode().value());
+        assertNotNull(response.getBody());
+        assertTrue(response.getBody().enabled());
         verify(manageUseCase).activate(uuid);
     }
 
     // ==================== deactivate Tests ====================
 
     @Test
-    void deactivate_shouldReturn204() {
+    void deactivate_shouldReturn200WithPaymentMethod() {
         // Given
         UUID uuid = UUID.randomUUID();
-        doNothing().when(manageUseCase).deactivate(uuid);
+        PaymentMethod deactivated = PaymentMethod.builder()
+                .uuid(uuid)
+                .code("CASH")
+                .name("Efectivo")
+                .enabled(false)
+                .build();
+
+        when(manageUseCase.deactivate(uuid)).thenReturn(deactivated);
+        when(mapper.toResponseDto(deactivated)).thenAnswer(invocation ->
+            createResponseDto(invocation.getArgument(0)));
 
         // When
-        ResponseEntity<Void> response = controller.deactivate(uuid);
+        ResponseEntity<PaymentMethodResponseDto> response = controller.deactivate(uuid);
 
         // Then
         assertNotNull(response);
-        assertEquals(204, response.getStatusCode().value());
+        assertEquals(200, response.getStatusCode().value());
+        assertNotNull(response.getBody());
+        assertFalse(response.getBody().enabled());
         verify(manageUseCase).deactivate(uuid);
     }
 }

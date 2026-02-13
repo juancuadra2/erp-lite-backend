@@ -199,27 +199,27 @@ public class PaymentMethodController {
 
     @Operation(summary = "Activate payment method", description = "Activates a payment method")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "204", description = "Payment method activated successfully"),
+        @ApiResponse(responseCode = "200", description = "Payment method activated successfully"),
         @ApiResponse(responseCode = "404", description = "Payment method not found")
     })
     @PatchMapping("/{uuid}/activate")
-    public ResponseEntity<Void> activate(
+    public ResponseEntity<PaymentMethodResponseDto> activate(
             @Parameter(description = "UUID of the payment method", required = true)
             @PathVariable UUID uuid) {
-        manageUseCase.activate(uuid);
-        return ResponseEntity.noContent().build();
+        PaymentMethod activated = manageUseCase.activate(uuid);
+        return ResponseEntity.ok(mapper.toResponseDto(activated));
     }
 
     @Operation(summary = "Deactivate payment method", description = "Deactivates a payment method")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "204", description = "Payment method deactivated successfully"),
+        @ApiResponse(responseCode = "200", description = "Payment method deactivated successfully"),
         @ApiResponse(responseCode = "404", description = "Payment method not found")
     })
     @PatchMapping("/{uuid}/deactivate")
-    public ResponseEntity<Void> deactivate(
+    public ResponseEntity<PaymentMethodResponseDto> deactivate(
             @Parameter(description = "UUID of the payment method", required = true)
             @PathVariable UUID uuid) {
-        manageUseCase.deactivate(uuid);
-        return ResponseEntity.noContent().build();
+        PaymentMethod deactivated = manageUseCase.deactivate(uuid);
+        return ResponseEntity.ok(mapper.toResponseDto(deactivated));
     }
 }

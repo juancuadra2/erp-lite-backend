@@ -84,6 +84,7 @@ class ManagePaymentMethodUseCaseImplTest {
 
         PaymentMethod captured = paymentMethodCaptor.getValue();
         assertThat(captured.getCreatedAt()).isNotNull();
+        assertThat(captured.getCreatedBy()).isEqualTo(0L);
     }
 
     @Test
@@ -147,6 +148,7 @@ class ManagePaymentMethodUseCaseImplTest {
         assertThat(captured.getName()).isEqualTo("New Name");
         assertThat(captured.getEnabled()).isFalse();
         assertThat(captured.getUpdatedAt()).isNotNull();
+        assertThat(captured.getUpdatedBy()).isEqualTo(0L);
     }
 
     @Test
@@ -228,6 +230,8 @@ class ManagePaymentMethodUseCaseImplTest {
         PaymentMethod captured = paymentMethodCaptor.getValue();
         assertThat(captured.getEnabled()).isFalse();
         assertThat(captured.getDeletedAt()).isNotNull();
+        assertThat(captured.getDeletedBy()).isEqualTo(0L);
+        assertThat(captured.getUpdatedBy()).isEqualTo(0L);
     }
 
     @Test
@@ -272,7 +276,7 @@ class ManagePaymentMethodUseCaseImplTest {
     // ==================== activate Tests ====================
 
     @Test
-    void activate_shouldActivatePaymentMethod() {
+        void activate_shouldActivatePaymentMethod() {
         // Given
         PaymentMethod existingPaymentMethod = PaymentMethod.builder()
                 .uuid(sampleUuid)
@@ -285,15 +289,17 @@ class ManagePaymentMethodUseCaseImplTest {
         when(repository.save(any(PaymentMethod.class))).thenReturn(existingPaymentMethod);
 
         // When
-        useCase.activate(sampleUuid);
+        PaymentMethod result = useCase.activate(sampleUuid);
 
         // Then
+        assertThat(result).isNotNull();
         verify(repository).findByUuid(sampleUuid);
         verify(repository).save(paymentMethodCaptor.capture());
 
         PaymentMethod captured = paymentMethodCaptor.getValue();
         assertThat(captured.getEnabled()).isTrue();
         assertThat(captured.getUpdatedAt()).isNotNull();
+        assertThat(captured.getUpdatedBy()).isEqualTo(0L);
     }
 
     @Test
@@ -322,20 +328,25 @@ class ManagePaymentMethodUseCaseImplTest {
                 .build();
 
         when(repository.findByUuid(sampleUuid)).thenReturn(Optional.of(existingPaymentMethod));
-        when(domainService.canDeactivate(existingPaymentMethod)).thenReturn(true);
+        when(repository.countTransactionsWithPaymentMethod(sampleUuid)).thenReturn(0L);
+        when(domainService.canDeactivate(existingPaymentMethod, 0L)).thenReturn(true);
         when(repository.save(any(PaymentMethod.class))).thenReturn(existingPaymentMethod);
 
         // When
-        useCase.deactivate(sampleUuid);
+        PaymentMethod result = useCase.deactivate(sampleUuid);
 
         // Then
+        assertThat(result).isNotNull();
         verify(repository).findByUuid(sampleUuid);
-        verify(domainService).canDeactivate(existingPaymentMethod);
+        verify(repository).countTransactionsWithPaymentMethod(sampleUuid);
+        verify(domainService).canDeactivate(existingPaymentMethod, 0L);
         verify(repository).save(paymentMethodCaptor.capture());
 
         PaymentMethod captured = paymentMethodCaptor.getValue();
         assertThat(captured.getEnabled()).isFalse();
         assertThat(captured.getUpdatedAt()).isNotNull();
+        assertThat(captured.getDeletedBy()).isEqualTo(0L);
+        assertThat(captured.getUpdatedBy()).isEqualTo(0L);
     }
 
     @Test
@@ -348,7 +359,8 @@ class ManagePaymentMethodUseCaseImplTest {
                 .isInstanceOf(PaymentMethodNotFoundException.class);
 
         verify(repository).findByUuid(sampleUuid);
-        verify(domainService, never()).canDeactivate(any());
+        verify(repository, never()).countTransactionsWithPaymentMethod(any());
+        verify(domainService, never()).canDeactivate(any(), anyLong());
         verify(repository, never()).save(any());
     }
 
@@ -363,14 +375,16 @@ class ManagePaymentMethodUseCaseImplTest {
                 .build();
 
         when(repository.findByUuid(sampleUuid)).thenReturn(Optional.of(existingPaymentMethod));
-        when(domainService.canDeactivate(existingPaymentMethod)).thenReturn(false);
+        when(repository.countTransactionsWithPaymentMethod(sampleUuid)).thenReturn(10L);
+        when(domainService.canDeactivate(existingPaymentMethod, 10L)).thenReturn(false);
 
         // When & Then
         assertThatThrownBy(() -> useCase.deactivate(sampleUuid))
                 .isInstanceOf(PaymentMethodConstraintException.class);
 
         verify(repository).findByUuid(sampleUuid);
-        verify(domainService).canDeactivate(existingPaymentMethod);
+        verify(repository).countTransactionsWithPaymentMethod(sampleUuid);
+        verify(domainService).canDeactivate(existingPaymentMethod, 10L);
         verify(repository, never()).save(any());
     }
 }

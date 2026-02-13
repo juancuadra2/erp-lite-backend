@@ -28,10 +28,10 @@ public interface ManagePaymentMethodUseCase {
     /**
      * Activate a payment method
      */
-    void activate(UUID uuid);
+    PaymentMethod activate(UUID uuid);
 
     /**
      * Deactivate a payment method
      */
-    void deactivate(UUID uuid);
+    PaymentMethod deactivate(UUID uuid);
 }

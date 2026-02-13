@@ -170,12 +170,12 @@ class PaymentMethodDtoMapperTest {
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getUuid()).isEqualTo(uuid);
-        assertThat(result.getCode()).isEqualTo("CHECK");
-        assertThat(result.getName()).isEqualTo("Cheque");
-        assertThat(result.getEnabled()).isTrue();
-        assertThat(result.getCreatedAt()).isEqualTo(now);
-        assertThat(result.getUpdatedAt()).isEqualTo(now);
+        assertThat(result.uuid()).isEqualTo(uuid);
+        assertThat(result.code()).isEqualTo("CHECK");
+        assertThat(result.name()).isEqualTo("Cheque");
+        assertThat(result.enabled()).isTrue();
+        assertThat(result.createdAt()).isEqualTo(now);
+        assertThat(result.updatedAt()).isEqualTo(now);
     }
 
     @Test
@@ -199,8 +199,8 @@ class PaymentMethodDtoMapperTest {
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getCreatedAt()).isEqualTo(createdAt);
-        assertThat(result.getUpdatedAt()).isEqualTo(updatedAt);
+        assertThat(result.createdAt()).isEqualTo(createdAt);
+        assertThat(result.updatedAt()).isEqualTo(updatedAt);
     }
 
     @Test
@@ -219,12 +219,12 @@ class PaymentMethodDtoMapperTest {
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getUuid()).isEqualTo(uuid);
-        assertThat(result.getCode()).isEqualTo("WALLET");
-        assertThat(result.getName()).isEqualTo("Billetera Digital");
-        assertThat(result.getEnabled()).isNull();
-        assertThat(result.getCreatedAt()).isNull();
-        assertThat(result.getUpdatedAt()).isNull();
+        assertThat(result.uuid()).isEqualTo(uuid);
+        assertThat(result.code()).isEqualTo("WALLET");
+        assertThat(result.name()).isEqualTo("Billetera Digital");
+        assertThat(result.enabled()).isNull();
+        assertThat(result.createdAt()).isNull();
+        assertThat(result.updatedAt()).isNull();
     }
 
     @Test
@@ -262,10 +262,10 @@ class PaymentMethodDtoMapperTest {
 
         // Then
         assertThat(responseDto).isNotNull();
-        assertThat(responseDto.getCode()).isEqualTo(createDto.getCode());
-        assertThat(responseDto.getName()).isEqualTo(createDto.getName());
-        assertThat(responseDto.getUuid()).isNotNull();
-        assertThat(responseDto.getEnabled()).isTrue();
+        assertThat(responseDto.code()).isEqualTo(createDto.getCode());
+        assertThat(responseDto.name()).isEqualTo(createDto.getName());
+        assertThat(responseDto.uuid()).isNotNull();
+        assertThat(responseDto.enabled()).isTrue();
     }
 
     @Test
@@ -293,10 +293,10 @@ class PaymentMethodDtoMapperTest {
 
         // Then
         assertThat(responseDto).isNotNull();
-        assertThat(responseDto.getCode()).isEqualTo(updateDto.getCode());
-        assertThat(responseDto.getName()).isEqualTo(updateDto.getName());
-        assertThat(responseDto.getEnabled()).isEqualTo(updateDto.getEnabled());
-        assertThat(responseDto.getUuid()).isNotNull();
+        assertThat(responseDto.code()).isEqualTo(updateDto.getCode());
+        assertThat(responseDto.name()).isEqualTo(updateDto.getName());
+        assertThat(responseDto.enabled()).isEqualTo(updateDto.getEnabled());
+        assertThat(responseDto.uuid()).isNotNull();
     }
 
     @Test
@@ -323,12 +323,12 @@ class PaymentMethodDtoMapperTest {
 
         // Then - ResponseDto should only include external fields
         assertThat(result).isNotNull();
-        assertThat(result.getUuid()).isEqualTo(uuid);
-        assertThat(result.getCode()).isEqualTo("CRYPTO");
-        assertThat(result.getName()).isEqualTo("Criptomoneda");
-        assertThat(result.getEnabled()).isTrue();
-        assertThat(result.getCreatedAt()).isEqualTo(createdAt);
-        assertThat(result.getUpdatedAt()).isEqualTo(updatedAt);
+        assertThat(result.uuid()).isEqualTo(uuid);
+        assertThat(result.code()).isEqualTo("CRYPTO");
+        assertThat(result.name()).isEqualTo("Criptomoneda");
+        assertThat(result.enabled()).isTrue();
+        assertThat(result.createdAt()).isEqualTo(createdAt);
+        assertThat(result.updatedAt()).isEqualTo(updatedAt);
         // Internal fields not exposed in DTO
     }
 

@@ -14,16 +14,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-/**
- * Implementation of ManagePaymentMethodUseCase
- * Orchestrates domain services and repository for command operations
- * CQRS - Command side with write transactions
- */
 @Service
 @RequiredArgsConstructor
 @Transactional
 @Slf4j
 public class ManagePaymentMethodUseCaseImpl implements ManagePaymentMethodUseCase {
+
+    private static final Long SYSTEM_USER_ID = 0L;
 
     private final PaymentMethodRepository repository;
     private final PaymentMethodDomainService domainService;
@@ -32,14 +29,11 @@ public class ManagePaymentMethodUseCaseImpl implements ManagePaymentMethodUseCas
     public PaymentMethod create(PaymentMethod paymentMethod) {
         log.debug("Creating payment method with code: {}", paymentMethod.getCode());
 
-        // Prepare and validate for creation
         domainService.prepareForCreation(paymentMethod);
 
-        // Set audit fields
         paymentMethod.setCreatedAt(LocalDateTime.now());
-        // TODO: Set createdBy from security context when auth is implemented
+        paymentMethod.setCreatedBy(SYSTEM_USER_ID);
 
-        // Save and return
         PaymentMethod saved = repository.save(paymentMethod);
 
         log.info("Payment method created successfully with ID: {} and UUID: {}", saved.getId(), saved.getUuid());
@@ -50,25 +44,20 @@ public class ManagePaymentMethodUseCaseImpl implements ManagePaymentMethodUseCas
     public PaymentMethod update(UUID uuid, PaymentMethod paymentMethod) {
         log.debug("Updating payment method with UUID: {}", uuid);
 
-        // Find existing payment method
         PaymentMethod existing = repository.findByUuid(uuid)
             .orElseThrow(() -> new PaymentMethodNotFoundException("uuid", uuid.toString()));
 
-        // Update fields
         existing.setCode(paymentMethod.getCode());
         existing.setName(paymentMethod.getName());
         if (paymentMethod.getEnabled() != null) {
             existing.setEnabled(paymentMethod.getEnabled());
         }
 
-        // Prepare and validate for update
         domainService.prepareForUpdate(existing, uuid);
 
-        // Set audit fields
         existing.setUpdatedAt(LocalDateTime.now());
-        // TODO: Set updatedBy from security context when auth is implemented
+        existing.setUpdatedBy(SYSTEM_USER_ID);
 
-        // Save and return
         PaymentMethod updated = repository.save(existing);
 
         log.info("Payment method updated successfully with UUID: {}", uuid);
@@ -79,11 +68,9 @@ public class ManagePaymentMethodUseCaseImpl implements ManagePaymentMethodUseCas
     public void delete(UUID uuid) {
         log.debug("Deleting payment method with UUID: {}", uuid);
 
-        // Find existing payment method
         PaymentMethod existing = repository.findByUuid(uuid)
             .orElseThrow(() -> new PaymentMethodNotFoundException("uuid", uuid.toString()));
 
-        // Check if can be deleted (BR-PM-003: cannot delete if has transactions)
         long transactionsCount = repository.countTransactionsWithPaymentMethod(uuid);
         if (!domainService.canDelete(existing, transactionsCount)) {
             throw new PaymentMethodConstraintException(
@@ -91,57 +78,52 @@ public class ManagePaymentMethodUseCaseImpl implements ManagePaymentMethodUseCas
             );
         }
 
-        // Soft delete
-        existing.deactivate(null); // TODO: Get userId from security context
+        existing.deactivate(SYSTEM_USER_ID);
+        existing.setUpdatedBy(SYSTEM_USER_ID);
+        existing.setUpdatedAt(LocalDateTime.now());
         repository.save(existing);
 
         log.info("Payment method soft-deleted successfully with UUID: {}", uuid);
     }
 
     @Override
-    public void activate(UUID uuid) {
+    public PaymentMethod activate(UUID uuid) {
         log.debug("Activating payment method with UUID: {}", uuid);
 
-        // Find existing payment method
         PaymentMethod existing = repository.findByUuid(uuid)
             .orElseThrow(() -> new PaymentMethodNotFoundException("uuid", uuid.toString()));
 
-        // Activate
         existing.activate();
-
-        // Set audit fields
         existing.setUpdatedAt(LocalDateTime.now());
-        // TODO: Set updatedBy from security context when auth is implemented
+        existing.setUpdatedBy(SYSTEM_USER_ID);
 
-        // Save
-        repository.save(existing);
+        PaymentMethod activated = repository.save(existing);
 
         log.info("Payment method activated successfully with UUID: {}", uuid);
+        return activated;
     }
 
     @Override
-    public void deactivate(UUID uuid) {
+    public PaymentMethod deactivate(UUID uuid) {
         log.debug("Deactivating payment method with UUID: {}", uuid);
 
-        // Find existing payment method
         PaymentMethod existing = repository.findByUuid(uuid)
             .orElseThrow(() -> new PaymentMethodNotFoundException("uuid", uuid.toString()));
 
-        // Check if can be deactivated (always allowed for payment methods)
-        if (!domainService.canDeactivate(existing)) {
-            throw new PaymentMethodConstraintException("Cannot deactivate payment method");
+        long transactionsCount = repository.countTransactionsWithPaymentMethod(uuid);
+        if (!domainService.canDeactivate(existing, transactionsCount)) {
+            throw new PaymentMethodConstraintException(
+                "Cannot deactivate payment method with associated transactions. Found " + transactionsCount + " transactions."
+            );
         }
 
-        // Deactivate
-        existing.deactivate(null); // TODO: Get userId from security context
-
-        // Set audit fields
+        existing.deactivate(SYSTEM_USER_ID);
         existing.setUpdatedAt(LocalDateTime.now());
-        // TODO: Set updatedBy from security context when auth is implemented
+        existing.setUpdatedBy(SYSTEM_USER_ID);
 
-        // Save
-        repository.save(existing);
+        PaymentMethod deactivated = repository.save(existing);
 
         log.info("Payment method deactivated successfully with UUID: {}", uuid);
+        return deactivated;
     }
 }

@@ -18,9 +18,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-/**
- * Adapter implementing PaymentMethodRepository using JPA
- */
 @Component
 @RequiredArgsConstructor
 public class PaymentMethodRepositoryAdapter implements PaymentMethodRepository {
@@ -73,7 +70,6 @@ public class PaymentMethodRepositoryAdapter implements PaymentMethodRepository {
             return findAllActive();
         }
         
-        // For false or null, find all and filter
         return jpaRepository.findAll().stream()
             .filter(entity -> enabled == null || entity.getEnabled().equals(enabled))
             .map(mapper::toDomain)

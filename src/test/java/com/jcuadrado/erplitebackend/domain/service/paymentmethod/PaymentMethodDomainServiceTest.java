@@ -138,7 +138,7 @@ class PaymentMethodDomainServiceTest {
     // ========== Can Deactivate Tests ==========
 
     @Test
-    void canDeactivate_shouldAlwaysReturnTrue() {
+    void canDeactivate_shouldReturnTrueWhenNoTransactions() {
         // Given
         PaymentMethod paymentMethod = PaymentMethod.builder()
                 .code("CASH")
@@ -147,10 +147,26 @@ class PaymentMethodDomainServiceTest {
                 .build();
 
         // When
-        boolean result = domainService.canDeactivate(paymentMethod);
+        boolean result = domainService.canDeactivate(paymentMethod, 0L);
 
         // Then
         assertThat(result).isTrue();
+    }
+
+    @Test
+    void canDeactivate_shouldReturnFalseWhenHasTransactions() {
+        // Given
+        PaymentMethod paymentMethod = PaymentMethod.builder()
+                .code("CASH")
+                .name("Efectivo")
+                .enabled(true)
+                .build();
+
+        // When
+        boolean result = domainService.canDeactivate(paymentMethod, 5L);
+
+        // Then
+        assertThat(result).isFalse();
     }
 
     // ========== Can Delete Tests ==========

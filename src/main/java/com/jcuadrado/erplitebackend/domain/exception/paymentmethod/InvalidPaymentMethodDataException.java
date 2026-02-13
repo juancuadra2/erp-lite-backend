@@ -1,8 +1,5 @@
 package com.jcuadrado.erplitebackend.domain.exception.paymentmethod;
 
-/**
- * Exception thrown when payment method data is invalid
- */
 public class InvalidPaymentMethodDataException extends RuntimeException {
     
     public InvalidPaymentMethodDataException(String message) {

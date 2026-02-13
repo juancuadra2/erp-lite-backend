@@ -215,47 +215,4 @@ class CreatePaymentMethodRequestDtoTest {
         assertThat(violations).isNotEmpty();
         assertThat(violations).anyMatch(v -> v.getMessage().contains("must be between 1 and 100 characters"));
     }
-
-    @Test
-    @DisplayName("Should test equals and hashCode")
-    void shouldTestEqualsAndHashCode() {
-        // Given
-        CreatePaymentMethodRequestDto dto1 = CreatePaymentMethodRequestDto.builder()
-                .code("CASH")
-                .name("Efectivo")
-                .build();
-
-        CreatePaymentMethodRequestDto dto2 = CreatePaymentMethodRequestDto.builder()
-                .code("CASH")
-                .name("Efectivo")
-                .build();
-
-        CreatePaymentMethodRequestDto dto3 = CreatePaymentMethodRequestDto.builder()
-                .code("CARD")
-                .name("Tarjeta")
-                .build();
-
-        // Then
-        assertThat(dto1).isEqualTo(dto2);
-        assertThat(dto1).isNotEqualTo(dto3);
-        assertThat(dto1.hashCode()).isEqualTo(dto2.hashCode());
-        assertThat(dto1.hashCode()).isNotEqualTo(dto3.hashCode());
-    }
-
-    @Test
-    @DisplayName("Should test toString")
-    void shouldTestToString() {
-        // Given
-        CreatePaymentMethodRequestDto dto = CreatePaymentMethodRequestDto.builder()
-                .code("CASH")
-                .name("Efectivo")
-                .build();
-
-        // When
-        String toString = dto.toString();
-
-        // Then
-        assertThat(toString).contains("CASH");
-        assertThat(toString).contains("Efectivo");
-    }
 }

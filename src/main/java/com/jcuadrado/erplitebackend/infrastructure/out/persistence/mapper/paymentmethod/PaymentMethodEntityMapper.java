@@ -5,19 +5,10 @@ import com.jcuadrado.erplitebackend.infrastructure.out.persistence.entity.paymen
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
 
-/**
- * MapStruct mapper for converting between PaymentMethod domain model and PaymentMethodEntity
- */
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface PaymentMethodEntityMapper {
 
-    /**
-     * Convert domain model to entity
-     */
     PaymentMethodEntity toEntity(PaymentMethod paymentMethod);
 
-    /**
-     * Convert entity to domain model
-     */
     PaymentMethod toDomain(PaymentMethodEntity entity);
 }

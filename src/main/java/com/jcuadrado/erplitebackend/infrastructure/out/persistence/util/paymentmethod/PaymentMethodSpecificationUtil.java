@@ -8,20 +8,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Utility class for creating JPA Specifications for PaymentMethod queries
- */
 public class PaymentMethodSpecificationUtil {
 
     private PaymentMethodSpecificationUtil() {
         throw new UnsupportedOperationException("Utility class cannot be instantiated");
     }
 
-    /**
-     * Build specification from filter map
-     * @param filters Map with filter criteria
-     * @return JPA Specification
-     */
     public static Specification<PaymentMethodEntity> buildSpecification(Map<String, Object> filters) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
@@ -30,7 +22,6 @@ public class PaymentMethodSpecificationUtil {
                 return criteriaBuilder.conjunction();
             }
 
-            // Filter by enabled status
             if (filters.containsKey("enabled")) {
                 Boolean enabled = (Boolean) filters.get("enabled");
                 if (enabled != null) {
@@ -38,7 +29,6 @@ public class PaymentMethodSpecificationUtil {
                 }
             }
 
-            // Global search in code and name
             if (filters.containsKey("search")) {
                 String search = (String) filters.get("search");
                 if (search != null && !search.trim().isEmpty()) {
@@ -52,7 +42,6 @@ public class PaymentMethodSpecificationUtil {
                 }
             }
 
-            // Filter by code (exact match)
             if (filters.containsKey("code")) {
                 String code = (String) filters.get("code");
                 if (code != null && !code.trim().isEmpty()) {
@@ -60,7 +49,6 @@ public class PaymentMethodSpecificationUtil {
                 }
             }
 
-            // Filter by name (contains)
             if (filters.containsKey("name")) {
                 String name = (String) filters.get("name");
                 if (name != null && !name.trim().isEmpty()) {

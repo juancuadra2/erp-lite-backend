@@ -16,21 +16,25 @@
 
 ### Nomenclatura Rápida
 ```
-Domain:       DocumentType (Record)
-              DocumentTypeId (Record)
-              DocumentTypeDomainService (NO anotaciones Spring)
-              DocumentTypeNotFoundException (Exception)
+Feature folder (snake_case): document_types
 
-Application:  CreateDocumentTypeUseCase (Interface)
-              CreateDocumentTypeUseCaseImpl (@Service)
-              DocumentTypeRepository (Interface - Port Out)
+Domain (sin Spring):
+    - model/document_types:      DocumentType (Record), DocumentTypeId (Record)
+    - service/document_types:    DocumentTypeDomainService
+    - exception/document_types:  DocumentTypeNotFoundException
+
+Application:
+    - port/document_types:       CreateDocumentTypeUseCase (Port In)
+                                                             DocumentTypeRepository (Port Out)
+    - usecase/document_types:    CreateDocumentTypeUseCaseImpl (@Service)
 
 Infrastructure:
-  - Entity:   DocumentTypeEntity (@Entity + Lombok)
-  - DTO:      CreateDocumentTypeRequestDto (Lombok)
-              DocumentTypeResponseDto (Record)
-  - Web:      DocumentTypeController (@RestController)
-  - Adapter:  DocumentTypeRepositoryAdapter (@Repository)
+    - in/web/controller/document_types:  DocumentTypeController (@RestController)
+    - in/web/dto/document_types:         CreateDocumentTypeRequestDto (Lombok)
+                                                                             DocumentTypeResponseDto (Record)
+    - out/persistence/entity/document_types:      DocumentTypeEntity (@Entity + Lombok)
+    - out/persistence/repository/document_types:  DocumentTypeJpaRepository
+    - out/persistence/adapter/document_types:     DocumentTypeRepositoryAdapter (@Repository)
 ```
 
 ### Anotaciones por Tipo de Clase
@@ -341,7 +345,7 @@ src/main/java/com/tuapp/
 ### ⚠️ REGLA OBLIGATORIA
 **Cada feature tiene su propia carpeta en TODAS las capas.**
 
-### Ejemplo Completo: "document-types"
+### Ejemplo Completo: "document_types"
 ```
 src/main/java/com/tuapp/
 ├── domain/
@@ -1290,10 +1294,11 @@ public class CreateDocumentTypeUseCaseImpl {
 - ✅ Dependencias `final`
 - ✅ `@RequiredArgsConstructor` de Lombok
 - ✅ Anotaciones apropiadas:
-  - `@Service` - Servicios app/domain
+    - `@Service` - Servicios de application (casos de uso)
   - `@Repository` - Adapters persistencia
   - `@RestController` - Controllers
   - `@Component` - Genéricos
+- ❌ Servicios de dominio NO llevan anotaciones Spring (`@Service`, `@Component`)
 - ❌ Ports (interfaces) NO llevan anotaciones Spring
 - ✅ Beans manuales en `@Configuration` si lógica inicialización
 - ✅ Preferir interfaces sobre implementaciones

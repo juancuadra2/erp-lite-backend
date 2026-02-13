@@ -3,19 +3,18 @@ package com.jcuadrado.erplitebackend.infrastructure.out.persistence.entity.payme
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-/**
- * JPA Entity for payment_methods table
- */
 @Entity
 @Table(name = "payment_methods")
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -38,7 +37,6 @@ public class PaymentMethodEntity {
     @Column(nullable = false)
     private Boolean enabled;
 
-    // Audit fields
     @Column(name = "created_by")
     private Long createdBy;
 
