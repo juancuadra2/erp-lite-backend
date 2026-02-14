@@ -4,12 +4,10 @@ import com.jcuadrado.erplitebackend.domain.exception.paymentmethod.DuplicatePaym
 import com.jcuadrado.erplitebackend.domain.model.paymentmethod.PaymentMethod;
 import com.jcuadrado.erplitebackend.domain.port.paymentmethod.PaymentMethodRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.UUID;
 
 @RequiredArgsConstructor
-@Slf4j
 public class PaymentMethodDomainService {
 
     private final PaymentMethodRepository repository;
@@ -25,7 +23,6 @@ public class PaymentMethodDomainService {
     public void validateUniqueCode(String code) {
         String normalizedCode = normalizeCode(code);
         if (repository.existsByCode(normalizedCode)) {
-            log.warn("Duplicate code attempt: {}", normalizedCode);
             throw new DuplicatePaymentMethodCodeException(normalizedCode);
         }
     }
@@ -33,16 +30,15 @@ public class PaymentMethodDomainService {
     public void validateUniqueCodeExcluding(String code, UUID excludeUuid) {
         String normalizedCode = normalizeCode(code);
         if (repository.existsByCodeAndUuidNot(normalizedCode, excludeUuid)) {
-            log.warn("Duplicate code attempt for update: {}", normalizedCode);
             throw new DuplicatePaymentMethodCodeException(normalizedCode);
         }
     }
 
-    public boolean canDeactivate(PaymentMethod paymentMethod, long transactionsCount) {
+    public boolean canDeactivate(long transactionsCount) {
         return transactionsCount == 0;
     }
 
-    public boolean canDelete(PaymentMethod paymentMethod, long transactionsCount) {
+    public boolean canDelete(long transactionsCount) {
         return transactionsCount == 0;
     }
 
