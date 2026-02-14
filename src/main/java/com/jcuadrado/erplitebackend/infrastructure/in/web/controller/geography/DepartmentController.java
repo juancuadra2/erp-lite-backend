@@ -35,7 +35,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/geography/departments")
+@RequestMapping("/api/v1/geography/departments")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Departments", description = "API for managing Colombian departments")

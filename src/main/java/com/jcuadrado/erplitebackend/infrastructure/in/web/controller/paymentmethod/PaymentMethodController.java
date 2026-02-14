@@ -31,7 +31,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/payment-methods")
+@RequestMapping("/api/v1/payment-methods")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Payment Methods", description = "API for managing payment methods (Cash, Credit Card, Transfer, etc.)")

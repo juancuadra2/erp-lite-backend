@@ -31,7 +31,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/document-types")
+@RequestMapping("/api/v1/document-types")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Document Types", description = "API for managing document types (NIT, CC, CE, Passport, etc.)")
