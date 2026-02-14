@@ -4,11 +4,14 @@ import com.jcuadrado.erplitebackend.domain.model.geography.Department;
 import com.jcuadrado.erplitebackend.domain.model.geography.Municipality;
 import com.jcuadrado.erplitebackend.infrastructure.in.web.dto.geography.CreateMunicipalityRequestDto;
 import com.jcuadrado.erplitebackend.infrastructure.in.web.dto.geography.MunicipalityResponseDto;
+import com.jcuadrado.erplitebackend.infrastructure.in.web.dto.geography.MunicipalitySimplifiedDto;
 import com.jcuadrado.erplitebackend.infrastructure.in.web.dto.geography.UpdateMunicipalityRequestDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.Named;
+
+import java.util.List;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING, uses = {DepartmentDtoMapper.class})
 public interface MunicipalityDtoMapper {
@@ -34,6 +37,13 @@ public interface MunicipalityDtoMapper {
     Municipality toDomain(UpdateMunicipalityRequestDto dto);
 
     MunicipalityResponseDto toResponseDto(Municipality municipality);
+
+    @Mapping(target = "uuid", source = "uuid")
+    @Mapping(target = "code", source = "code")
+    @Mapping(target = "name", source = "name")
+    MunicipalitySimplifiedDto toSimplifiedDto(Municipality municipality);
+
+    List<MunicipalitySimplifiedDto> toSimplifiedDtoList(List<Municipality> municipalities);
 
     @Named("departmentFromId")
     default Department departmentFromId(Long departmentId) {

@@ -278,4 +278,64 @@ class MunicipalityRepositoryAdapterTest {
         assertThat(result).isEqualTo(10L);
         verify(jpaRepository).countByDepartmentId(1L);
     }
+
+    @Test
+    void findAllByDepartmentIdAndEnabled_shouldReturnList() {
+        // Given
+        Department dept = Department.builder().id(1L).code("05").name("Antioquia").build();
+        Municipality muni1 = Municipality.builder().code("001").name("Medellin").department(dept).enabled(true).build();
+        Municipality muni2 = Municipality.builder().code("002").name("Envigado").department(dept).enabled(true).build();
+        
+        MunicipalityEntity entity1 = MunicipalityEntity.builder().id(1L).code("001").name("Medellin").enabled(true).build();
+        MunicipalityEntity entity2 = MunicipalityEntity.builder().id(2L).code("002").name("Envigado").enabled(true).build();
+        
+        when(jpaRepository.findByDepartmentIdAndEnabledOrderByNameAsc(1L, true))
+                .thenReturn(List.of(entity1, entity2));
+        when(mapper.toDomain(entity1)).thenReturn(muni1);
+        when(mapper.toDomain(entity2)).thenReturn(muni2);
+
+        // When
+        List<Municipality> result = adapter.findAllByDepartmentIdAndEnabled(1L, true);
+
+        // Then
+        assertThat(result).hasSize(2).containsExactly(muni1, muni2);
+        verify(jpaRepository).findByDepartmentIdAndEnabledOrderByNameAsc(1L, true);
+        verify(mapper).toDomain(entity1);
+        verify(mapper).toDomain(entity2);
+    }
+
+    @Test
+    void findAllByDepartmentIdAndEnabled_shouldReturnEmptyList() {
+        // Given
+        when(jpaRepository.findByDepartmentIdAndEnabledOrderByNameAsc(1L, true))
+                .thenReturn(Collections.emptyList());
+
+        // When
+        List<Municipality> result = adapter.findAllByDepartmentIdAndEnabled(1L, true);
+
+        // Then
+        assertThat(result).isEmpty();
+        verify(jpaRepository).findByDepartmentIdAndEnabledOrderByNameAsc(1L, true);
+    }
+
+    @Test
+    void findAllByDepartmentIdAndEnabled_withDisabled_shouldReturnList() {
+        // Given
+        Department dept = Department.builder().id(1L).code("05").name("Antioquia").build();
+        Municipality muni1 = Municipality.builder().code("001").name("Medellin").department(dept).enabled(false).build();
+        
+        MunicipalityEntity entity1 = MunicipalityEntity.builder().id(1L).code("001").name("Medellin").enabled(false).build();
+        
+        when(jpaRepository.findByDepartmentIdAndEnabledOrderByNameAsc(1L, false))
+                .thenReturn(List.of(entity1));
+        when(mapper.toDomain(entity1)).thenReturn(muni1);
+
+        // When
+        List<Municipality> result = adapter.findAllByDepartmentIdAndEnabled(1L, false);
+
+        // Then
+        assertThat(result).hasSize(1).containsExactly(muni1);
+        verify(jpaRepository).findByDepartmentIdAndEnabledOrderByNameAsc(1L, false);
+        verify(mapper).toDomain(entity1);
+    }
 }

@@ -1,6 +1,6 @@
 # ERP Lite Backend - Estado General
 
-**Última actualización**: 2026-02-06  
+**Última actualización**: 2026-02-13  
 **Sprint actual**: Sprint 6 (2026-02-05 → 2026-02-18)
 
 ---
@@ -10,9 +10,9 @@
 ### Resumen de Features
 - **Total features planeados**: 10
 - **Completados**: 0 (0%) - *Revertidos por ajuste arquitectónico*
-- **En preparación**: 0 (0%)
-- **En desarrollo activo**: 1 (10%) - *Architecture redesign*
-- **Pendientes**: 9 (90%)
+- **En preparación**: 1 (10%) - *tax-types (especificación completa)*
+- **En desarrollo activo**: 1 (10%) - *document-types (architecture redesign)*
+- **Pendientes**: 8 (80%)
 
 ### Progreso General del Proyecto
 ```
@@ -72,23 +72,39 @@
 - **Documentación**: [wip/geography/](wip/geography/)
 - **README**: [wip/geography/README.md](wip/geography/README.md) - Detalles de eliminación
 
+### tax-types (Tipos de Impuestos) - v1.0.0
+- **Estado**: ✅ Implementado y validado
+- **Developer**: AI Assistant
+- **Progress**: 32/32 tareas (100%)
+- **Architecture**: Hexagonal (Aligned with Scaffolding)
+- **ETA**: Completado 2026-02-13
+- **Priority**: 🔴 High
+- **Documentación**: [wip/04-tax-types/](wip/04-tax-types/)
+- **Specs**:
+  - ✅ 1-functional-spec.md (Versión 1.1 - Completada)
+  - ✅ 2-technical-spec.md (Versión 1.0 - Completada)
+  - ✅ 3-tasks.json (32 tareas en 8 fases - 45 story points)
+- **Features Clave**:
+  - Catálogo de tipos de impuestos (IVA, ReteFuente, ICA)
+  - Campo percentage (BigDecimal 4 decimales, 0-100%)
+  - Campo isIncluded (incluido en precio o aparte)
+  - Enum TaxApplicationType (SALE/PURCHASE/BOTH)
+  - 10 tipos de impuestos colombianos en seed data
+  - CQRS: Compare (Query) y Manage (Command)
+  - 7 endpoints REST API in /api/v1/tax-types (consolidados)
+  - Validaciones exhaustivas (código, porcentaje, nombre)
+- **Fase Actual**: PHASE 8 completada
+- **Resultado**: 157 tests OK, cobertura dominio 100%, application ~99%, infrastructure ~98%
+
 ---
 
 ## 📋 Features Pendientes (Backlog)
 
 ### Orden de Implementación Recomendado
 
-- **Documentación**: [geography/](geography/)
+#### Fase 1: Catálogos Base (Sin Dependencias)
 
-**03-tax-types** (Tipos de Impuestos)
-- **Prioridad**: 🔴 Alta
-- **Descripción**: Catálogo de tipos de impuestos (IVA, ReteFuente, etc.)
-- **Dependencias**: Ninguna
-- **Estimación**: 1 semana
-- **Estado**: Sin especificación detallada
-- **Documentación**: [tax-types/](tax-types/)
-
-**04-payment-methods** (Métodos de Pago)
+**03-payment-methods** (Métodos de Pago)
 - **Prioridad**: 🟡 Media
 - **Descripción**: Catálogo de métodos de pago
 - **Dependencias**: Ninguna
@@ -168,6 +184,24 @@ _No hay blockers globales actualmente_
 
 ## 📝 Decisiones Recientes
 
+### 2026-02-13: Tax Types Specification Completed
+- ✅ **Especificación funcional completa** (1-functional-spec.md v1.1)
+  - 3 User Stories con 14+ acceptance scenarios
+  - Tabla detallada de seed data con 10 impuestos colombianos
+  - Business rules BR-TT-001 a BR-TT-007
+  - Validaciones exhaustivas (código, porcentaje, nombre)
+- ✅ **Especificación técnica completa** (2-technical-spec.md v1.0)
+  - Arquitectura hexagonal completa (~1200 líneas)
+  - Domain: TaxType aggregate, TaxApplicationType enum, services, exceptions
+  - Application: CQRS use cases (Compare/Manage)
+  - Infrastructure: REST API (7 endpoints), DTOs, JPA entities, mappers
+  - Database: Flyway V7 (schema), V8 (seed data), Docker scripts 07/08
+- ✅ **Plan de tareas detallado** (3-tasks.json)
+  - 32 tareas organizadas en 8 fases
+  - 68 horas estimadas
+  - Riesgos y notas técnicas documentadas
+- 📋 **Próximo paso**: Validación de specs y inicio de implementación (T000)
+
 ### 2026-02-06: Ajuste Arquitectónico Global
 - 🔄 **Migración a Hexagonal Architecture** con scaffolding estandarizado
 - 🔄 `document-types` movido de `features/` a `wip/` para rediseño (v2.0.0)
@@ -197,11 +231,11 @@ _No hay blockers globales actualmente_
 
 ```
 Nivel 0 (Catálogos Base Independientes):
-├─ 01-document-types ✅ IMPLEMENTADO
-├─ 02-geography
-├─ 03-tax-types
-├─ 04-payment-methods
-└─ 05-units-of-measure
+├─ 01-document-types ⚠️ EN REDESIGN (v2.0.0)
+├─ 02-geography ❌ ELIMINADO
+├─ 04-tax-types 🟡 ESPECIFICACIÓN COMPLETA (0/32 tareas)
+├─ 03-payment-methods ⚪ PENDIENTE
+└─ 05-units-of-measure ⚪ PENDIENTE
 
 Nivel 1 (Dependen de catálogos base):
 ├─ 06-security → depende de: [01-document-types]
@@ -221,9 +255,27 @@ Nivel 4+ (Módulos complejos):
 
 ## 🎯 Próximos Pasos Recomendados
 
-1. **Iniciar Geography (02)** → 2 semanas, sin dependencias
-2. **O iniciar Security (06)** → 4 semanas, crítico para el sistema
-3. Completar especificaciones faltantes (tax-types, payment-methods, units-of-measure)
+### Opción A: Implementar Tax Types (04)
+**Ventajas**:
+- ✅ Especificación 100% completa y lista
+- ✅ 32 tareas detalladas con estimaciones
+- ✅ Sin dependencias de otros módulos
+- ✅ 1 semana de implementación
+- ✅ Crítico para módulos de ventas y compras
+
+### Opción B: Completar especificaciones de catálogos restantes
+**Payment Methods (03)** y **Units of Measure (05)**:
+- Seguir mismo patrón usado en tax-types
+- Estimar 2-3 días por especificación
+- Tener catálogos base documentados antes de Security (06)
+
+### Opción C: Iniciar Security (06)
+**Bloqueador crítico**:
+- ⚠️ Sin este módulo no hay control de acceso
+- ⚠️ 4 semanas de implementación
+- ⚠️ Depende de Document Types (01) que está en redesign
+
+**Recomendación**: Opción A (implementar tax-types) → tiene mayor ROI inmediato
 
 ---
 

@@ -31,7 +31,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/geography/municipalities")
+@RequestMapping("/api/v1/geography/municipalities")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Municipalities", description = "API for managing Colombian municipalities")
@@ -55,7 +55,7 @@ public class MunicipalityController {
         Municipality created = manageUseCase.create(domain);
         MunicipalityResponseDto response = mapper.toResponseDto(created);
         log.info("Municipality created successfully with UUID: {}", created.getUuid());
-        URI location = URI.create("/api/geography/municipalities/" + created.getUuid());
+        URI location = URI.create("/api/v1/geography/municipalities/" + created.getUuid());
         return ResponseEntity.created(location).body(response);
     }
 

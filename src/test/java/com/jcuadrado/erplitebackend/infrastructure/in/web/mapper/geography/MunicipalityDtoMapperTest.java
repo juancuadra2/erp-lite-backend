@@ -4,6 +4,7 @@ import com.jcuadrado.erplitebackend.domain.model.geography.Department;
 import com.jcuadrado.erplitebackend.domain.model.geography.Municipality;
 import com.jcuadrado.erplitebackend.infrastructure.in.web.dto.geography.CreateMunicipalityRequestDto;
 import com.jcuadrado.erplitebackend.infrastructure.in.web.dto.geography.MunicipalityResponseDto;
+import com.jcuadrado.erplitebackend.infrastructure.in.web.dto.geography.MunicipalitySimplifiedDto;
 import com.jcuadrado.erplitebackend.infrastructure.in.web.dto.geography.UpdateMunicipalityRequestDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,7 @@ import org.mapstruct.factory.Mappers;
 
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -153,5 +155,54 @@ class MunicipalityDtoMapperTest {
         Department result = mapper.departmentFromId(null);
 
         assertThat(result).isNull();
+    }
+
+    @Test
+    void toSimplifiedDto_shouldMapOnlyBasicFields() {
+        UUID munUuid = UUID.randomUUID();
+        Department department = Department.builder()
+                .id(1L).code("05").name("Antioquia").enabled(true).build();
+        Municipality municipality = Municipality.builder()
+                .id(10L).uuid(munUuid).code("05001").name("Medellín")
+                .department(department).enabled(true).build();
+
+        MunicipalitySimplifiedDto result = mapper.toSimplifiedDto(municipality);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getUuid()).isEqualTo(munUuid);
+        assertThat(result.getCode()).isEqualTo("05001");
+        assertThat(result.getName()).isEqualTo("Medellín");
+    }
+
+    @Test
+    void toSimplifiedDtoList_shouldMapAllMunicipalities() {
+        UUID uuid1 = UUID.randomUUID();
+        UUID uuid2 = UUID.randomUUID();
+        Department department = Department.builder()
+                .id(1L).code("05").name("Antioquia").enabled(true).build();
+
+        Municipality municipality1 = Municipality.builder()
+                .id(1L).uuid(uuid1).code("05001").name("Medellín")
+                .department(department).enabled(true).build();
+        Municipality municipality2 = Municipality.builder()
+                .id(2L).uuid(uuid2).code("05002").name("Abejorral")
+                .department(department).enabled(true).build();
+
+        List<MunicipalitySimplifiedDto> result = mapper.toSimplifiedDtoList(List.of(municipality1, municipality2));
+
+        assertThat(result).hasSize(2);
+        assertThat(result.get(0).getUuid()).isEqualTo(uuid1);
+        assertThat(result.get(0).getCode()).isEqualTo("05001");
+        assertThat(result.get(0).getName()).isEqualTo("Medellín");
+        assertThat(result.get(1).getUuid()).isEqualTo(uuid2);
+        assertThat(result.get(1).getCode()).isEqualTo("05002");
+        assertThat(result.get(1).getName()).isEqualTo("Abejorral");
+    }
+
+    @Test
+    void toSimplifiedDtoList_shouldReturnEmptyListWhenInputIsEmpty() {
+        List<MunicipalitySimplifiedDto> result = mapper.toSimplifiedDtoList(List.of());
+
+        assertThat(result).isEmpty();
     }
 }

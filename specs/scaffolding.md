@@ -36,12 +36,11 @@ erp-lite-backend/
    │  │  │  │  └─ [otros-features]/
    │  │  │  │
    │  │  │  ├─ port/
-   │  │  │  │  └─ out/
-   │  │  │  │     ├─ document-types/
-   │  │  │  │     │  └─ DocumentTypeRepository.java
-   │  │  │  │     ├─ contacts/
-   │  │  │  │     │  └─ ContactRepository.java
-   │  │  │  │     └─ [otros-features]/
+   │  │  │  │  ├─ document-types/
+   │  │  │  │  │  └─ DocumentTypeRepository.java
+   │  │  │  │  ├─ contacts/
+   │  │  │  │  │  └─ ContactRepository.java
+   │  │  │  │  └─ [otros-features]/
    │  │  │  │
    │  │  │  └─ exception/
    │  │  │     ├─ document-types/
@@ -54,14 +53,13 @@ erp-lite-backend/
    │  │  │
    │  │  ├─ application/
    │  │  │  ├─ port/
-   │  │  │  │  └─ in/
-   │  │  │  │     ├─ document-types/
-   │  │  │  │     │  ├─ CompareDocumentTypesUseCase.java
-   │  │  │  │     │  └─ ManageDocumentTypeUseCase.java
-   │  │  │  │     ├─ contacts/
-   │  │  │  │     │  ├─ ManageContactUseCase.java
-   │  │  │  │     │  └─ SearchContactUseCase.java
-   │  │  │  │     └─ [otros-features]/
+   │  │  │  │  ├─ document-types/
+   │  │  │  │  │  ├─ CompareDocumentTypesUseCase.java
+   │  │  │  │  │  └─ ManageDocumentTypeUseCase.java
+   │  │  │  │  ├─ contacts/
+   │  │  │  │  │  ├─ ManageContactUseCase.java
+   │  │  │  │  │  └─ SearchContactUseCase.java
+   │  │  │  │  └─ [otros-features]/
    │  │  │  │
    │  │  │  └─ usecase/
    │  │  │     ├─ document-types/

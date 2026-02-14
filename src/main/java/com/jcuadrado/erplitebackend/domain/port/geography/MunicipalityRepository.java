@@ -26,6 +26,8 @@ public interface MunicipalityRepository {
 
     List<Municipality> findAllEnabled();
 
+    List<Municipality> findAllByDepartmentIdAndEnabled(Long departmentId, Boolean enabled);
+
     boolean existsByCodeAndDepartmentId(String code, Long departmentId);
 
     boolean existsByCodeAndDepartmentIdExcludingUuid(String code, Long departmentId, UUID excludeUuid);

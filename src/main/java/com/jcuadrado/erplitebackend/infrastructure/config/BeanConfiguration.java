@@ -3,10 +3,20 @@ package com.jcuadrado.erplitebackend.infrastructure.config;
 import com.jcuadrado.erplitebackend.domain.port.documenttypes.DocumentTypeRepository;
 import com.jcuadrado.erplitebackend.domain.port.geography.DepartmentRepository;
 import com.jcuadrado.erplitebackend.domain.port.geography.MunicipalityRepository;
+import com.jcuadrado.erplitebackend.domain.port.paymentmethod.PaymentMethodRepository;
+import com.jcuadrado.erplitebackend.domain.port.taxtype.TaxTypeRepository;
+import com.jcuadrado.erplitebackend.domain.port.unitofmeasure.UnitOfMeasureRepository;
 import com.jcuadrado.erplitebackend.domain.service.documenttypes.DocumentTypeDomainService;
 import com.jcuadrado.erplitebackend.domain.service.documenttypes.DocumentTypeValidator;
 import com.jcuadrado.erplitebackend.domain.service.geography.GeographyDomainService;
 import com.jcuadrado.erplitebackend.domain.service.geography.GeographyValidator;
+import com.jcuadrado.erplitebackend.domain.service.paymentmethod.PaymentMethodDomainService;
+import com.jcuadrado.erplitebackend.domain.service.paymentmethod.PaymentMethodValidator;
+import com.jcuadrado.erplitebackend.domain.service.taxtype.TaxTypeDomainService;
+import com.jcuadrado.erplitebackend.domain.service.taxtype.TaxTypeValidationService;
+import com.jcuadrado.erplitebackend.domain.service.unitofmeasure.UnitOfMeasureDomainService;
+import com.jcuadrado.erplitebackend.domain.service.unitofmeasure.UnitOfMeasureValidationService;
+import com.jcuadrado.erplitebackend.domain.service.unitofmeasure.UnitOfMeasureValidator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -53,6 +63,63 @@ public class BeanConfiguration {
             MunicipalityRepository municipalityRepository,
             GeographyValidator geographyValidator) {
         return new GeographyDomainService(departmentRepository, municipalityRepository, geographyValidator);
+    }
+
+    // ==================== Payment Method Beans ====================
+
+    /**
+     * Bean for PaymentMethodValidator
+     */
+    @Bean
+    public PaymentMethodValidator paymentMethodValidator() {
+        return new PaymentMethodValidator();
+    }
+
+    /**
+     * Bean for PaymentMethodDomainService
+     */
+    @Bean
+    public PaymentMethodDomainService paymentMethodDomainService(
+            PaymentMethodRepository repository,
+            PaymentMethodValidator validator) {
+        return new PaymentMethodDomainService(repository, validator);
+    }
+
+    // ==================== Tax Type Beans ====================
+
+    /**
+     * Bean for TaxTypeDomainService
+     */
+    @Bean
+    public TaxTypeDomainService taxTypeDomainService() {
+        return new TaxTypeDomainService();
+    }
+
+    /**
+     * Bean for TaxTypeValidationService
+     */
+    @Bean
+    public TaxTypeValidationService taxTypeValidationService(TaxTypeRepository repository) {
+        return new TaxTypeValidationService(repository);
+    }
+
+    // ==================== Unit Of Measure Beans ====================
+
+    @Bean
+    public UnitOfMeasureValidator unitOfMeasureValidator() {
+        return new UnitOfMeasureValidator();
+    }
+
+    @Bean
+    public UnitOfMeasureValidationService unitOfMeasureValidationService(UnitOfMeasureRepository repository) {
+        return new UnitOfMeasureValidationService(repository);
+    }
+
+    @Bean
+    public UnitOfMeasureDomainService unitOfMeasureDomainService(
+            UnitOfMeasureValidator validator,
+            UnitOfMeasureValidationService validationService) {
+        return new UnitOfMeasureDomainService(validator, validationService);
     }
 }
 

@@ -71,20 +71,15 @@ public class DocumentTypeDomainService {
      * Validate and prepare document type for creation
      */
     public void prepareForCreation(DocumentType documentType) {
-        // Validate fields
         validator.validateAll(
             documentType.getCode(),
             documentType.getName(),
             documentType.getDescription()
         );
 
-        // Normalize code
         documentType.setCode(normalizeCode(documentType.getCode()));
-
-        // Validate uniqueness
         validateUniqueCode(documentType.getCode());
 
-        // Set defaults
         if (documentType.getUuid() == null) {
             documentType.setUuid(UUID.randomUUID());
         }
@@ -97,17 +92,13 @@ public class DocumentTypeDomainService {
      * Validate and prepare document type for update
      */
     public void prepareForUpdate(DocumentType documentType) {
-        // Validate fields
         validator.validateAll(
             documentType.getCode(),
             documentType.getName(),
             documentType.getDescription()
         );
 
-        // Normalize code
         documentType.setCode(normalizeCode(documentType.getCode()));
-
-        // Validate uniqueness excluding current document
         validateUniqueCodeExcluding(documentType.getCode(), documentType.getUuid());
     }
 }

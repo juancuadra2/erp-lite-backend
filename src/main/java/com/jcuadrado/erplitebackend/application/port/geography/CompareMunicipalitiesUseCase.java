@@ -17,5 +17,7 @@ public interface CompareMunicipalitiesUseCase {
 
     List<Municipality> getAllActive();
 
+    List<Municipality> getAllByDepartment(UUID departmentUuid);
+
     Page<Municipality> findAll(Map<String, Object> filters, Pageable pageable);
 }
