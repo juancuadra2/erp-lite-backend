@@ -37,9 +37,9 @@ public class CompareMunicipalitiesUseCaseImpl implements CompareMunicipalitiesUs
 
     @Override
     public List<Municipality> getAllByDepartment(UUID departmentUuid) {
-        departmentRepository.findByUuid(departmentUuid)
+         var department = departmentRepository.findByUuid(departmentUuid)
                 .orElseThrow(() -> new DepartmentNotFoundException(departmentUuid));
-        Long departmentId = departmentRepository.findByUuid(departmentUuid).get().getId();
+        Long departmentId = department.getId();
         return repository.findAllByDepartmentIdAndEnabled(departmentId, true);
     }
 

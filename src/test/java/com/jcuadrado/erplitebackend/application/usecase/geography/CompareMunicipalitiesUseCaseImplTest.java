@@ -158,7 +158,7 @@ class CompareMunicipalitiesUseCaseImplTest {
 
         assertThat(result).hasSize(2);
         assertThat(result).containsExactly(sampleMunicipality1, sampleMunicipality2);
-        verify(departmentRepository, times(2)).findByUuid(departmentUuid);
+        verify(departmentRepository, times(1)).findByUuid(departmentUuid);
         verify(repository).findAllByDepartmentIdAndEnabled(1L, true);
     }
 
