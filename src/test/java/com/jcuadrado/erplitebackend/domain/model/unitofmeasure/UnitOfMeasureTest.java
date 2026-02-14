@@ -50,13 +50,4 @@ class UnitOfMeasureTest {
         assertThat(unit.getUpdatedBy()).isEqualTo(40L);
         assertThat(unit.getUpdatedAt()).isNotNull();
     }
-
-    @Test
-    void createAndUpdate_shouldHandleNullAbbreviation() {
-        UnitOfMeasure unit = UnitOfMeasure.create("Unidad", null, 1L);
-        assertThat(unit.getAbbreviation()).isNull();
-
-        unit.update("Unidad Editada", null, 2L);
-        assertThat(unit.getAbbreviation()).isNull();
-    }
 }

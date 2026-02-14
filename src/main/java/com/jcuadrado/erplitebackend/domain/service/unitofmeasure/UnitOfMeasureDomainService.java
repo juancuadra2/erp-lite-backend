@@ -13,10 +13,6 @@ public class UnitOfMeasureDomainService {
     private final UnitOfMeasureValidationService validationService;
 
     public String normalizeAbbreviation(String abbreviation) {
-        if (abbreviation == null) {
-            return null;
-        }
-
         return abbreviation.toUpperCase().trim();
     }
 
