@@ -68,9 +68,10 @@ class UnitOfMeasureDomainServiceTest {
     }
 
     @Test
-    void normalizeAbbreviation_shouldReturnNullWhenInputIsNull() {
+    void normalizeAbbreviation_shouldThrowWhenInputIsNull() {
         UnitOfMeasureDomainService service = new UnitOfMeasureDomainService(validator, validationService);
 
-        assertThat(service.normalizeAbbreviation(null)).isNull();
+        assertThatThrownBy(() -> service.normalizeAbbreviation(null))
+                .isInstanceOf(NullPointerException.class);
     }
 }
