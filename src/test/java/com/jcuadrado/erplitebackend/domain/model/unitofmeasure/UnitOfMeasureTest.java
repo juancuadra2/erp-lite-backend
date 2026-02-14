@@ -4,11 +4,20 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.UUID;
+
 class UnitOfMeasureTest {
 
     @Test
     void create_shouldInitializeRequiredFields() {
-        UnitOfMeasure unit = UnitOfMeasure.create("Caja", "cj", 10L);
+        UnitOfMeasure unit = UnitOfMeasure.builder()
+                .uuid(UUID.randomUUID())
+                .name("Caja")
+                .abbreviation("CJ")
+                .enabled(true)
+                .createdBy(10L)
+                .createdAt(java.time.LocalDateTime.now())
+                .build();
 
         assertThat(unit.getUuid()).isNotNull();
         assertThat(unit.getName()).isEqualTo("Caja");
@@ -21,9 +30,16 @@ class UnitOfMeasureTest {
 
     @Test
     void update_shouldChangeNameAndAbbreviationAndAudit() {
-        UnitOfMeasure unit = UnitOfMeasure.create("Caja", "CJ", 10L);
+        UnitOfMeasure unit = UnitOfMeasure.builder()
+                .name("Caja")
+                .abbreviation("CJ")
+                .createdBy(10L)
+                .build();
 
-        unit.update("Caja Grande", "cg", 20L);
+        unit.setName("Caja Grande");
+        unit.setAbbreviation("CG");
+        unit.setUpdatedBy(20L);
+        unit.setUpdatedAt(java.time.LocalDateTime.now());
 
         assertThat(unit.getName()).isEqualTo("Caja Grande");
         assertThat(unit.getAbbreviation()).isEqualTo("CG");
@@ -33,7 +49,11 @@ class UnitOfMeasureTest {
 
     @Test
     void deactivateAndActivate_shouldToggleStateAndDeleteAudit() {
-        UnitOfMeasure unit = UnitOfMeasure.create("Caja", "CJ", 10L);
+        UnitOfMeasure unit = UnitOfMeasure.builder()
+                .name("Caja")
+                .abbreviation("CJ")
+                .enabled(true)
+                .build();
 
         unit.deactivate(30L);
 

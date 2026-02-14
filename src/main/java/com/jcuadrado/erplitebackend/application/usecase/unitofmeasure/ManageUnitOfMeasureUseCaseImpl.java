@@ -6,7 +6,6 @@ import com.jcuadrado.erplitebackend.domain.model.unitofmeasure.UnitOfMeasure;
 import com.jcuadrado.erplitebackend.domain.port.unitofmeasure.UnitOfMeasureRepository;
 import com.jcuadrado.erplitebackend.domain.service.unitofmeasure.UnitOfMeasureDomainService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,7 +15,6 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Transactional
-@Slf4j
 public class ManageUnitOfMeasureUseCaseImpl implements ManageUnitOfMeasureUseCase {
 
     private static final Long SYSTEM_USER_ID = 0L;
@@ -26,8 +24,6 @@ public class ManageUnitOfMeasureUseCaseImpl implements ManageUnitOfMeasureUseCas
 
     @Override
     public UnitOfMeasure create(UnitOfMeasure unitOfMeasure) {
-        log.debug("Creating unit of measure with name: {}", unitOfMeasure.getName());
-
         domainService.prepareForCreation(unitOfMeasure);
 
         if (unitOfMeasure.getUuid() == null) {

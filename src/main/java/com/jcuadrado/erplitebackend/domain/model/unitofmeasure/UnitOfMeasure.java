@@ -28,24 +28,6 @@ public class UnitOfMeasure {
     private LocalDateTime updatedAt;
     private LocalDateTime deletedAt;
 
-    public static UnitOfMeasure create(String name, String abbreviation, Long userId) {
-        return UnitOfMeasure.builder()
-                .uuid(UUID.randomUUID())
-                .name(name)
-                .abbreviation(abbreviation.toUpperCase().trim())
-                .enabled(true)
-                .createdBy(userId)
-                .createdAt(LocalDateTime.now())
-                .build();
-    }
-
-    public void update(String name, String abbreviation, Long userId) {
-        this.name = name;
-        this.abbreviation = abbreviation.toUpperCase().trim();
-        this.updatedBy = userId;
-        this.updatedAt = LocalDateTime.now();
-    }
-
     public void deactivate(Long userId) {
         this.enabled = false;
         this.deletedBy = userId;
