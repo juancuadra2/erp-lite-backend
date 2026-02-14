@@ -1,158 +1,158 @@
-# Rules for chat
-Responde siempre en español.
+# RULES - Fuente Única de Verdad Operativa
 
-# Rules for Specifications (SOURCE OF TRUTH)
-NUNCA implementes nada que no esté especificado en los documentos del proyecto.
-La fuente de la verdad son los specs funcionales, técnicos y tasks en la carpeta /specs/.
-Antes de implementar, consulta:
-  - specs/PROJECT_INFO.md - Información general del proyecto y features
-  - specs/features/[feature]/ - Especificaciones funcionales detalladas del feature
-  - specs/wip/[feature]/ - Features en trabajo activo
-  - specs/scaffolding.md - Estructura de paquetes y convenciones arquitectónicas
-Si algo no está especificado, pregunta al usuario antes de implementar.
-No asumas requisitos, comportamientos o decisiones de diseño no documentadas.
+Este documento define las reglas específicas de este proyecto para implementación, revisión y validación.
 
-# Rules for code
-Siempre sigue las buenas prácticas de programación.
-Sigue estrictamente las convenciones de nomenclatura del proyecto.
-Aplica los principios SOLID en el diseño de clases y métodos.
-Asegúrate de que el código sea limpio, legible y fácil de mantener.
+## 0) Convenciones normativas
+- **MUST**: obligatorio, sin excepción salvo decisión explícita documentada.
+- **SHOULD**: recomendado fuerte; si no se cumple, debe justificarse.
+- **MAY**: opcional.
+- **Bloqueante**: impide cierre de tarea hasta resolverse.
 
-# Rules for Lombok Usage (PRIORITY)
-Usa Lombok para reducir código boilerplate en todas las clases.
-Anotaciones obligatorias según tipo de clase:
-  - Entidades JPA: @Entity, @Table, @Getter, @Setter, @NoArgsConstructor, @AllArgsConstructor, @Builder
-  - DTOs: @Getter, @Setter, @NoArgsConstructor, @AllArgsConstructor, @Builder
-  - Modelos de dominio: @Getter, @AllArgsConstructor, @Builder (inmutables, sin @Setter)
-  - Servicios/Controllers: @RequiredArgsConstructor para inyección por constructor
-Usa @Slf4j para logging automático en lugar de declarar logger manualmente.
-Evita @Data (usa combinaciones específicas de @Getter/@Setter según necesidad).
-Usa @Builder para construcción fluida de objetos complejos.
-No uses @ToString ni @EqualsAndHashCode en entidades JPA (puede causar lazy loading issues).
+## 1) Precedencia normativa (mayor → menor)
+1. `specs/RULES.md` (este documento)
+2. `specs/wip/[feature]/` (trabajo activo)
+3. `specs/features/[feature]/` (funcionalidad implementada)
+4. `specs/PROJECT_INFO.md`
+5. `specs/scaffolding.md`
+6. `.github/copilot-instructions.md` (solo guía transversal)
 
-# Rules for Code Documentation
-No agregues comentarios explicativos dentro de métodos (el código debe ser autoexplicativo).
-Usa JavaDoc solo en interfaces públicas (ports, casos de uso) para describir contratos.
-No documentes lo obvio ("// suma dos números").
-Los comentarios TODO/FIXME son aceptables temporalmente con issue tracker asociado.
+Si dos fuentes se contradicen, se aplica la de mayor precedencia.
 
-# Rules for Architecture
-Sigue la arquitectura hexagonal (Ports and Adapters) para organizar el código.
-Sigue la sugerencia en el archivo scaffolding.md para la estructura de paquetes y clases.
+## 2) Regla crítica de implementación
+- MUST: no implementar requerimientos no especificados en `specs/`.
+- MUST: si falta información funcional/técnica, detener y pedir clarificación.
+- MUST: no asumir reglas de negocio no documentadas.
 
-# Rules for Feature Organization
-Cada feature debe tener su propia carpeta en TODAS las capas.
-Estructura obligatoria:
-  - domain/model/[feature]/
-  - domain/service/[feature]/
-  - domain/exception/[feature]/
-  - application/port/in/[feature]/
-  - application/usecase/[feature]/
-  - infrastructure/in/web/controller/[feature]/
-  - infrastructure/in/web/dto/[feature]/
-  - infrastructure/out/persistence/entity/[feature]/
-No mezcles código de diferentes features en la misma clase.
-Los elementos compartidos van en domain/shared/ o application/shared/.
+## 3) Protocolo de conflicto
+Ante conflicto entre documentos:
+1. Detener cambios.
+2. Reportar conflicto con rutas exactas.
+3. Solicitar decisión explícita.
+4. Reanudar solo con decisión documentada.
 
-# Rules for Naming Conventions
-Clases:
-  - Entidades JPA: [Feature]Entity (ej: DocumentTypeEntity)
-  - Modelos de dominio: [Feature] (ej: DocumentType) sin sufijo
-  - DTOs: [Feature][Tipo]Dto (ej: DocumentTypeResponseDto)
-  - Servicios: [Feature]DomainService, [Feature]UseCaseImpl
-  - Repositorios: [Feature]Repository (puerto), [Feature]RepositoryAdapter (implementación)
-  - Controllers: [Feature]Controller
-Paquetes: siempre en snake-case con guiones (ej: document-types)
-Variables: camelCase descriptivo (ej: documentTypeList, isEnabled)
-Constantes: UPPER_SNAKE_CASE (ej: MAX_RETRY_ATTEMPTS)
+## 4) Protocolo de ambigüedad
+Ante ambigüedad:
+1. No asumir comportamiento.
+2. Proponer 2-3 interpretaciones concretas.
+3. Solicitar selección del usuario.
+4. Documentar la decisión en el artefacto correspondiente.
 
-# Rules for Testing
-Implementa tests unitarios para todos los casos de uso (mínimo 100% coverage).
-Usa @DisplayName descriptivo en cada test para claridad.
-Estructura los tests con patrón AAA (Arrange-Act-Assert).
-Mockea las dependencias externas usando Mockito.
-Nombra los tests siguiendo el patrón: should[ExpectedBehavior]When[StateUnderTest].
-Evita lógica compleja dentro de los tests.
+## 5) Principios de código
+- MUST: aplicar SOLID y DRY.
+- MUST: priorizar legibilidad, cohesión y separación de responsabilidades.
+- MUST: corregir causa raíz antes que parches superficiales.
+- SHOULD: evitar sobreingeniería.
 
-# Rules for Exception Handling
-Crea excepciones de dominio específicas por feature (hereda de RuntimeException).
-Nomenclatura: [Feature][Concepto]Exception (ej: DocumentTypeNotFoundException).
-Las excepciones de dominio van en domain/exception/[feature]/.
-Usa @RestControllerAdvice centralizado para traducir excepciones a respuestas HTTP.
-No captures excepciones genéricas (Exception, RuntimeException) salvo casos muy específicos.
-Incluye mensajes descriptivos y contextuales en las excepciones.
+## 6) Arquitectura y organización
+- MUST: mantener arquitectura hexagonal (Domain, Application, Infrastructure).
+- MUST: seguir `specs/scaffolding.md` para estructura de paquetes.
+- MUST: organizar por feature en todas las capas; no mezclar features en una misma clase.
 
-# Rules for Database Migrations
-Toda modificación de esquema debe hacerse vía Flyway (archivos en db/migration/).
-Nomenclatura: V[major].[minor]__[descripcion_snake_case].sql
-Las migraciones deben ser idempotentes cuando sea posible.
-Nunca modifiques una migración ya aplicada en producción.
-Incluye datos de catálogo en la misma versión que crea las tablas.
-Usa transacciones en las migraciones cuando sea posible.
+## 7) Reglas de comentarios y documentación
+### Permitidos
+- MAY: JavaDoc en interfaces públicas (ports/contratos).
+- MAY: JavaDoc en métodos públicos complejos si aporta contexto real.
+- MAY: comentarios de razón técnica no obvia (el "por qué").
+- MAY: `TODO` solo con formato `// TODO [ISSUE-123]: descripción`.
 
-# Rules for DTOs and Mapping
-Usa MapStruct para mapeo entre entidades-dominio y DTOs-dominio.
-Los DTOs deben estar en infrastructure/in/web/dto/[feature]/.
-Sufijo obligatorio: RequestDto (entrada), ResponseDto (salida), Dto (compartido).
-Los mappers de MapStruct deben usar @Mapper(componentModel = "spring").
-No expongas entidades JPA directamente en los controllers.
-Valida los DTOs de entrada con Jakarta Validation (@Valid, @NotNull, etc.).
+### Prohibidos
+- MUST NOT: comentarios que parafrasean el código (`// validar datos`, `// guardar`).
+- MUST NOT: comentarios decorativos o separadores visuales.
+- MUST NOT: comentarios inline obvios de atributos/campos.
+- MUST NOT: dejar código comentado.
+- MUST NOT: TODOs sin identificador de issue.
 
-# Rules for Validation
-Validaciones de negocio van en los servicios de dominio (domain/service/[feature]/).
-Validaciones estructurales van en DTOs con anotaciones Jakarta Validation.
-Los validadores de dominio deben lanzar excepciones específicas del dominio.
-No mezcles validaciones de infraestructura con validaciones de negocio.
-Usa Optional para valores que pueden ser nulos en dominio.
+### Regla de desempate
+Si existe duda entre comentar o refactorizar, prevalece refactorizar y eliminar comentario.
 
-# Rules for REST API
-Usa plural para recursos REST (ej: /api/v1/document-types).
-Verbos HTTP: GET (consulta), POST (crear), PUT (actualizar completo), PATCH (actualizar parcial), DELETE (eliminar).
-Códigos HTTP: 200 (OK), 201 (Created con Location header), 204 (No Content), 400 (Bad Request), 404 (Not Found), 409 (Conflict).
-Usa ResponseEntity<T> para control explícito de códigos HTTP.
-Versionado en URL: /api/v1/, /api/v2/.
-Documenta con anotaciones de SpringDoc (@Operation, @ApiResponse).
+## 8) Records y Lombok
+### Regla base
+- MUST: tipo inmutable → `record`.
+- MUST: tipo mutable → Lombok específico.
 
-# Rules for Dependency Injection
-Usa inyección por constructor (evita @Autowired en campos).
-Marca las clases de servicio con @Service, @Component o @Repository según corresponda.
-Los ports (interfaces) no llevan anotaciones Spring.
-Registra beans manualmente en BeanConfiguration si requieren lógica de inicialización.
-Prefiere interfaces sobre implementaciones en las dependencias.
+### Lombok en este proyecto
+- MUST: usar `@Slf4j` en clases que emiten logs (principalmente infraestructura y casos de uso).
+- MUST NOT: usar `@Data` en entidades JPA.
+- MUST: en JPA usar `@Getter`, `@Setter`, `@NoArgsConstructor`, `@AllArgsConstructor`, `@Builder`.
 
-# Rules for Logging
-Usa SLF4J con Logback para todos los logs.
-Niveles: ERROR para errores críticos, WARN para situaciones anormales, INFO para eventos importantes, DEBUG para detalles de depuración.
-No uses System.out.println() ni printStackTrace().
-Incluye contexto relevante en los mensajes (IDs, operación, usuario si aplica).
-Los logs en capa de dominio deben ser excepcionales (solo validaciones críticas).
+## 9) Nomenclatura
+- Clases: nombres descriptivos por responsabilidad (`[Feature]Controller`, `[Feature]RepositoryAdapter`, etc.).
+- Variables/métodos: `camelCase` descriptivo.
+- Constantes: `UPPER_SNAKE_CASE`.
+- Mantener consistencia con convenciones ya presentes en el repositorio.
 
-# Rules for Implementation Workflow
-ANTES de implementar cualquier código:
-  1. VALIDA que lo que vas a implementar esté especificado en los specs (funcionales, técnicos, tasks) - LA FUENTE DE LA VERDAD
-  2. Lee y comprende TODAS estas reglas
-  3. Identifica el feature y su ubicación en la estructura hexagonal
-  4. Verifica convenciones de nomenclatura aplicables
-  5. Planifica qué anotaciones de Lombok necesitarás
+## 10) Validaciones
+- MUST: validaciones de negocio en servicios de dominio.
+- MUST: validaciones estructurales en DTOs (Jakarta Validation).
+- MUST NOT: mezclar validación de infraestructura con reglas de negocio.
 
-DURANTE la implementación:
-  1. Aplica Lombok en todas las clases nuevas
-  2. Sigue estrictamente la estructura de paquetes por feature
-  3. Implementa validaciones apropiadas según la capa
-  4. Mantén la separación de responsabilidades (ports, adapters, domain)
+## 11) Excepciones
+- MUST: usar excepciones específicas por dominio/feature.
+- MUST NOT: capturas genéricas sin necesidad real y justificada.
+- MUST: mapear excepciones a HTTP en handler centralizado.
 
-DESPUÉS de implementar:
-  1. Revisa que se usen las anotaciones de Lombok correctas
-  2. Verifica nomenclatura de clases, métodos y variables
-  3. Confirma que las excepciones sean específicas del dominio
-  4. Valida que los tests tengan @DisplayName descriptivos
-  5. Asegura cobertura de tests mínima del 100%
-  6. Verifica que no haya código comentado ni imports no usados
-  7. Confirma que los logs usen SLF4J (@Slf4j)
-  8. Valida que los DTOs usen MapStruct para mapeo
+## 12) DTOs y mapeo
+- MUST NOT: exponer entidades JPA directamente en controllers.
+- MUST: usar MapStruct cuando exista transformación entre capas (Entity↔Domain, Domain↔DTO).
+- MUST: separar DTO request/response de modelos de dominio.
 
-CUMPLIMIENTO:
-Estas reglas deben cumplirse al 100%. No hay excepciones salvo justificación técnica crítica documentada.
+## 13) REST API
+- MUST: recursos en plural.
+- MUST: uso correcto de verbos HTTP (`GET`, `POST`, `PUT`, `PATCH`, `DELETE`).
+- MUST: códigos HTTP consistentes; en controllers usar `ResponseEntity` para control explícito de status.
 
-# Rules for commits
-No hagas commits sin antes preguntar.
+## 14) Persistencia y migraciones
+- MUST: cambios de esquema vía Flyway.
+- MUST NOT: modificar migraciones ya aplicadas.
+- MUST: scripts de catálogos/seed deben ser idempotentes.
+
+## 15) Testing y validación técnica
+- MUST: priorizar tests unitarios por caso de uso y reglas de negocio.
+- MUST: nomenclatura descriptiva en tests (`@DisplayName` y nombres claros).
+- MUST: ejecutar validación técnica antes de cerrar tarea.
+
+### Definición de “validación técnica”
+- Si hay cambios en `src/main/java`: MUST ejecutar tests relacionados + build de compilación.
+- Si hay cambios en `src/test/java` únicamente: MUST ejecutar al menos los tests modificados.
+- Si hay cambios en migraciones SQL: MUST validar build y coherencia de scripts (sin errores sintácticos evidentes).
+
+## 16) Logging y seguridad
+- MUST NOT: usar `System.out.println`.
+- MUST NOT: exponer secretos o datos sensibles en logs.
+- SHOULD: incluir contexto útil en logs sin sobrecargar.
+- MUST: los logs deben propagarse hasta infraestructura; la escritura efectiva (appenders/sinks) se realiza en infraestructura.
+- MUST NOT: Domain y Application acoplarse a mecanismos concretos de salida de logs.
+
+## 17) Flujo de implementación obligatorio
+Antes de implementar:
+1. Revisar `specs/RULES.md` y specs del feature.
+2. Confirmar que no hay conflicto/ambigüedad.
+3. Planificar cambios mínimos y enfocados.
+
+Durante implementación:
+1. Respetar arquitectura y nomenclatura.
+2. Aplicar validaciones en la capa correcta.
+3. Mantener separación de responsabilidades.
+
+Después de implementar:
+1. Revisar cumplimiento de estas reglas.
+2. Ejecutar validación técnica (tests/build aplicable).
+3. Reportar cambios, riesgos y próximos pasos.
+4. MUST: ejecutar una auditoría final de cumplimiento "al pie de la letra" contra `specs/RULES.md` y specs del feature antes de cerrar la tarea.
+
+## 18) Criterio de bloqueo automático
+Un cambio se considera incompleto si:
+- Implementa algo no definido en `specs/`.
+- Tiene conflictos/ambigüedades no resueltas.
+- Incumple la política de comentarios.
+- No ejecuta validación técnica según la sección 15.
+- No ejecuta auditoría final de cumplimiento estricto según la sección 17.
+
+## 19) Checklist obligatorio antes de entregar
+- [ ] El requerimiento existe en `specs/wip` o `specs/features`.
+- [ ] No hay conflictos de precedencia.
+- [ ] No hay ambigüedad sin decisión explícita.
+- [ ] Se cumple la política de comentarios.
+- [ ] Se respeta arquitectura y nomenclatura.
+- [ ] La validación técnica (tests/build aplicable) fue ejecutada.
+- [ ] Se ejecutó auditoría final de cumplimiento estricto contra `specs/RULES.md` y specs del feature.

@@ -4,12 +4,15 @@ import com.jcuadrado.erplitebackend.domain.port.documenttypes.DocumentTypeReposi
 import com.jcuadrado.erplitebackend.domain.port.geography.DepartmentRepository;
 import com.jcuadrado.erplitebackend.domain.port.geography.MunicipalityRepository;
 import com.jcuadrado.erplitebackend.domain.port.paymentmethod.PaymentMethodRepository;
+import com.jcuadrado.erplitebackend.domain.port.taxtype.TaxTypeRepository;
 import com.jcuadrado.erplitebackend.domain.service.documenttypes.DocumentTypeDomainService;
 import com.jcuadrado.erplitebackend.domain.service.documenttypes.DocumentTypeValidator;
 import com.jcuadrado.erplitebackend.domain.service.geography.GeographyDomainService;
 import com.jcuadrado.erplitebackend.domain.service.geography.GeographyValidator;
 import com.jcuadrado.erplitebackend.domain.service.paymentmethod.PaymentMethodDomainService;
 import com.jcuadrado.erplitebackend.domain.service.paymentmethod.PaymentMethodValidator;
+import com.jcuadrado.erplitebackend.domain.service.taxtype.TaxTypeDomainService;
+import com.jcuadrado.erplitebackend.domain.service.taxtype.TaxTypeValidationService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -76,6 +79,24 @@ public class BeanConfiguration {
             PaymentMethodRepository repository,
             PaymentMethodValidator validator) {
         return new PaymentMethodDomainService(repository, validator);
+    }
+
+    // ==================== Tax Type Beans ====================
+
+    /**
+     * Bean for TaxTypeDomainService
+     */
+    @Bean
+    public TaxTypeDomainService taxTypeDomainService() {
+        return new TaxTypeDomainService();
+    }
+
+    /**
+     * Bean for TaxTypeValidationService
+     */
+    @Bean
+    public TaxTypeValidationService taxTypeValidationService(TaxTypeRepository repository) {
+        return new TaxTypeValidationService(repository);
     }
 }
 

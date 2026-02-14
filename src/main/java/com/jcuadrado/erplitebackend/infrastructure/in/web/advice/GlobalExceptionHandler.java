@@ -14,6 +14,12 @@ import com.jcuadrado.erplitebackend.domain.exception.paymentmethod.InvalidPaymen
 import com.jcuadrado.erplitebackend.domain.exception.paymentmethod.InvalidPaymentMethodDataException;
 import com.jcuadrado.erplitebackend.domain.exception.paymentmethod.PaymentMethodConstraintException;
 import com.jcuadrado.erplitebackend.domain.exception.paymentmethod.PaymentMethodNotFoundException;
+import com.jcuadrado.erplitebackend.domain.exception.taxtype.DuplicateTaxTypeCodeException;
+import com.jcuadrado.erplitebackend.domain.exception.taxtype.InvalidTaxPercentageException;
+import com.jcuadrado.erplitebackend.domain.exception.taxtype.InvalidTaxTypeCodeException;
+import com.jcuadrado.erplitebackend.domain.exception.taxtype.InvalidTaxTypeDataException;
+import com.jcuadrado.erplitebackend.domain.exception.taxtype.TaxTypeConstraintException;
+import com.jcuadrado.erplitebackend.domain.exception.taxtype.TaxTypeNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -285,6 +291,98 @@ public class GlobalExceptionHandler {
             .message(ex.getMessage())
             .build();
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    // ==================== Tax Type Exception Handlers ====================
+
+    /**
+     * Handle TaxTypeNotFoundException (404)
+     */
+    @ExceptionHandler(TaxTypeNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleTaxTypeNotFound(TaxTypeNotFoundException ex) {
+        log.error("Tax type not found: {}", ex.getMessage());
+        ErrorResponse error = ErrorResponse.builder()
+            .timestamp(LocalDateTime.now())
+            .status(HttpStatus.NOT_FOUND.value())
+            .error("Not Found")
+            .message(ex.getMessage())
+            .build();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
+    /**
+     * Handle DuplicateTaxTypeCodeException (409)
+     */
+    @ExceptionHandler(DuplicateTaxTypeCodeException.class)
+    public ResponseEntity<ErrorResponse> handleDuplicateTaxTypeCode(DuplicateTaxTypeCodeException ex) {
+        log.warn("Duplicate tax type code: {}", ex.getMessage());
+        ErrorResponse error = ErrorResponse.builder()
+            .timestamp(LocalDateTime.now())
+            .status(HttpStatus.CONFLICT.value())
+            .error("Conflict")
+            .message(ex.getMessage())
+            .build();
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
+    /**
+     * Handle InvalidTaxTypeCodeException (400)
+     */
+    @ExceptionHandler(InvalidTaxTypeCodeException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidTaxTypeCode(InvalidTaxTypeCodeException ex) {
+        log.warn("Invalid tax type code: {}", ex.getMessage());
+        ErrorResponse error = ErrorResponse.builder()
+            .timestamp(LocalDateTime.now())
+            .status(HttpStatus.BAD_REQUEST.value())
+            .error("Bad Request")
+            .message(ex.getMessage())
+            .build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    /**
+     * Handle InvalidTaxPercentageException (400)
+     */
+    @ExceptionHandler(InvalidTaxPercentageException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidTaxPercentage(InvalidTaxPercentageException ex) {
+        log.warn("Invalid tax percentage: {}", ex.getMessage());
+        ErrorResponse error = ErrorResponse.builder()
+            .timestamp(LocalDateTime.now())
+            .status(HttpStatus.BAD_REQUEST.value())
+            .error("Bad Request")
+            .message(ex.getMessage())
+            .build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    /**
+     * Handle InvalidTaxTypeDataException (400)
+     */
+    @ExceptionHandler(InvalidTaxTypeDataException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidTaxTypeData(InvalidTaxTypeDataException ex) {
+        log.warn("Invalid tax type data: {}", ex.getMessage());
+        ErrorResponse error = ErrorResponse.builder()
+            .timestamp(LocalDateTime.now())
+            .status(HttpStatus.BAD_REQUEST.value())
+            .error("Bad Request")
+            .message(ex.getMessage())
+            .build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    /**
+     * Handle TaxTypeConstraintException (409)
+     */
+    @ExceptionHandler(TaxTypeConstraintException.class)
+    public ResponseEntity<ErrorResponse> handleTaxTypeConstraint(TaxTypeConstraintException ex) {
+        log.warn("Tax type constraint violation: {}", ex.getMessage());
+        ErrorResponse error = ErrorResponse.builder()
+            .timestamp(LocalDateTime.now())
+            .status(HttpStatus.CONFLICT.value())
+            .error("Conflict")
+            .message(ex.getMessage())
+            .build();
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
 
     /**

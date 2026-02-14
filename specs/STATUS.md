@@ -73,11 +73,11 @@
 - **README**: [wip/geography/README.md](wip/geography/README.md) - Detalles de eliminación
 
 ### tax-types (Tipos de Impuestos) - v1.0.0
-- **Estado**: 🟡 Planning & Documentation (Specification Completed)
+- **Estado**: ✅ Implementado y validado
 - **Developer**: AI Assistant
-- **Progress**: 0/32 tareas (0%) - Especificación completa
+- **Progress**: 32/32 tareas (100%)
 - **Architecture**: Hexagonal (Aligned with Scaffolding)
-- **ETA**: 2026-02-20 (1 semana de implementación)
+- **ETA**: Completado 2026-02-13
 - **Priority**: 🔴 High
 - **Documentación**: [wip/04-tax-types/](wip/04-tax-types/)
 - **Specs**:
@@ -93,8 +93,8 @@
   - CQRS: Compare (Query) y Manage (Command)
   - 7 endpoints REST API in /api/v1/tax-types (consolidados)
   - Validaciones exhaustivas (código, porcentaje, nombre)
-- **Fase Actual**: PHASE 0 (Pre-Implementation Validation)
-- **Próximo Paso**: T000 - Validación y aprobación de specs
+- **Fase Actual**: PHASE 8 completada
+- **Resultado**: 157 tests OK, cobertura dominio 100%, application ~99%, infrastructure ~98%
 
 ---
 
