@@ -32,7 +32,7 @@ public class UnitOfMeasure {
         return UnitOfMeasure.builder()
                 .uuid(UUID.randomUUID())
                 .name(name)
-                .abbreviation(abbreviation == null ? null : abbreviation.toUpperCase().trim())
+                .abbreviation(abbreviation.toUpperCase().trim())
                 .enabled(true)
                 .createdBy(userId)
                 .createdAt(LocalDateTime.now())
@@ -41,7 +41,7 @@ public class UnitOfMeasure {
 
     public void update(String name, String abbreviation, Long userId) {
         this.name = name;
-        this.abbreviation = abbreviation == null ? null : abbreviation.toUpperCase().trim();
+        this.abbreviation = abbreviation.toUpperCase().trim();
         this.updatedBy = userId;
         this.updatedAt = LocalDateTime.now();
     }
