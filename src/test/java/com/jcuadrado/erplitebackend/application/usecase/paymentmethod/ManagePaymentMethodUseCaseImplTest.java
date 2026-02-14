@@ -49,8 +49,6 @@ class ManagePaymentMethodUseCaseImplTest {
         sampleUuid = UUID.randomUUID();
     }
 
-    // ==================== create Tests ====================
-
     @Test
     void create_shouldPrepareValidateAndSavePaymentMethod() {
         // Given
@@ -110,8 +108,6 @@ class ManagePaymentMethodUseCaseImplTest {
         assertThat(captured.getCreatedAt()).isNotNull();
         assertThat(captured.getCreatedAt()).isAfterOrEqualTo(beforeCreation);
     }
-
-    // ==================== update Tests ====================
 
     @Test
     void update_shouldFindExistingPaymentMethodAndUpdate() {
@@ -201,8 +197,6 @@ class ManagePaymentMethodUseCaseImplTest {
         assertThat(captured.getUpdatedAt()).isAfterOrEqualTo(beforeUpdate);
     }
 
-    // ==================== delete Tests ====================
-
     @Test
     void delete_shouldSoftDeletePaymentMethodWhenNoTransactions() {
         // Given
@@ -215,7 +209,7 @@ class ManagePaymentMethodUseCaseImplTest {
 
         when(repository.findByUuid(sampleUuid)).thenReturn(Optional.of(existingPaymentMethod));
         when(repository.countTransactionsWithPaymentMethod(sampleUuid)).thenReturn(0L);
-        when(domainService.canDelete(existingPaymentMethod, 0L)).thenReturn(true);
+        when(domainService.canDelete( 0L)).thenReturn(true);
         when(repository.save(any(PaymentMethod.class))).thenReturn(existingPaymentMethod);
 
         // When
@@ -224,7 +218,7 @@ class ManagePaymentMethodUseCaseImplTest {
         // Then
         verify(repository).findByUuid(sampleUuid);
         verify(repository).countTransactionsWithPaymentMethod(sampleUuid);
-        verify(domainService).canDelete(existingPaymentMethod, 0L);
+        verify(domainService).canDelete( 0L);
         verify(repository).save(paymentMethodCaptor.capture());
 
         PaymentMethod captured = paymentMethodCaptor.getValue();
@@ -246,7 +240,7 @@ class ManagePaymentMethodUseCaseImplTest {
 
         when(repository.findByUuid(sampleUuid)).thenReturn(Optional.of(existingPaymentMethod));
         when(repository.countTransactionsWithPaymentMethod(sampleUuid)).thenReturn(100L);
-        when(domainService.canDelete(existingPaymentMethod, 100L)).thenReturn(false);
+        when(domainService.canDelete( 100L)).thenReturn(false);
 
         // When & Then
         assertThatThrownBy(() -> useCase.delete(sampleUuid))
@@ -255,7 +249,7 @@ class ManagePaymentMethodUseCaseImplTest {
 
         verify(repository).findByUuid(sampleUuid);
         verify(repository).countTransactionsWithPaymentMethod(sampleUuid);
-        verify(domainService).canDelete(existingPaymentMethod, 100L);
+        verify(domainService).canDelete( 100L);
         verify(repository, never()).save(any());
     }
 
@@ -272,8 +266,6 @@ class ManagePaymentMethodUseCaseImplTest {
         verify(repository, never()).countTransactionsWithPaymentMethod(any());
         verify(repository, never()).save(any());
     }
-
-    // ==================== activate Tests ====================
 
     @Test
         void activate_shouldActivatePaymentMethod() {
@@ -315,8 +307,6 @@ class ManagePaymentMethodUseCaseImplTest {
         verify(repository, never()).save(any());
     }
 
-    // ==================== deactivate Tests ====================
-
     @Test
     void deactivate_shouldDeactivatePaymentMethod() {
         // Given
@@ -329,7 +319,7 @@ class ManagePaymentMethodUseCaseImplTest {
 
         when(repository.findByUuid(sampleUuid)).thenReturn(Optional.of(existingPaymentMethod));
         when(repository.countTransactionsWithPaymentMethod(sampleUuid)).thenReturn(0L);
-        when(domainService.canDeactivate(existingPaymentMethod, 0L)).thenReturn(true);
+        when(domainService.canDeactivate(0L)).thenReturn(true);
         when(repository.save(any(PaymentMethod.class))).thenReturn(existingPaymentMethod);
 
         // When
@@ -339,7 +329,7 @@ class ManagePaymentMethodUseCaseImplTest {
         assertThat(result).isNotNull();
         verify(repository).findByUuid(sampleUuid);
         verify(repository).countTransactionsWithPaymentMethod(sampleUuid);
-        verify(domainService).canDeactivate(existingPaymentMethod, 0L);
+        verify(domainService).canDeactivate(0L);
         verify(repository).save(paymentMethodCaptor.capture());
 
         PaymentMethod captured = paymentMethodCaptor.getValue();
@@ -360,7 +350,7 @@ class ManagePaymentMethodUseCaseImplTest {
 
         verify(repository).findByUuid(sampleUuid);
         verify(repository, never()).countTransactionsWithPaymentMethod(any());
-        verify(domainService, never()).canDeactivate(any(), anyLong());
+        verify(domainService, never()).canDeactivate(anyLong());
         verify(repository, never()).save(any());
     }
 
@@ -376,7 +366,7 @@ class ManagePaymentMethodUseCaseImplTest {
 
         when(repository.findByUuid(sampleUuid)).thenReturn(Optional.of(existingPaymentMethod));
         when(repository.countTransactionsWithPaymentMethod(sampleUuid)).thenReturn(10L);
-        when(domainService.canDeactivate(existingPaymentMethod, 10L)).thenReturn(false);
+        when(domainService.canDeactivate(10L)).thenReturn(false);
 
         // When & Then
         assertThatThrownBy(() -> useCase.deactivate(sampleUuid))
@@ -384,7 +374,7 @@ class ManagePaymentMethodUseCaseImplTest {
 
         verify(repository).findByUuid(sampleUuid);
         verify(repository).countTransactionsWithPaymentMethod(sampleUuid);
-        verify(domainService).canDeactivate(existingPaymentMethod, 10L);
+        verify(domainService).canDeactivate(10L);
         verify(repository, never()).save(any());
     }
 }

@@ -28,8 +28,6 @@ class PaymentMethodDomainServiceTest {
     @InjectMocks
     private PaymentMethodDomainService domainService;
 
-    // ========== Normalize Code Tests ==========
-
     @Test
     void normalizeCode_shouldConvertToUppercaseAndTrim() {
         // Given
@@ -65,8 +63,6 @@ class PaymentMethodDomainServiceTest {
         // Then
         assertThat(result).isEqualTo("CASH");
     }
-
-    // ========== Validate Unique Code Tests ==========
 
     @Test
     void validateUniqueCode_shouldPassWhenCodeDoesNotExist() {
@@ -106,8 +102,6 @@ class PaymentMethodDomainServiceTest {
         verify(repository).existsByCode("CASH");
     }
 
-    // ========== Validate Unique Code Excluding Tests ==========
-
     @Test
     void validateUniqueCodeExcluding_shouldPassWhenCodeDoesNotExistForOtherPaymentMethods() {
         // Given
@@ -135,19 +129,10 @@ class PaymentMethodDomainServiceTest {
         verify(repository).existsByCodeAndUuidNot("CASH", uuid);
     }
 
-    // ========== Can Deactivate Tests ==========
-
     @Test
     void canDeactivate_shouldReturnTrueWhenNoTransactions() {
-        // Given
-        PaymentMethod paymentMethod = PaymentMethod.builder()
-                .code("CASH")
-                .name("Efectivo")
-                .enabled(true)
-                .build();
-
         // When
-        boolean result = domainService.canDeactivate(paymentMethod, 0L);
+        boolean result = domainService.canDeactivate( 0L);
 
         // Then
         assertThat(result).isTrue();
@@ -155,33 +140,20 @@ class PaymentMethodDomainServiceTest {
 
     @Test
     void canDeactivate_shouldReturnFalseWhenHasTransactions() {
-        // Given
-        PaymentMethod paymentMethod = PaymentMethod.builder()
-                .code("CASH")
-                .name("Efectivo")
-                .enabled(true)
-                .build();
-
         // When
-        boolean result = domainService.canDeactivate(paymentMethod, 5L);
+        boolean result = domainService.canDeactivate(5L);
 
         // Then
         assertThat(result).isFalse();
     }
 
-    // ========== Can Delete Tests ==========
-
     @Test
     void canDelete_shouldReturnTrueWhenNoTransactions() {
         // Given
-        PaymentMethod paymentMethod = PaymentMethod.builder()
-                .code("CASH")
-                .name("Efectivo")
-                .build();
         long transactionsCount = 0L;
 
         // When
-        boolean result = domainService.canDelete(paymentMethod, transactionsCount);
+        boolean result = domainService.canDelete(transactionsCount);
 
         // Then
         assertThat(result).isTrue();
@@ -190,20 +162,14 @@ class PaymentMethodDomainServiceTest {
     @Test
     void canDelete_shouldReturnFalseWhenHasTransactions() {
         // Given
-        PaymentMethod paymentMethod = PaymentMethod.builder()
-                .code("CASH")
-                .name("Efectivo")
-                .build();
         long transactionsCount = 100L;
 
         // When
-        boolean result = domainService.canDelete(paymentMethod, transactionsCount);
+        boolean result = domainService.canDelete(transactionsCount);
 
         // Then
         assertThat(result).isFalse();
     }
-
-    // ========== Prepare For Creation Tests ==========
 
     @Test
     void prepareForCreation_shouldValidateAndNormalizeCode() {
@@ -303,8 +269,6 @@ class PaymentMethodDomainServiceTest {
         verify(validator).validateAll("CASH", "Efectivo");
         verify(repository).existsByCode("CASH");
     }
-
-    // ========== Prepare For Update Tests ==========
 
     @Test
     void prepareForUpdate_shouldValidateAndNormalizeCode() {

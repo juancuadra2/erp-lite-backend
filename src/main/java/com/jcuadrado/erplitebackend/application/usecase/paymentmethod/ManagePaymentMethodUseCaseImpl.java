@@ -72,7 +72,7 @@ public class ManagePaymentMethodUseCaseImpl implements ManagePaymentMethodUseCas
             .orElseThrow(() -> new PaymentMethodNotFoundException("uuid", uuid.toString()));
 
         long transactionsCount = repository.countTransactionsWithPaymentMethod(uuid);
-        if (!domainService.canDelete(existing, transactionsCount)) {
+        if (!domainService.canDelete(transactionsCount)) {
             throw new PaymentMethodConstraintException(
                 "Cannot delete payment method with associated transactions. Found " + transactionsCount + " transactions."
             );
@@ -111,7 +111,7 @@ public class ManagePaymentMethodUseCaseImpl implements ManagePaymentMethodUseCas
             .orElseThrow(() -> new PaymentMethodNotFoundException("uuid", uuid.toString()));
 
         long transactionsCount = repository.countTransactionsWithPaymentMethod(uuid);
-        if (!domainService.canDeactivate(existing, transactionsCount)) {
+        if (!domainService.canDeactivate(transactionsCount)) {
             throw new PaymentMethodConstraintException(
                 "Cannot deactivate payment method with associated transactions. Found " + transactionsCount + " transactions."
             );
