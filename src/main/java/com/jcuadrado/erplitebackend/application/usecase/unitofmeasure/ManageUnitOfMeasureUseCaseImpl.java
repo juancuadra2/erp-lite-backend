@@ -45,13 +45,8 @@ public class ManageUnitOfMeasureUseCaseImpl implements ManageUnitOfMeasureUseCas
         UnitOfMeasure existing = repository.findByUuid(uuid)
                 .orElseThrow(() -> new UnitOfMeasureNotFoundException(uuid));
 
-        if (updates.getName() != null) {
-            existing.setName(updates.getName());
-        }
-
-        if (updates.getAbbreviation() != null) {
-            existing.setAbbreviation(updates.getAbbreviation());
-        }
+        existing.setName(updates.getName());
+        existing.setAbbreviation(updates.getAbbreviation());
 
         domainService.prepareForUpdate(existing, uuid);
 

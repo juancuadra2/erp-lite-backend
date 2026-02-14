@@ -88,17 +88,17 @@ class ManageUnitOfMeasureUseCaseImplTest {
     }
 
     @Test
-    void update_shouldKeepExistingValuesWhenUpdatesAreNull() {
+    void update_shouldReplaceExistingValues() {
         UUID uuid = UUID.randomUUID();
         UnitOfMeasure existing = UnitOfMeasure.builder().uuid(uuid).name("Caja").abbreviation("CJ").enabled(true).build();
-        UnitOfMeasure updates = UnitOfMeasure.builder().name(null).abbreviation(null).build();
+        UnitOfMeasure updates = UnitOfMeasure.builder().name("Bolsa").abbreviation("BL").build();
         when(repository.findByUuid(uuid)).thenReturn(Optional.of(existing));
         when(repository.save(existing)).thenReturn(existing);
 
         UnitOfMeasure result = useCase.update(uuid, updates);
 
-        assertThat(result.getName()).isEqualTo("Caja");
-        assertThat(result.getAbbreviation()).isEqualTo("CJ");
+        assertThat(result.getName()).isEqualTo("Bolsa");
+        assertThat(result.getAbbreviation()).isEqualTo("BL");
         verify(domainService).prepareForUpdate(existing, uuid);
     }
 
