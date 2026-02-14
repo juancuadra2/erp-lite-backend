@@ -5,7 +5,7 @@ CREATE TABLE units_of_measure (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     uuid BINARY(16) NOT NULL UNIQUE,
     name VARCHAR(50) NOT NULL UNIQUE,
-    abbreviation VARCHAR(10) NOT NULL UNIQUE,
+    abbreviation VARCHAR(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL UNIQUE,
     enabled BOOLEAN DEFAULT TRUE,
     created_by BIGINT,
     updated_by BIGINT,
