@@ -156,3 +156,31 @@ Un cambio se considera incompleto si:
 - [ ] Se respeta arquitectura y nomenclatura.
 - [ ] La validación técnica (tests/build aplicable) fue ejecutada.
 - [ ] Se ejecutó auditoría final de cumplimiento estricto contra `specs/RULES.md` y specs del feature.
+
+## 20) Estándar de estructura y naming en `specs/wip/[feature]/`
+
+### Estructura mínima requerida
+- MUST: cada feature en WIP debe contener exactamente estos artefactos base:
+	1. `1-functional-spec.md`
+	2. `2-technical-spec.md`
+	3. `3-tasks.json`
+	4. `STATUS.md`
+
+### Convención de nombres
+- MUST: usar prefijo numérico para preservar orden de revisión (`1-`, `2-`, `3-`).
+- MUST NOT: usar nombres alternos para los artefactos base (`functional-spec.md`, `technical-spec.md`, `tasks.json`, `plan.md`) una vez estandarizado el feature.
+
+### Enlaces internos y consistencia
+- MUST: todos los links y referencias internas del feature deben apuntar a los nombres canónicos anteriores.
+- SHOULD: si existe contenido de planificación narrativa, integrarlo en `3-tasks.json` y/o `STATUS.md` en lugar de crear `plan.md` adicional.
+
+## 21) Política de estimación para planeación
+
+### Unidad de estimación
+- MUST: toda estimación de trabajo en artefactos de planeación (`3-tasks.json`, `STATUS.md`, documentación de plan) debe expresarse en **story points**.
+- MUST NOT: usar estimaciones en horas como unidad principal de planeación.
+
+### JSON de tareas
+- MUST: en `3-tasks.json` cada tarea debe usar el campo `storyPoints`.
+- MUST NOT: usar `estimatedHours` en tareas nuevas o actualizadas.
+- SHOULD: mantener `estimatedStoryPoints` a nivel global del feature para total consolidado.

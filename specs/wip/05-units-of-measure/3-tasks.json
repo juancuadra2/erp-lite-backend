@@ -1,11 +1,22 @@
-{
+﻿{
   "feature": "05-units-of-measure",
   "title": "Módulo de Unidades de Medida",
   "description": "Catálogo de unidades de medida (Unidad, Kilogramo, Litro, Metro, etc.) para gestión de productos e inventarios",
   "version": "1.0",
   "created": "2026-02-01",
+  "estimationUnit": "story-points",
   "estimatedStoryPoints": 26,
-  "estimatedHours": 26,
+  "taskEndGate": {
+    "id": "TASK-END-GATE-V1",
+    "description": "Validación obligatoria al finalizar cada tarea",
+    "checks": [
+      "Cumple specs/RULES.md y reglas de precedencia",
+      "Cumple 1-functional-spec.md y 2-technical-spec.md del feature",
+      "No introduce requerimientos fuera de scope",
+      "Sin ambigüedades pendientes sin decisión explícita",
+      "Validación técnica ejecutada según sección 15 de RULES.md (si aplica)"
+    ]
+  },
   "phases": [
     {
       "id": "phase-1",
@@ -19,9 +30,10 @@
           "phase": "phase-1",
           "status": "pending",
           "priority": "high",
-          "estimatedHours": 1,
+          "storyPoints": 1,
           "dependencies": [],
-          "tags": ["domain", "model"]
+          "tags": ["domain", "model"],
+          "endGateRef": "TASK-END-GATE-V1"
         },
         {
           "id": "T002",
@@ -30,9 +42,10 @@
           "phase": "phase-1",
           "status": "pending",
           "priority": "high",
-          "estimatedHours": 0.5,
+          "storyPoints": 0.5,
           "dependencies": [],
-          "tags": ["domain", "exception"]
+          "tags": ["domain", "exception"],
+          "endGateRef": "TASK-END-GATE-V1"
         },
         {
           "id": "T003",
@@ -41,9 +54,10 @@
           "phase": "phase-1",
           "status": "pending",
           "priority": "high",
-          "estimatedHours": 0.5,
+          "storyPoints": 0.5,
           "dependencies": ["T001"],
-          "tags": ["application", "command"]
+          "tags": ["application", "command"],
+          "endGateRef": "TASK-END-GATE-V1"
         }
       ]
     },
@@ -59,9 +73,10 @@
           "phase": "phase-2",
           "status": "pending",
           "priority": "high",
-          "estimatedHours": 1,
+          "storyPoints": 1,
           "dependencies": ["T001", "T002"],
-          "tags": ["domain", "service", "validation"]
+          "tags": ["domain", "service", "validation"],
+          "endGateRef": "TASK-END-GATE-V1"
         },
         {
           "id": "T005",
@@ -70,9 +85,10 @@
           "phase": "phase-2",
           "status": "pending",
           "priority": "high",
-          "estimatedHours": 1,
+          "storyPoints": 1,
           "dependencies": ["T002"],
-          "tags": ["domain", "service", "validation"]
+          "tags": ["domain", "service", "validation"],
+          "endGateRef": "TASK-END-GATE-V1"
         }
       ]
     },
@@ -88,9 +104,10 @@
           "phase": "phase-3",
           "status": "pending",
           "priority": "high",
-          "estimatedHours": 0.5,
+          "storyPoints": 0.5,
           "dependencies": ["T001", "T003"],
-          "tags": ["application", "port", "use-case"]
+          "tags": ["application", "port", "use-case"],
+          "endGateRef": "TASK-END-GATE-V1"
         },
         {
           "id": "T007",
@@ -99,9 +116,10 @@
           "phase": "phase-3",
           "status": "pending",
           "priority": "high",
-          "estimatedHours": 0.5,
+          "storyPoints": 0.5,
           "dependencies": ["T001"],
-          "tags": ["application", "port", "repository"]
+          "tags": ["application", "port", "repository"],
+          "endGateRef": "TASK-END-GATE-V1"
         }
       ]
     },
@@ -117,9 +135,10 @@
           "phase": "phase-4",
           "status": "pending",
           "priority": "high",
-          "estimatedHours": 1,
+          "storyPoints": 1,
           "dependencies": ["T003", "T004", "T005", "T006", "T007"],
-          "tags": ["application", "service", "use-case"]
+          "tags": ["application", "service", "use-case"],
+          "endGateRef": "TASK-END-GATE-V1"
         },
         {
           "id": "T009",
@@ -128,9 +147,10 @@
           "phase": "phase-4",
           "status": "pending",
           "priority": "high",
-          "estimatedHours": 0.5,
+          "storyPoints": 0.5,
           "dependencies": ["T006", "T007"],
-          "tags": ["application", "service", "use-case"]
+          "tags": ["application", "service", "use-case"],
+          "endGateRef": "TASK-END-GATE-V1"
         },
         {
           "id": "T010",
@@ -139,9 +159,10 @@
           "phase": "phase-4",
           "status": "pending",
           "priority": "high",
-          "estimatedHours": 1,
+          "storyPoints": 1,
           "dependencies": ["T003", "T004", "T005", "T006", "T007"],
-          "tags": ["application", "service", "use-case"]
+          "tags": ["application", "service", "use-case"],
+          "endGateRef": "TASK-END-GATE-V1"
         },
         {
           "id": "T011",
@@ -150,9 +171,10 @@
           "phase": "phase-4",
           "status": "pending",
           "priority": "high",
-          "estimatedHours": 0.5,
+          "storyPoints": 0.5,
           "dependencies": ["T004", "T006", "T007"],
-          "tags": ["application", "service", "use-case"]
+          "tags": ["application", "service", "use-case"],
+          "endGateRef": "TASK-END-GATE-V1"
         },
         {
           "id": "T012",
@@ -161,9 +183,10 @@
           "phase": "phase-4",
           "status": "pending",
           "priority": "high",
-          "estimatedHours": 0.5,
+          "storyPoints": 0.5,
           "dependencies": ["T006", "T007"],
-          "tags": ["application", "service", "use-case"]
+          "tags": ["application", "service", "use-case"],
+          "endGateRef": "TASK-END-GATE-V1"
         },
         {
           "id": "T013",
@@ -172,9 +195,10 @@
           "phase": "phase-4",
           "status": "pending",
           "priority": "high",
-          "estimatedHours": 0.5,
+          "storyPoints": 0.5,
           "dependencies": ["T006", "T007"],
-          "tags": ["application", "service", "use-case"]
+          "tags": ["application", "service", "use-case"],
+          "endGateRef": "TASK-END-GATE-V1"
         },
         {
           "id": "T014",
@@ -183,9 +207,10 @@
           "phase": "phase-4",
           "status": "pending",
           "priority": "medium",
-          "estimatedHours": 0.5,
+          "storyPoints": 0.5,
           "dependencies": ["T006", "T007"],
-          "tags": ["application", "service", "use-case"]
+          "tags": ["application", "service", "use-case"],
+          "endGateRef": "TASK-END-GATE-V1"
         }
       ]
     },
@@ -201,9 +226,10 @@
           "phase": "phase-5",
           "status": "pending",
           "priority": "high",
-          "estimatedHours": 1,
+          "storyPoints": 1,
           "dependencies": ["T001"],
-          "tags": ["infrastructure", "persistence", "entity"]
+          "tags": ["infrastructure", "persistence", "entity"],
+          "endGateRef": "TASK-END-GATE-V1"
         },
         {
           "id": "T016",
@@ -212,9 +238,10 @@
           "phase": "phase-5",
           "status": "pending",
           "priority": "high",
-          "estimatedHours": 1,
+          "storyPoints": 1,
           "dependencies": ["T015"],
-          "tags": ["infrastructure", "persistence", "repository"]
+          "tags": ["infrastructure", "persistence", "repository"],
+          "endGateRef": "TASK-END-GATE-V1"
         },
         {
           "id": "T017",
@@ -223,9 +250,10 @@
           "phase": "phase-5",
           "status": "pending",
           "priority": "high",
-          "estimatedHours": 0.5,
+          "storyPoints": 0.5,
           "dependencies": ["T001", "T015"],
-          "tags": ["infrastructure", "mapper"]
+          "tags": ["infrastructure", "mapper"],
+          "endGateRef": "TASK-END-GATE-V1"
         },
         {
           "id": "T018",
@@ -234,9 +262,10 @@
           "phase": "phase-5",
           "status": "pending",
           "priority": "high",
-          "estimatedHours": 0.5,
+          "storyPoints": 0.5,
           "dependencies": ["T007", "T016", "T017"],
-          "tags": ["infrastructure", "adapter", "persistence"]
+          "tags": ["infrastructure", "adapter", "persistence"],
+          "endGateRef": "TASK-END-GATE-V1"
         }
       ]
     },
@@ -252,9 +281,10 @@
           "phase": "phase-6",
           "status": "pending",
           "priority": "high",
-          "estimatedHours": 1,
+          "storyPoints": 1,
           "dependencies": ["T001"],
-          "tags": ["infrastructure", "api", "dto"]
+          "tags": ["infrastructure", "api", "dto"],
+          "endGateRef": "TASK-END-GATE-V1"
         },
         {
           "id": "T020",
@@ -263,9 +293,10 @@
           "phase": "phase-6",
           "status": "pending",
           "priority": "high",
-          "estimatedHours": 0.5,
+          "storyPoints": 0.5,
           "dependencies": ["T001", "T019"],
-          "tags": ["infrastructure", "mapper"]
+          "tags": ["infrastructure", "mapper"],
+          "endGateRef": "TASK-END-GATE-V1"
         },
         {
           "id": "T021",
@@ -274,9 +305,10 @@
           "phase": "phase-6",
           "status": "pending",
           "priority": "high",
-          "estimatedHours": 1,
+          "storyPoints": 1,
           "dependencies": ["T006", "T019", "T020"],
-          "tags": ["infrastructure", "api", "controller"]
+          "tags": ["infrastructure", "api", "controller"],
+          "endGateRef": "TASK-END-GATE-V1"
         },
         {
           "id": "T022",
@@ -285,9 +317,10 @@
           "phase": "phase-6",
           "status": "pending",
           "priority": "high",
-          "estimatedHours": 0.5,
+          "storyPoints": 0.5,
           "dependencies": ["T002"],
-          "tags": ["infrastructure", "api", "exception"]
+          "tags": ["infrastructure", "api", "exception"],
+          "endGateRef": "TASK-END-GATE-V1"
         }
       ]
     },
@@ -303,9 +336,10 @@
           "phase": "phase-7",
           "status": "pending",
           "priority": "high",
-          "estimatedHours": 0.5,
+          "storyPoints": 0.5,
           "dependencies": [],
-          "tags": ["database", "migration", "flyway"]
+          "tags": ["database", "migration", "flyway"],
+          "endGateRef": "TASK-END-GATE-V1"
         },
         {
           "id": "T024",
@@ -314,9 +348,10 @@
           "phase": "phase-7",
           "status": "pending",
           "priority": "high",
-          "estimatedHours": 0.5,
+          "storyPoints": 0.5,
           "dependencies": ["T023"],
-          "tags": ["database", "migration", "seed-data", "flyway"]
+          "tags": ["database", "migration", "seed-data", "flyway"],
+          "endGateRef": "TASK-END-GATE-V1"
         }
       ]
     },
@@ -332,9 +367,10 @@
           "phase": "phase-8",
           "status": "pending",
           "priority": "high",
-          "estimatedHours": 0.5,
+          "storyPoints": 0.5,
           "dependencies": ["T001"],
-          "tags": ["test", "unit", "domain"]
+          "tags": ["test", "unit", "domain"],
+          "endGateRef": "TASK-END-GATE-V1"
         },
         {
           "id": "T026",
@@ -343,9 +379,10 @@
           "phase": "phase-8",
           "status": "pending",
           "priority": "high",
-          "estimatedHours": 1,
+          "storyPoints": 1,
           "dependencies": ["T004"],
-          "tags": ["test", "unit", "domain", "service"]
+          "tags": ["test", "unit", "domain", "service"],
+          "endGateRef": "TASK-END-GATE-V1"
         },
         {
           "id": "T027",
@@ -354,9 +391,10 @@
           "phase": "phase-8",
           "status": "pending",
           "priority": "high",
-          "estimatedHours": 0.5,
+          "storyPoints": 0.5,
           "dependencies": ["T005"],
-          "tags": ["test", "unit", "domain", "service"]
+          "tags": ["test", "unit", "domain", "service"],
+          "endGateRef": "TASK-END-GATE-V1"
         },
         {
           "id": "T028",
@@ -365,9 +403,10 @@
           "phase": "phase-8",
           "status": "pending",
           "priority": "high",
-          "estimatedHours": 1,
+          "storyPoints": 1,
           "dependencies": ["T008"],
-          "tags": ["test", "unit", "application", "service"]
+          "tags": ["test", "unit", "application", "service"],
+          "endGateRef": "TASK-END-GATE-V1"
         },
         {
           "id": "T029",
@@ -376,9 +415,10 @@
           "phase": "phase-8",
           "status": "pending",
           "priority": "high",
-          "estimatedHours": 0.5,
+          "storyPoints": 0.5,
           "dependencies": ["T009"],
-          "tags": ["test", "unit", "application", "service"]
+          "tags": ["test", "unit", "application", "service"],
+          "endGateRef": "TASK-END-GATE-V1"
         },
         {
           "id": "T030",
@@ -387,9 +427,10 @@
           "phase": "phase-8",
           "status": "pending",
           "priority": "high",
-          "estimatedHours": 0.5,
+          "storyPoints": 0.5,
           "dependencies": ["T010"],
-          "tags": ["test", "unit", "application", "service"]
+          "tags": ["test", "unit", "application", "service"],
+          "endGateRef": "TASK-END-GATE-V1"
         },
         {
           "id": "T031",
@@ -398,9 +439,10 @@
           "phase": "phase-8",
           "status": "pending",
           "priority": "high",
-          "estimatedHours": 0.5,
+          "storyPoints": 0.5,
           "dependencies": ["T011"],
-          "tags": ["test", "unit", "application", "service"]
+          "tags": ["test", "unit", "application", "service"],
+          "endGateRef": "TASK-END-GATE-V1"
         },
         {
           "id": "T032",
@@ -409,9 +451,10 @@
           "phase": "phase-8",
           "status": "pending",
           "priority": "high",
-          "estimatedHours": 0.5,
+          "storyPoints": 0.5,
           "dependencies": ["T013"],
-          "tags": ["test", "unit", "application", "service"]
+          "tags": ["test", "unit", "application", "service"],
+          "endGateRef": "TASK-END-GATE-V1"
         },
         {
           "id": "T033",
@@ -420,9 +463,10 @@
           "phase": "phase-8",
           "status": "pending",
           "priority": "medium",
-          "estimatedHours": 0.5,
+          "storyPoints": 0.5,
           "dependencies": ["T014"],
-          "tags": ["test", "unit", "application", "service"]
+          "tags": ["test", "unit", "application", "service"],
+          "endGateRef": "TASK-END-GATE-V1"
         }
       ]
     },
@@ -438,9 +482,10 @@
           "phase": "phase-9",
           "status": "pending",
           "priority": "high",
-          "estimatedHours": 1.5,
+          "storyPoints": 1.5,
           "dependencies": ["T016", "T023", "T024"],
-          "tags": ["test", "integration", "repository"]
+          "tags": ["test", "integration", "repository"],
+          "endGateRef": "TASK-END-GATE-V1"
         },
         {
           "id": "T035",
@@ -449,9 +494,10 @@
           "phase": "phase-9",
           "status": "pending",
           "priority": "medium",
-          "estimatedHours": 0.5,
+          "storyPoints": 0.5,
           "dependencies": ["T018"],
-          "tags": ["test", "integration", "adapter"]
+          "tags": ["test", "integration", "adapter"],
+          "endGateRef": "TASK-END-GATE-V1"
         },
         {
           "id": "T036",
@@ -460,9 +506,10 @@
           "phase": "phase-9",
           "status": "pending",
           "priority": "high",
-          "estimatedHours": 1,
+          "storyPoints": 1,
           "dependencies": ["T021"],
-          "tags": ["test", "integration", "controller", "api"]
+          "tags": ["test", "integration", "controller", "api"],
+          "endGateRef": "TASK-END-GATE-V1"
         }
       ]
     },
@@ -478,9 +525,10 @@
           "phase": "phase-10",
           "status": "pending",
           "priority": "medium",
-          "estimatedHours": 1,
+          "storyPoints": 1,
           "dependencies": ["T021"],
-          "tags": ["documentation", "swagger"]
+          "tags": ["documentation", "swagger"],
+          "endGateRef": "TASK-END-GATE-V1"
         },
         {
           "id": "T038",
@@ -489,9 +537,10 @@
           "phase": "phase-10",
           "status": "pending",
           "priority": "high",
-          "estimatedHours": 1,
+          "storyPoints": 1,
           "dependencies": ["T025", "T026", "T027", "T028", "T029", "T030", "T031", "T032", "T033", "T034", "T035", "T036", "T037"],
-          "tags": ["review", "cleanup"]
+          "tags": ["review", "cleanup"],
+          "endGateRef": "TASK-END-GATE-V1"
         }
       ]
     }
@@ -505,3 +554,5 @@
     "progressPercentage": 0
   }
 }
+
+

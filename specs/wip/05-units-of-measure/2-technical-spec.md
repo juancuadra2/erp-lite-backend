@@ -1,10 +1,10 @@
 # Technical Specification: Módulo de Unidades de Medida
 
 **Feature**: 05-units-of-measure  
-**Version**: 1.0  
+**Version**: 1.1  
 **Created**: 2026-02-01  
-**Last Updated**: 2026-02-01  
-**Status**: ⏳ PHASE 2 - Awaiting Technical Review
+**Last Updated**: 2026-02-13  
+**Status**: ⚠️ PHASE 2 - Technical Draft Refinement (v1.1)
 
 ---
 
@@ -14,11 +14,58 @@ Este módulo implementa un **catálogo base de unidades de medida** siguiendo la
 
 ### Tech Stack
 
-- **Backend**: Java 17+, Spring Boot 3.x
+- **Backend**: Java 21, Spring Boot 3.x
 - **Persistence**: MySQL 8.0+ con Flyway
 - **Mapping**: MapStruct 1.5+
 - **Testing**: JUnit 5, Mockito, Testcontainers
 - **Documentation**: Swagger/OpenAPI 3.0
+
+---
+
+## ✅ Definición Técnica Complementaria (Iteración v1.1)
+
+### DT-01: Convención de Rutas REST
+- Base path canónico: `/api/v1/units-of-measure`
+- Los endpoints definidos previamente se mantienen, pero sobre prefijo `v1`.
+
+### DT-02: Organización de Paquetes (Alineación Scaffolding)
+- Se adopta estructura feature-based consistente con módulos vigentes:
+    - `domain.model.unitofmeasure`
+    - `domain.service.unitofmeasure`
+    - `domain.exception.unitofmeasure`
+    - `domain.port.out.unitofmeasure`
+    - `application.port.in.unitofmeasure`
+    - `application.usecase.unitofmeasure`
+    - `infrastructure.in.web.(controller|dto|mapper).unitofmeasure`
+    - `infrastructure.out.persistence.(entity|repository|mapper|adapter).unitofmeasure`
+
+### DT-03: Convención de Casos de Uso
+- Se recomienda consolidar puertos de entrada en estilo CQRS para coherencia transversal:
+    - `CompareUnitsOfMeasureUseCase` (consultas)
+    - `ManageUnitOfMeasureUseCase` (comandos)
+- Si se mantiene granularidad por operación, deberá justificarse en revisión técnica.
+
+### DT-04: Convención de Modelo de Persistencia
+- Para compatibilidad con módulos existentes, se define convención de tabla:
+    - `id BIGINT AUTO_INCREMENT` (PK interna)
+    - `uuid BINARY(16) UNIQUE` (identificador externo)
+    - `enabled BOOLEAN` (estado lógico)
+    - `created_at`, `updated_at`, `deleted_at`
+    - `created_by`, `updated_by`, `deleted_by`
+- Los snippets previos que usan `id` UUID directo como PK se consideran referencia preliminar y quedan supersedidos por esta convención.
+
+### DT-05: Soft Delete y Reactivación
+- Soft delete: desactivación lógica + trazabilidad de auditoría.
+- Reactivación: limpia marcadores de eliminación lógica y restituye `enabled=true`.
+
+### DT-06: Definición de Búsqueda/Listado
+- Se mantiene búsqueda case-insensitive por `name` y `abbreviation`.
+- Se recomienda consolidar en `GET /api/v1/units-of-measure` con filtros opcionales y paginación (`page`, `size`, `sort`, `direction`) para coherencia con módulos implementados.
+- Si se conserva endpoint dedicado `/search`, debe documentarse como alias funcional del listado filtrado.
+
+### DT-07: Servicios de Dominio
+- Los servicios de dominio se modelan como POJOs de dominio (sin anotaciones de framework en capa domain).
+- La inyección se resuelve en configuración de infraestructura (`BeanConfiguration`).
 
 ---
 
@@ -694,6 +741,8 @@ public ResponseEntity<ErrorResponse> handleInvalidData(InvalidUnitOfMeasureDataE
 
 ## 💾 Database Design
 
+> **Nota v1.1**: Este diseño debe interpretarse bajo la convención DT-04. En caso de discrepancia entre snippets previos y DT-04, prevalece DT-04 por alineación transversal con el repositorio.
+
 ### Entity Relationship Diagram
 
 ```
@@ -942,5 +991,5 @@ curl -X POST http://localhost:8080/api/units-of-measure \
 
 ---
 
-**Status**: ⚠️ PHASE 2 - Technical Draft  
-**Next Step**: Tech Lead Review → Approve → Move to PHASE 3
+**Status**: ⚠️ PHASE 2 - Technical Draft Refinement (v1.1)  
+**Next Step**: Technical Review (Tech Lead) → Resolve design decisions → Approve → Move to PHASE 3

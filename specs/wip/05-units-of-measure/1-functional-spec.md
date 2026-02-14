@@ -1,10 +1,10 @@
 # Functional Specification: Módulo de Unidades de Medida
 
 **Feature**: 05-units-of-measure  
-**Version**: 1.0  
+**Version**: 1.1  
 **Created**: 2026-02-01  
-**Last Updated**: 2026-02-01  
-**Status**: ⏳ PHASE 1 - Awaiting Approval
+**Last Updated**: 2026-02-13  
+**Status**: ⚠️ PHASE 1 - Draft Refinement (v1.1)
 
 ---
 
@@ -35,10 +35,36 @@ Este módulo proporciona un **catálogo de unidades de medida** utilizado para l
 
 **❌ Out of Scope:**
 - Conversiones automáticas entre unidades (se maneja en ProductUnitConversion)
-- Categorización de unidades (peso, volumen, longitud)
+- Categorización funcional configurable (la clasificación en seed data es solo informativa)
 - Equivalencias internacionales (Imperial ↔ Métrico)
 - Unidades compuestas (kg/m², m³)
 - Multiidioma
+
+---
+
+## ✅ Definición Complementaria (Iteración v1.1)
+
+### DC-01: Convención de API
+- **Base path canónico**: `/api/v1/units-of-measure`
+- Los escenarios y contratos de esta spec se interpretan sobre `v1`.
+
+### DC-02: Identificador Externo
+- El identificador expuesto por API es `uuid`.
+- En mensajes y escenarios previos donde aparece `id`, se interpreta como `uuid`.
+
+### DC-03: Estado de Registro
+- El estado funcional de la unidad se maneja con bandera booleana (`enabled`/`active`).
+- Para mantener trazabilidad con otros módulos, el estado representa **unidad disponible para uso** y soporta soft delete.
+
+### DC-04: Soft Delete
+- DELETE desactiva lógicamente el registro (soft delete).
+- Una unidad desactivada no debe aparecer en listados por defecto.
+- Se mantiene endpoint de activación para reversión controlada.
+
+### DC-05: Reglas de Búsqueda
+- Búsqueda por `name` y `abbreviation` es **case-insensitive**.
+- El resultado de búsqueda es por coincidencia parcial (`contains`).
+- Si se envían ambos filtros, se prioriza `name` cuando exista valor no vacío.
 
 ---
 
@@ -152,8 +178,8 @@ Este módulo proporciona un **catálogo de unidades de medida** utilizado para l
 
 ### BR-02: Validaciones de Formato
 - **Nombre**: 2-50 caracteres, solo letras y espacios
-- **Abreviatura**: 1-10 caracteres, solo letras y números
-- No se permiten caracteres especiales
+- **Abreviatura**: 1-10 caracteres, letras/números y superíndices `²` `³`
+- No se permiten otros caracteres especiales
 
 ### BR-03: Soft Delete
 - DELETE solo marca `active=false`
@@ -221,6 +247,8 @@ Este módulo proporciona un **catálogo de unidades de medida** utilizado para l
 
 ### Unidades Precargadas para Colombia
 
+> Nota: La columna **Category** es referencial/documental para legibilidad del catálogo inicial; no implica una capacidad funcional de categorización configurable en esta versión.
+
 | ID | Name | Abbreviation | Category |
 |----|------|--------------|----------|
 | 1 | Unidad | UN | Cantidad |
@@ -265,7 +293,7 @@ Este módulo proporciona un **catálogo de unidades de medida** utilizado para l
 Los siguientes elementos **NO** están incluidos en esta versión:
 
 ❌ Conversiones automáticas (delegado a ProductUnitConversion)  
-❌ Categorización de unidades (peso, volumen, longitud)  
+❌ Gestión de categorías como entidad funcional configurable  
 ❌ Equivalencias internacionales (kg ↔ lb)  
 ❌ Unidades compuestas (kg/m², L/min)  
 ❌ Multiidioma (solo español)  
@@ -291,11 +319,11 @@ Los siguientes elementos **NO** están incluidos en esta versión:
 ## 📝 Notes
 
 - Esta especificación cubre **solo la parte funcional** del módulo
-- Ver [technical-spec.md](technical-spec.md) para detalles técnicos de arquitectura, base de datos, y diseño
+- Ver [2-technical-spec.md](2-technical-spec.md) para detalles técnicos de arquitectura, base de datos, y diseño
 - Este es un **catálogo base independiente** que debe implementarse antes de módulos que lo requieran
 - Las conversiones entre unidades se manejan en **ProductUnitConversion** (asociadas a productos específicos)
 
 ---
 
-**Status**: ⚠️ PHASE 1 - Draft  
-**Next Step**: Review → Clarify → Approve → Move to PHASE 2
+**Status**: ⚠️ PHASE 1 - Draft Refinement (v1.1)  
+**Next Step**: Functional Review (PO) → Clarify → Approve → Move to PHASE 2
