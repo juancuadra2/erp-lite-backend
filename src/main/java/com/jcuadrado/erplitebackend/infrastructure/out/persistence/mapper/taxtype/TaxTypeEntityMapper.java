@@ -3,7 +3,6 @@ package com.jcuadrado.erplitebackend.infrastructure.out.persistence.mapper.taxty
 import com.jcuadrado.erplitebackend.domain.model.taxtype.TaxType;
 import com.jcuadrado.erplitebackend.infrastructure.out.persistence.entity.taxtype.TaxTypeEntity;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 
 /**
  * TaxTypeEntityMapper - MapStruct mapper for TaxType <-> TaxTypeEntity

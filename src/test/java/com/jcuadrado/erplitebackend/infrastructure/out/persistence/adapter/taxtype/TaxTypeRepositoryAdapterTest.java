@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -164,7 +165,7 @@ class TaxTypeRepositoryAdapterTest {
         List<TaxTypeEntity> entities = List.of(entity);
         Page<TaxTypeEntity> entityPage = new PageImpl<>(entities, pageable, 1);
 
-        when(jpaRepository.findAll(any(Specification.class), eq(pageable))).thenReturn(entityPage);
+        when(jpaRepository.findAll(ArgumentMatchers.<Specification<TaxTypeEntity>>any(), eq(pageable))).thenReturn(entityPage);
         when(mapper.toDomain(entity)).thenReturn(domainObject);
 
         Page<TaxType> result = adapter.findAll(filters, pageable);
@@ -172,7 +173,7 @@ class TaxTypeRepositoryAdapterTest {
         assertThat(result).isNotNull();
         assertThat(result.getContent()).hasSize(1).contains(domainObject);
         assertThat(result.getTotalElements()).isEqualTo(1);
-        verify(jpaRepository).findAll(any(Specification.class), eq(pageable));
+        verify(jpaRepository).findAll(ArgumentMatchers.<Specification<TaxTypeEntity>>any(), eq(pageable));
         verify(mapper).toDomain(entity);
     }
 
@@ -270,13 +271,13 @@ class TaxTypeRepositoryAdapterTest {
     @DisplayName("findByApplicationType should return matching tax types without enabled filter")
     void findByApplicationType_withoutEnabledFilter_shouldReturnMatchingTaxTypes() {
         List<TaxTypeEntity> entities = List.of(entity);
-        when(jpaRepository.findAll(any(Specification.class))).thenReturn(entities);
+        when(jpaRepository.findAll(ArgumentMatchers.<Specification<TaxTypeEntity>>any())).thenReturn(entities);
         when(mapper.toDomain(entity)).thenReturn(domainObject);
 
         List<TaxType> result = adapter.findByApplicationType(TaxApplicationType.SALE, null);
 
         assertThat(result).hasSize(1).contains(domainObject);
-        verify(jpaRepository).findAll(any(Specification.class));
+        verify(jpaRepository).findAll(ArgumentMatchers.<Specification<TaxTypeEntity>>any());
         verify(mapper).toDomain(entity);
     }
 
@@ -284,13 +285,13 @@ class TaxTypeRepositoryAdapterTest {
     @DisplayName("findByApplicationType should filter by enabled when specified")
     void findByApplicationType_withEnabledFilter_shouldFilterByEnabled() {
         List<TaxTypeEntity> entities = List.of(entity);
-        when(jpaRepository.findAll(any(Specification.class))).thenReturn(entities);
+        when(jpaRepository.findAll(ArgumentMatchers.<Specification<TaxTypeEntity>>any())).thenReturn(entities);
         when(mapper.toDomain(entity)).thenReturn(domainObject);
 
         List<TaxType> result = adapter.findByApplicationType(TaxApplicationType.PURCHASE, true);
 
         assertThat(result).hasSize(1).contains(domainObject);
-        verify(jpaRepository).findAll(any(Specification.class));
+        verify(jpaRepository).findAll(ArgumentMatchers.<Specification<TaxTypeEntity>>any());
         verify(mapper).toDomain(entity);
     }
 

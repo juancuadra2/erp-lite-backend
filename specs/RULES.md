@@ -105,6 +105,8 @@ Si existe duda entre comentar o refactorizar, prevalece refactorizar y eliminar 
 - MUST: cambios de esquema vía Flyway.
 - MUST NOT: modificar migraciones ya aplicadas.
 - MUST: scripts de catálogos/seed deben ser idempotentes.
+- MUST: toda nueva migración/versionado en `src/main/resources/db/migration` debe tener su equivalente en `docker/mysql-init` para entornos locales con Docker.
+- MUST NOT: cerrar un feature con cambios de BD sin validar sincronía entre Flyway y `docker/mysql-init`.
 
 ## 15) Testing y validación técnica
 - MUST: priorizar tests unitarios por caso de uso y reglas de negocio.
@@ -155,6 +157,7 @@ Un cambio se considera incompleto si:
 - [ ] Se cumple la política de comentarios.
 - [ ] Se respeta arquitectura y nomenclatura.
 - [ ] La validación técnica (tests/build aplicable) fue ejecutada.
+- [ ] Si hubo cambios de BD, Flyway y `docker/mysql-init` están sincronizados.
 - [ ] Se ejecutó auditoría final de cumplimiento estricto contra `specs/RULES.md` y specs del feature.
 
 ## 20) Estándar de estructura y naming en `specs/wip/[feature]/`
