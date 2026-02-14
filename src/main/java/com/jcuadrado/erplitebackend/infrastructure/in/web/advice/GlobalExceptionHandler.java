@@ -20,6 +20,11 @@ import com.jcuadrado.erplitebackend.domain.exception.taxtype.InvalidTaxTypeCodeE
 import com.jcuadrado.erplitebackend.domain.exception.taxtype.InvalidTaxTypeDataException;
 import com.jcuadrado.erplitebackend.domain.exception.taxtype.TaxTypeConstraintException;
 import com.jcuadrado.erplitebackend.domain.exception.taxtype.TaxTypeNotFoundException;
+import com.jcuadrado.erplitebackend.domain.exception.unitofmeasure.DuplicateUnitOfMeasureAbbreviationException;
+import com.jcuadrado.erplitebackend.domain.exception.unitofmeasure.DuplicateUnitOfMeasureNameException;
+import com.jcuadrado.erplitebackend.domain.exception.unitofmeasure.InvalidUnitOfMeasureDataException;
+import com.jcuadrado.erplitebackend.domain.exception.unitofmeasure.UnitOfMeasureInUseException;
+import com.jcuadrado.erplitebackend.domain.exception.unitofmeasure.UnitOfMeasureNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -382,6 +387,56 @@ public class GlobalExceptionHandler {
             .error("Conflict")
             .message(ex.getMessage())
             .build();
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
+    // ==================== Unit Of Measure Exception Handlers ====================
+
+    @ExceptionHandler(UnitOfMeasureNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleUnitOfMeasureNotFound(UnitOfMeasureNotFoundException ex) {
+        log.error("Unit of measure not found: {}", ex.getMessage());
+        ErrorResponse error = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.NOT_FOUND.value())
+                .error("Not Found")
+                .message(ex.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
+    @ExceptionHandler({DuplicateUnitOfMeasureNameException.class, DuplicateUnitOfMeasureAbbreviationException.class})
+    public ResponseEntity<ErrorResponse> handleDuplicateUnitOfMeasure(RuntimeException ex) {
+        log.warn("Duplicate unit of measure: {}", ex.getMessage());
+        ErrorResponse error = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.CONFLICT.value())
+                .error("Conflict")
+                .message(ex.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
+    @ExceptionHandler(InvalidUnitOfMeasureDataException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidUnitOfMeasureData(InvalidUnitOfMeasureDataException ex) {
+        log.warn("Invalid unit of measure data: {}", ex.getMessage());
+        ErrorResponse error = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error("Bad Request")
+                .message(ex.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    @ExceptionHandler(UnitOfMeasureInUseException.class)
+    public ResponseEntity<ErrorResponse> handleUnitOfMeasureInUse(UnitOfMeasureInUseException ex) {
+        log.warn("Unit of measure in use: {}", ex.getMessage());
+        ErrorResponse error = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.CONFLICT.value())
+                .error("Conflict")
+                .message(ex.getMessage())
+                .build();
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
 

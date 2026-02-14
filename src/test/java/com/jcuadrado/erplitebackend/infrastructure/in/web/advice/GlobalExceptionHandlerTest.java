@@ -20,6 +20,11 @@ import com.jcuadrado.erplitebackend.domain.exception.taxtype.InvalidTaxTypeCodeE
 import com.jcuadrado.erplitebackend.domain.exception.taxtype.InvalidTaxTypeDataException;
 import com.jcuadrado.erplitebackend.domain.exception.taxtype.TaxTypeConstraintException;
 import com.jcuadrado.erplitebackend.domain.exception.taxtype.TaxTypeNotFoundException;
+import com.jcuadrado.erplitebackend.domain.exception.unitofmeasure.DuplicateUnitOfMeasureAbbreviationException;
+import com.jcuadrado.erplitebackend.domain.exception.unitofmeasure.DuplicateUnitOfMeasureNameException;
+import com.jcuadrado.erplitebackend.domain.exception.unitofmeasure.InvalidUnitOfMeasureDataException;
+import com.jcuadrado.erplitebackend.domain.exception.unitofmeasure.UnitOfMeasureInUseException;
+import com.jcuadrado.erplitebackend.domain.exception.unitofmeasure.UnitOfMeasureNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -425,6 +430,76 @@ class GlobalExceptionHandlerTest {
         assertThat(response.getBody().getStatus()).isEqualTo(409);
         assertThat(response.getBody().getError()).isEqualTo("Conflict");
         assertThat(response.getBody().getMessage()).isEqualTo("Constraint violation");
+    }
+
+    @Test
+    void handleUnitOfMeasureNotFound_shouldReturnNotFound() {
+        UnitOfMeasureNotFoundException exception = new UnitOfMeasureNotFoundException("uom-not-found");
+
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+            exceptionHandler.handleUnitOfMeasureNotFound(exception);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(404);
+        assertThat(response.getBody().getError()).isEqualTo("Not Found");
+        assertThat(response.getBody().getMessage()).contains("uom-not-found");
+    }
+
+    @Test
+    void handleDuplicateUnitOfMeasure_shouldReturnConflictForName() {
+        DuplicateUnitOfMeasureNameException exception = new DuplicateUnitOfMeasureNameException("Caja");
+
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+            exceptionHandler.handleDuplicateUnitOfMeasure(exception);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(409);
+        assertThat(response.getBody().getError()).isEqualTo("Conflict");
+        assertThat(response.getBody().getMessage()).contains("Caja");
+    }
+
+    @Test
+    void handleDuplicateUnitOfMeasure_shouldReturnConflictForAbbreviation() {
+        DuplicateUnitOfMeasureAbbreviationException exception = new DuplicateUnitOfMeasureAbbreviationException("KG");
+
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+            exceptionHandler.handleDuplicateUnitOfMeasure(exception);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(409);
+        assertThat(response.getBody().getError()).isEqualTo("Conflict");
+        assertThat(response.getBody().getMessage()).contains("KG");
+    }
+
+    @Test
+    void handleInvalidUnitOfMeasureData_shouldReturnBadRequest() {
+        InvalidUnitOfMeasureDataException exception = new InvalidUnitOfMeasureDataException("Invalid unit");
+
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+            exceptionHandler.handleInvalidUnitOfMeasureData(exception);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(400);
+        assertThat(response.getBody().getError()).isEqualTo("Bad Request");
+        assertThat(response.getBody().getMessage()).isEqualTo("Invalid unit");
+    }
+
+    @Test
+    void handleUnitOfMeasureInUse_shouldReturnConflict() {
+        UnitOfMeasureInUseException exception = new UnitOfMeasureInUseException("Unit in use");
+
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+            exceptionHandler.handleUnitOfMeasureInUse(exception);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(409);
+        assertThat(response.getBody().getError()).isEqualTo("Conflict");
+        assertThat(response.getBody().getMessage()).isEqualTo("Unit in use");
     }
 
     @Test
