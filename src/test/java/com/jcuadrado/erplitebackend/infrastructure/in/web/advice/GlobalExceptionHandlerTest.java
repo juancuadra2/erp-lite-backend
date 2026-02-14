@@ -14,6 +14,12 @@ import com.jcuadrado.erplitebackend.domain.exception.paymentmethod.InvalidPaymen
 import com.jcuadrado.erplitebackend.domain.exception.paymentmethod.InvalidPaymentMethodDataException;
 import com.jcuadrado.erplitebackend.domain.exception.paymentmethod.PaymentMethodConstraintException;
 import com.jcuadrado.erplitebackend.domain.exception.paymentmethod.PaymentMethodNotFoundException;
+import com.jcuadrado.erplitebackend.domain.exception.taxtype.DuplicateTaxTypeCodeException;
+import com.jcuadrado.erplitebackend.domain.exception.taxtype.InvalidTaxPercentageException;
+import com.jcuadrado.erplitebackend.domain.exception.taxtype.InvalidTaxTypeCodeException;
+import com.jcuadrado.erplitebackend.domain.exception.taxtype.InvalidTaxTypeDataException;
+import com.jcuadrado.erplitebackend.domain.exception.taxtype.TaxTypeConstraintException;
+import com.jcuadrado.erplitebackend.domain.exception.taxtype.TaxTypeNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -317,6 +323,108 @@ class GlobalExceptionHandlerTest {
         assertThat(response.getBody().getStatus()).isEqualTo(400);
         assertThat(response.getBody().getError()).isEqualTo("Bad Request");
         assertThat(response.getBody().getMessage()).isEqualTo("Illegal state");
+    }
+
+    @Test
+    void handleTaxTypeNotFound_shouldReturnNotFound() {
+        // Given
+        TaxTypeNotFoundException exception = new TaxTypeNotFoundException("IVA19");
+
+        // When
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+            exceptionHandler.handleTaxTypeNotFound(exception);
+
+        // Then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(404);
+        assertThat(response.getBody().getError()).isEqualTo("Not Found");
+        assertThat(response.getBody().getMessage()).contains("IVA19");
+    }
+
+    @Test
+    void handleDuplicateTaxTypeCode_shouldReturnConflict() {
+        // Given
+        DuplicateTaxTypeCodeException exception = new DuplicateTaxTypeCodeException("IVA19");
+
+        // When
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+            exceptionHandler.handleDuplicateTaxTypeCode(exception);
+
+        // Then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(409);
+        assertThat(response.getBody().getError()).isEqualTo("Conflict");
+        assertThat(response.getBody().getMessage()).contains("IVA19");
+    }
+
+    @Test
+    void handleInvalidTaxTypeCode_shouldReturnBadRequest() {
+        // Given
+        InvalidTaxTypeCodeException exception = new InvalidTaxTypeCodeException("invalid");
+
+        // When
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+            exceptionHandler.handleInvalidTaxTypeCode(exception);
+
+        // Then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(400);
+        assertThat(response.getBody().getError()).isEqualTo("Bad Request");
+        assertThat(response.getBody().getMessage()).contains("invalid");
+    }
+
+    @Test
+    void handleInvalidTaxPercentage_shouldReturnBadRequest() {
+        // Given
+        InvalidTaxPercentageException exception = new InvalidTaxPercentageException("percentage");
+
+        // When
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+            exceptionHandler.handleInvalidTaxPercentage(exception);
+
+        // Then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(400);
+        assertThat(response.getBody().getError()).isEqualTo("Bad Request");
+        assertThat(response.getBody().getMessage()).contains("percentage");
+    }
+
+    @Test
+    void handleInvalidTaxTypeData_shouldReturnBadRequest() {
+        // Given
+        InvalidTaxTypeDataException exception = new InvalidTaxTypeDataException("Invalid tax data");
+
+        // When
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+            exceptionHandler.handleInvalidTaxTypeData(exception);
+
+        // Then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(400);
+        assertThat(response.getBody().getError()).isEqualTo("Bad Request");
+        assertThat(response.getBody().getMessage()).isEqualTo("Invalid tax data");
+    }
+
+    @Test
+    void handleTaxTypeConstraint_shouldReturnConflict() {
+        // Given
+        TaxTypeConstraintException exception = new TaxTypeConstraintException("Constraint violation");
+
+        // When
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+            exceptionHandler.handleTaxTypeConstraint(exception);
+
+        // Then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(409);
+        assertThat(response.getBody().getError()).isEqualTo("Conflict");
+        assertThat(response.getBody().getMessage()).isEqualTo("Constraint violation");
     }
 
     @Test

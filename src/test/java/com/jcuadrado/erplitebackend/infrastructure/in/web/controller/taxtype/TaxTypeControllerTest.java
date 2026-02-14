@@ -20,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 
 import java.math.BigDecimal;
@@ -194,6 +195,37 @@ class TaxTypeControllerTest {
         assertNotNull(response.getBody());
         assertEquals(2, response.getBody().getContent().size());
     }
+
+        @Test
+        @DisplayName("list should build pageable with desc sort and trim blank name")
+        @SuppressWarnings("unchecked")
+        void list_shouldBuildPageableWithDescSortAndIgnoreBlankName() {
+                Page<TaxType> page = new PageImpl<>(List.of());
+
+                when(compareUseCase.findAll(any(), any(Pageable.class))).thenReturn(page);
+
+                ResponseEntity<PagedResponseDto<TaxTypeResponseDto>> response = controller.list(
+                                true, null, "   ",
+                                2, 5, "name", "DESC"
+                );
+
+                assertNotNull(response);
+                assertEquals(200, response.getStatusCode().value());
+                assertNotNull(response.getBody());
+
+                var filtersCaptor = org.mockito.ArgumentCaptor.forClass(Map.class);
+                var pageableCaptor = org.mockito.ArgumentCaptor.forClass(Pageable.class);
+                verify(compareUseCase).findAll(filtersCaptor.capture(), pageableCaptor.capture());
+
+                Map<String, Object> capturedFilters = filtersCaptor.getValue();
+                Pageable capturedPageable = pageableCaptor.getValue();
+
+                assertTrue(capturedFilters.containsKey("enabled"));
+                assertFalse(capturedFilters.containsKey("name"));
+                assertEquals(2, capturedPageable.getPageNumber());
+                assertEquals(5, capturedPageable.getPageSize());
+                assertEquals(Sort.Direction.DESC, capturedPageable.getSort().getOrderFor("name").getDirection());
+        }
 
     @Test
     @DisplayName("update should return 200 with updated tax type")

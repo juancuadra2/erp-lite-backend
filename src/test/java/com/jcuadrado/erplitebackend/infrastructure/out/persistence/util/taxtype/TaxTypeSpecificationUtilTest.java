@@ -23,6 +23,13 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class TaxTypeSpecificationUtilTest {
 
+    @Test
+    @DisplayName("should instantiate utility class")
+    void shouldInstantiateUtilityClass() {
+        TaxTypeSpecificationUtil util = new TaxTypeSpecificationUtil();
+        assertThat(util).isNotNull();
+    }
+
     @Mock
     private Root<TaxTypeEntity> root;
 
