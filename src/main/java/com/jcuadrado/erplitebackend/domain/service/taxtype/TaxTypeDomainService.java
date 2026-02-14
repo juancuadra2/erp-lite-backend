@@ -8,23 +8,10 @@ import com.jcuadrado.erplitebackend.domain.model.taxtype.TaxType;
 
 import java.math.BigDecimal;
 
-/**
- * TaxTypeDomainService - Servicio de dominio (POJO)
- * 
- * Contiene reglas de negocio que no pertenecen a una entidad específica.
- * Se registra como Bean en BeanConfiguration.
- * NO usa anotaciones Spring (@Service) porque está en la capa de dominio.
- */
 public class TaxTypeDomainService {
 
     private static final BigDecimal MAX_TAX_PERCENTAGE = new BigDecimal("100.0000");
-    
-    /**
-     * Valida el formato del código (BR-TT-001)
-     * - No puede ser vacío
-     * - Máximo 20 caracteres
-     * - Solo letras mayúsculas, números, puntos, guiones y guiones bajos
-     */
+
     public void validateCode(String code) {
         if (code == null || code.isBlank()) {
             throw new InvalidTaxTypeCodeException("Tax type code cannot be empty");
@@ -38,13 +25,7 @@ public class TaxTypeDomainService {
             );
         }
     }
-    
-    /**
-     * Valida el porcentaje (BR-TT-002)
-     * - No puede ser null
-     * - Debe estar entre 0.0000 y 100.0000
-     * - Máximo 4 decimales de precisión
-     */
+
     public void validatePercentage(BigDecimal percentage) {
         if (percentage == null) {
             throw new InvalidTaxPercentageException("Tax percentage cannot be null");
@@ -83,10 +64,7 @@ public class TaxTypeDomainService {
                percentage.compareTo(BigDecimal.ZERO) >= 0 &&
                percentage.compareTo(MAX_TAX_PERCENTAGE) <= 0;
     }
-    
-    /**
-     * Valida el nombre
-     */
+
     public void validateName(String name) {
         if (name == null || name.isBlank()) {
             throw new InvalidTaxTypeDataException("Tax type name cannot be empty");
@@ -95,11 +73,7 @@ public class TaxTypeDomainService {
             throw new InvalidTaxTypeDataException("Tax type name cannot exceed 100 characters");
         }
     }
-    
-    /**
-     * Determina si un tipo de impuesto puede ser eliminado (BR-TT-005)
-     * No puede eliminarse si tiene productos o transacciones asociadas
-     */
+
     public boolean canBeDeleted(TaxType taxType, long associatedProductsCount, long associatedTransactionsCount) {
         return associatedProductsCount == 0 && associatedTransactionsCount == 0;
     }

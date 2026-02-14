@@ -180,6 +180,32 @@ class ManageTaxTypeUseCaseImplTest {
     }
 
     @Test
+    @DisplayName("create should not change enabled when already set")
+    void create_shouldNotChangeEnabledWhenAlreadySet() {
+        // Given
+        TaxType newTaxType = TaxType.builder()
+                .code("IVA19")
+                .name("IVA 19%")
+                .percentage(new BigDecimal("19.0000"))
+                .enabled(false)
+                .build();
+
+        doNothing().when(domainService).validateCode(anyString());
+        doNothing().when(domainService).validateName(anyString());
+        doNothing().when(domainService).validatePercentage(any(BigDecimal.class));
+        doNothing().when(validationService).ensureCodeIsUnique(anyString(), any());
+        when(repository.save(any(TaxType.class))).thenReturn(newTaxType);
+
+        // When
+        useCase.create(newTaxType);
+
+        // Then
+        verify(repository).save(taxTypeCaptor.capture());
+        TaxType captured = taxTypeCaptor.getValue();
+        assertThat(captured.getEnabled()).isFalse();
+    }
+
+    @Test
     @DisplayName("create should throw exception when code is invalid")
     void create_shouldThrowExceptionWhenCodeIsInvalid() {
         // Given
@@ -359,6 +385,31 @@ class ManageTaxTypeUseCaseImplTest {
         assertThat(captured.getName()).isEqualTo("Updated Name Only");
         assertThat(captured.getCode()).isEqualTo("IVA19"); // Unchanged
         assertThat(captured.getPercentage()).isEqualByComparingTo(new BigDecimal("19.0000")); // Unchanged
+    }
+
+    @Test
+    @DisplayName("update should not update name when name is null in updates")
+    void update_shouldNotUpdateNameWhenNameIsNullInUpdates() {
+        // Given
+        TaxType existing = sampleTaxType;
+        TaxType updates = TaxType.builder()
+                .name(null) // Explicitly null
+                .code("IVA5") // Other field to update
+                .build();
+
+        when(repository.findByUuid(sampleUuid)).thenReturn(Optional.of(existing));
+        doNothing().when(domainService).validateCode(anyString());
+        doNothing().when(validationService).ensureCodeIsUnique(anyString(), eq(sampleUuid));
+        when(repository.save(any(TaxType.class))).thenReturn(existing);
+
+        // When
+        useCase.update(sampleUuid, updates);
+
+        // Then
+        verify(repository).save(taxTypeCaptor.capture());
+        TaxType captured = taxTypeCaptor.getValue();
+        assertThat(captured.getName()).isEqualTo("IVA 19%"); // Unchanged
+        assertThat(captured.getCode()).isEqualTo("IVA5"); // Updated
     }
 
     @Test
