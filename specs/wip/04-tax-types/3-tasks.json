@@ -1,0 +1,495 @@
+{
+  "feature": "tax-types",
+  "version": "1.0.0",
+  "lastUpdated": "2026-02-13T00:00:00Z",
+  "summary": {
+    "total": 32,
+    "completed": 0,
+    "inProgress": 0,
+    "blocked": 0,
+    "pending": 32
+  },
+  "phases": [
+    {
+      "id": "phase-0",
+      "name": "Pre-Implementation Validation",
+      "order": 0,
+      "status": "pending",
+      "tasks": [
+        {
+          "id": "T000",
+          "title": "Validar alineación y aprobación de specs",
+          "description": "Confirmar que 1-functional-spec.md y 2-technical-spec.md están alineados y aprobados antes de iniciar la implementación",
+          "phase": "phase-0",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 1,
+          "dependencies": [],
+          "tags": ["validation", "spec"]
+        }
+      ]
+    },
+    {
+      "id": "phase-1",
+      "name": "Foundation & Domain Models",
+      "order": 1,
+      "status": "pending",
+      "tasks": [
+        {
+          "id": "T001",
+          "title": "Crear entidad de dominio TaxType",
+          "description": "Crear modelo de dominio puro TaxType (Aggregate Root) en domain/model/taxtype/. Incluir atributos según spec (code, name, percentage, isIncluded, applicationType, enabled + audit), métodos de negocio (activate, deactivate, isActive, isApplicableForSales, isApplicableForPurchases, isValidPercentage)",
+          "phase": "phase-1",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 2,
+          "dependencies": ["T000"],
+          "tags": ["domain", "model"]
+        },
+        {
+          "id": "T002",
+          "title": "Crear enum TaxApplicationType",
+          "description": "Crear enum TaxApplicationType en domain/model/taxtype/ con valores: SALE, PURCHASE, BOTH. Incluir tests unitarios",
+          "phase": "phase-1",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 1,
+          "dependencies": ["T001"],
+          "tags": ["domain", "model", "enum"]
+        },
+        {
+          "id": "T003",
+          "title": "Crear excepciones específicas del dominio",
+          "description": "Crear excepciones en domain/exception/taxtype/: TaxTypeNotFoundException, DuplicateTaxTypeCodeException, InvalidTaxTypeCodeException, InvalidTaxPercentageException, InvalidTaxTypeDataException, TaxTypeConstraintException. Incluir tests unitarios",
+          "phase": "phase-1",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 1,
+          "dependencies": ["T001"],
+          "tags": ["domain", "exception"]
+        },
+        {
+          "id": "T004",
+          "title": "Implementar TaxTypeDomainService",
+          "description": "Crear TaxTypeDomainService con reglas de negocio: validateCode (formato ^[A-Z0-9._-]+$, max 20), validatePercentage (0-100, max 4 decimales), validateName (obligatorio, max 100), canBeDeleted (verificar productos y transacciones). Incluir tests unitarios > 95%",
+          "phase": "phase-1",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 2,
+          "dependencies": ["T002", "T003"],
+          "tags": ["domain", "service"]
+        },
+        {
+          "id": "T005",
+          "title": "Implementar TaxTypeValidationService",
+          "description": "Crear TaxTypeValidationService con método: ensureCodeIsUnique. Incluir tests unitarios",
+          "phase": "phase-1",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 1,
+          "dependencies": ["T004"],
+          "tags": ["domain", "service", "validation"]
+        }
+      ]
+    },
+    {
+      "id": "phase-2",
+      "name": "Database Schema & Migrations",
+      "order": 2,
+      "status": "pending",
+      "tasks": [
+        {
+          "id": "T006",
+          "title": "Crear migración V7 para tabla tax_types",
+          "description": "Crear V7__create_tax_types_table.sql con tabla tax_types (id, uuid, code, name, percentage DECIMAL(7,4), is_included, application_type, enabled + audit), índices (uuid, code, enabled, application_type), constraints (UNIQUE)",
+          "phase": "phase-2",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 1,
+          "dependencies": ["T005"],
+          "tags": ["database", "migration"]
+        },
+        {
+          "id": "T007",
+          "title": "Crear migración V8 con seed data de Colombia",
+          "description": "Crear V8__insert_colombia_tax_types.sql con 10 tipos de impuestos iniciales: IVA19, IVA5, IVA0, RETE_SERV_2.5, RETE_SERV_4.0, RETE_HON_10.0, RETE_COMP_2.5, RETEIVA_15, ICA_BOG_SERV, ICA_BOG_IND. Con INSERT ON DUPLICATE KEY UPDATE para idempotencia",
+          "phase": "phase-2",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 1,
+          "dependencies": ["T006"],
+          "tags": ["database", "migration", "seed-data"]
+        },
+        {
+          "id": "T008",
+          "title": "Crear scripts Docker para inicialización MySQL",
+          "description": "Crear 07_create_tax_types_table.sql y 08_insert_colombia_tax_types.sql en docker/mysql-init/ equivalentes a V7 y V8",
+          "phase": "phase-2",
+          "status": "pending",
+          "priority": "medium",
+          "storyPoints": 1,
+          "dependencies": ["T007"],
+          "tags": ["docker", "database"]
+        }
+      ]
+    },
+    {
+      "id": "phase-3",
+      "name": "Domain Ports & Application Layer",
+      "order": 3,
+      "status": "pending",
+      "tasks": [
+        {
+          "id": "T009",
+          "title": "Crear puerto de salida TaxTypeRepository",
+          "description": "Crear interfaz TaxTypeRepository en domain/port/out/taxtype/ con métodos: save, findByUuid, findByCode, delete, findAll, findByEnabled, findByNameContaining, findByApplicationType, existsByCode, existsByCodeAndUuidNot, countProductsWithTaxType, countTransactionsWithTaxType",
+          "phase": "phase-3",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 1,
+          "dependencies": ["T005"],
+          "tags": ["domain", "port", "repository"]
+        },
+        {
+          "id": "T010",
+          "title": "Crear puertos de entrada (Use Cases) - CQRS",
+          "description": "Crear 2 interfaces en application/port/in/taxtype/: CompareTaxTypesUseCase (getByUuid, getByCode, getAllActive, findAll, searchByName, filterByApplicationType) y ManageTaxTypeUseCase (create, update, activate, deactivate, delete)",
+          "phase": "phase-3",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 1,
+          "dependencies": ["T009"],
+          "tags": ["application", "port", "use-case", "cqrs"]
+        },
+        {
+          "id": "T011",
+          "title": "Implementar CompareTaxTypesUseCaseImpl",
+          "description": "Implementar casos de uso de consulta (Query side) en application/usecase/taxtype/. Con @Transactional(readOnly=true). Incluir lógica de filtrado por applicationType (BOTH aparece en ambos). Incluir tests unitarios con mocks >= 95%",
+          "phase": "phase-3",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 2,
+          "dependencies": ["T010"],
+          "tags": ["application", "use-case", "query"]
+        },
+        {
+          "id": "T012",
+          "title": "Implementar ManageTaxTypeUseCaseImpl",
+          "description": "Implementar casos de uso de comando (Command side) con validaciones completas (code, percentage, name). Con @Transactional. Verificar BR-TT-005 en deactivate/delete. Incluir tests unitarios con mocks >= 95%",
+          "phase": "phase-3",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 3,
+          "dependencies": ["T010"],
+          "tags": ["application", "use-case", "command"]
+        }
+      ]
+    },
+    {
+      "id": "phase-4",
+      "name": "Infrastructure - Persistence Layer",
+      "order": 4,
+      "status": "pending",
+      "tasks": [
+        {
+          "id": "T013",
+          "title": "Crear TaxTypeEntity (JPA)",
+          "description": "Crear entidad JPA en infrastructure/out/persistence/entity/taxtype/ con anotaciones, índices, @PrePersist, @PreUpdate. Campo percentage como DECIMAL(7,4). Campo applicationType como @Enumerated(EnumType.STRING). Incluir tests unitarios básicos",
+          "phase": "phase-4",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 1,
+          "dependencies": ["T006"],
+          "tags": ["infrastructure", "persistence", "entity"]
+        },
+        {
+          "id": "T014",
+          "title": "Crear TaxTypeJpaRepository",
+          "description": "Crear repositorio JPA en infrastructure/out/persistence/repository/taxtype/ extendiendo JpaRepository y JpaSpecificationExecutor. Con métodos custom: findByApplicationTypeInAndEnabled (para filtrar incluyendo BOTH)",
+          "phase": "phase-4",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 1,
+          "dependencies": ["T013"],
+          "tags": ["infrastructure", "persistence", "repository"]
+        },
+        {
+          "id": "T015",
+          "title": "Crear TaxTypeEntityMapper (MapStruct)",
+          "description": "Crear mapper MapStruct bidireccional en infrastructure/out/persistence/mapper/taxtype/ para conversión TaxType <-> TaxTypeEntity. Incluir tests >= 90%",
+          "phase": "phase-4",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 1,
+          "dependencies": ["T013"],
+          "tags": ["infrastructure", "persistence", "mapper"]
+        },
+        {
+          "id": "T016",
+          "title": "Crear TaxTypeSpecificationUtil",
+          "description": "Crear utility para construcción dinámica de queries JPA en infrastructure/out/persistence/util/taxtype/. Soportar filtros: enabled, applicationType (con lógica OR para BOTH), name. Incluir tests",
+          "phase": "phase-4",
+          "status": "pending",
+          "priority": "medium",
+          "storyPoints": 1,
+          "dependencies": ["T014"],
+          "tags": ["infrastructure", "persistence", "util"]
+        },
+        {
+          "id": "T017",
+          "title": "Implementar TaxTypeRepositoryAdapter",
+          "description": "Crear adaptador en infrastructure/out/persistence/adapter/taxtype/ que implementa TaxTypeRepository port. Implementar lógica de findByApplicationType (incluyendo BOTH). Métodos countProducts y countTransactions retornan 0 (TODO). Incluir tests de integración con H2",
+          "phase": "phase-4",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 2,
+          "dependencies": ["T015", "T016"],
+          "tags": ["infrastructure", "persistence", "adapter"]
+        }
+      ]
+    },
+    {
+      "id": "phase-5",
+      "name": "Infrastructure - Web Layer (REST API)",
+      "order": 5,
+      "status": "pending",
+      "tasks": [
+        {
+          "id": "T018",
+          "title": "Crear DTOs de request",
+          "description": "Crear en infrastructure/in/web/dto/taxtype/: CreateTaxTypeRequestDto y UpdateTaxTypeRequestDto con validaciones Bean Validation: @NotBlank, @Pattern (code), @DecimalMin/Max (percentage 0-100), @Digits (4 decimales), @NotNull (isIncluded, applicationType)",
+          "phase": "phase-5",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 1,
+          "dependencies": ["T012"],
+          "tags": ["infrastructure", "web", "dto"]
+        },
+        {
+          "id": "T019",
+          "title": "Crear DTO de response",
+          "description": "Crear TaxTypeResponseDto en infrastructure/in/web/dto/taxtype/ con todos los campos para exposición en API (uuid, code, name, percentage, isIncluded, applicationType, enabled, createdAt, updatedAt)",
+          "phase": "phase-5",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 1,
+          "dependencies": ["T018"],
+          "tags": ["infrastructure", "web", "dto"]
+        },
+        {
+          "id": "T020",
+          "title": "Crear TaxTypeDtoMapper (MapStruct)",
+          "description": "Crear mapper en infrastructure/in/web/mapper/taxtype/ para conversión DTOs <-> Domain. Incluir tests >= 90%",
+          "phase": "phase-5",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 1,
+          "dependencies": ["T019"],
+          "tags": ["infrastructure", "web", "mapper"]
+        },
+        {
+          "id": "T021",
+          "title": "Crear TaxTypeController - Parte 1: CRUD básico",
+          "description": "Crear controller REST en infrastructure/in/web/controller/taxtype/ con endpoints: POST /, GET /{uuid}, PUT /{uuid}, GET /?enabled=&applicationType=&name=&page=&size= (consolidado: listado, búsqueda y filtros). Con anotaciones SpringDoc (@Operation, @ApiResponses). Incluir tests >= 90%",
+          "phase": "phase-5",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 2,
+          "dependencies": ["T020"],
+          "tags": ["infrastructure", "web", "controller"]
+        },
+        {
+          "id": "T022",
+          "title": "Crear TaxTypeController - Parte 2: Operaciones adicionales",
+          "description": "Agregar endpoints: PATCH /{uuid}/activate, PATCH /{uuid}/deactivate, DELETE /{uuid}. Incluir tests >= 90%",
+          "phase": "phase-5",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 1,
+          "dependencies": ["T021"],
+          "tags": ["infrastructure", "web", "controller"]
+        },
+        {
+          "id": "T023",
+          "title": "Agregar exception handlers a GlobalExceptionHandler",
+          "description": "Agregar handlers en GlobalExceptionHandler para: TaxTypeNotFoundException (404), DuplicateTaxTypeCodeException (409), InvalidTaxTypeCodeException (400), InvalidTaxPercentageException (400), InvalidTaxTypeDataException (400), TaxTypeConstraintException (409). Incluir tests",
+          "phase": "phase-5",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 1,
+          "dependencies": ["T022"],
+          "tags": ["infrastructure", "web", "exception-handler"]
+        }
+      ]
+    },
+    {
+      "id": "phase-6",
+      "name": "Configuration & Bean Setup",
+      "order": 6,
+      "status": "pending",
+      "tasks": [
+        {
+          "id": "T024",
+          "title": "Registrar beans de dominio en BeanConfiguration",
+          "description": "Agregar @Bean methods en BeanConfiguration para: TaxTypeDomainService y TaxTypeValidationService. Verificar inyección de dependencias correcta",
+          "phase": "phase-6",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 1,
+          "dependencies": ["T017", "T023"],
+          "tags": ["configuration", "bean"]
+        },
+        {
+          "id": "T025",
+          "title": "Verificar configuración de MapStruct",
+          "description": "Verificar que pom.xml incluye mapstruct-processor y que los mappers se generan correctamente en target/generated-sources. Ejecutar mvn clean compile",
+          "phase": "phase-6",
+          "status": "pending",
+          "priority": "medium",
+          "storyPoints": 1,
+          "dependencies": ["T024"],
+          "tags": ["configuration", "mapstruct"]
+        }
+      ]
+    },
+    {
+      "id": "phase-7",
+      "name": "Testing & Quality Assurance",
+      "order": 7,
+      "status": "pending",
+      "tasks": [
+        {
+          "id": "T026",
+          "title": "Tests de dominio - Coverage 100%",
+          "description": "Asegurar cobertura 100% en: TaxType (métodos de negocio), TaxTypeDomainService (todas las validaciones), TaxTypeValidationService, Excepciones. Total: ~80 tests",
+          "phase": "phase-7",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 2,
+          "dependencies": ["T024"],
+          "tags": ["testing", "domain"]
+        },
+        {
+          "id": "T027",
+          "title": "Tests de application - Coverage >= 95%",
+          "description": "Tests unitarios de use cases con mocks: CompareTaxTypesUseCaseImplTest y ManageTaxTypeUseCaseImplTest. Cubrir todos los scenarios funcionales. Total: ~60 tests",
+          "phase": "phase-7",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 3,
+          "dependencies": ["T026"],
+          "tags": ["testing", "application"]
+        },
+        {
+          "id": "T028",
+          "title": "Tests de infrastructure - Coverage >= 85%",
+          "description": "Tests de: Controller (MockMvc, >= 90%), Adapters (con H2), Mappers (>= 90%), SpecificationUtil. Total: ~70 tests",
+          "phase": "phase-7",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 3,
+          "dependencies": ["T027"],
+          "tags": ["testing", "infrastructure"]
+        },
+        {
+          "id": "T029",
+          "title": "Ejecutar suite completa de tests y verificar cobertura",
+          "description": "Ejecutar mvn clean test jacoco:report. Verificar cobertura global >= 85%, domain >= 100%, application >= 95%, infrastructure >= 85%. Generar reporte HTML",
+          "phase": "phase-7",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 1,
+          "dependencies": ["T028"],
+          "tags": ["testing", "coverage"]
+        }
+      ]
+    },
+    {
+      "id": "phase-8",
+      "name": "Documentation & Final Validation",
+      "order": 8,
+      "status": "pending",
+      "tasks": [
+        {
+          "id": "T030",
+          "title": "Documentar API con SpringDoc",
+          "description": "Verificar que todos los endpoints tienen @Operation, @ApiResponses, @Parameter. Generar y revisar Swagger UI en /swagger-ui.html. Exportar OpenAPI spec",
+          "phase": "phase-8",
+          "status": "pending",
+          "priority": "medium",
+          "storyPoints": 1,
+          "dependencies": ["T029"],
+          "tags": ["documentation", "api"]
+        },
+        {
+          "id": "T031",
+          "title": "Build completo y validación final",
+          "description": "Ejecutar mvn clean install. Verificar: 0 errores, 0 warnings, todos los tests pasan, cobertura >= 85%, migraciones Flyway OK, seed data cargado (10 registros). Probar endpoints manualmente en Postman/Swagger",
+          "phase": "phase-8",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 1,
+          "dependencies": ["T030"],
+          "tags": ["validation", "build"]
+        },
+        {
+          "id": "T032",
+          "title": "Actualizar STATUS.md con métricas finales",
+          "description": "Actualizar STATUS.md con: tareas completadas (32/32), cobertura final, total de tests, endpoints implementados (7), archivos creados. Marcar módulo como COMPLETADO",
+          "phase": "phase-8",
+          "status": "pending",
+          "priority": "medium",
+          "storyPoints": 1,
+          "dependencies": ["T031"],
+          "tags": ["documentation", "status"]
+        }
+      ]
+    }
+  ],
+  "estimations": {
+    "totalStoryPoints": 45,
+    "byPhase": {
+      "phase-0": 1,
+      "phase-1": 7,
+      "phase-2": 3,
+      "phase-3": 7,
+      "phase-4": 6,
+      "phase-5": 7,
+      "phase-6": 2,
+      "phase-7": 9,
+      "phase-8": 3
+    },
+    "byPriority": {
+      "high": 38,
+      "medium": 7
+    }
+  },
+  "risks": [
+    {
+      "id": "R001",
+      "description": "Validación de porcentaje con 4 decimales puede tener problemas de precisión en BigDecimal",
+      "mitigation": "Usar BigDecimal.scale() y tests exhaustivos con valores límite",
+      "severity": "medium"
+    },
+    {
+      "id": "R002",
+      "description": "Lógica de filtrado por applicationType (BOTH aparece en ambos) puede ser compleja",
+      "mitigation": "Implementar TaxTypeSpecificationUtil con tests comprehensivos",
+      "severity": "low"
+    },
+    {
+      "id": "R003",
+      "description": "countProductsWithTaxType y countTransactionsWithTaxType son TODOs (módulos futuros)",
+      "mitigation": "Retornar 0 temporalmente, documentar TODOs, crear issues para implementación futura",
+      "severity": "low"
+    }
+  ],
+  "technicalNotes": [
+    "Campo percentage es DECIMAL(7,4) en BD para soportar hasta 100.9999%",
+    "Enum TaxApplicationType se almacena como STRING en BD (no ORDINAL)",
+    "Método findByApplicationType debe incluir BOTH en ambos filtros (SALE y PURCHASE)",
+    "Seed data incluye 10 impuestos colombianos vigentes en 2026",
+    "Validación de código permite: mayúsculas, números, puntos, guiones, underscores (^[A-Z0-9._-]+$)",
+    "isIncluded determina si el impuesto está incluido en el precio (true) o se calcula aparte (false)"
+  ]
+}
