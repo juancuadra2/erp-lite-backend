@@ -14,11 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-/**
- * ManageTaxTypeUseCaseImpl - Implementación de casos de uso de comando
- * 
- * Implementa el patrón CQRS (Command Side) para operaciones de escritura.
- */
 @Service
 @RequiredArgsConstructor
 public class ManageTaxTypeUseCaseImpl implements ManageTaxTypeUseCase {

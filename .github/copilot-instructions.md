@@ -26,6 +26,7 @@ Si hay conflicto entre este archivo y `specs/RULES.md`, **prevalece `specs/RULES
 - Mantener consistencia con el estilo existente del repositorio.
 - Evitar duplicación innecesaria.
 - Nombrar variables/métodos de forma descriptiva.
+- Evitar valores mágicos hardcodeados (strings, números, patrones repetidos); usar constantes con el alcance adecuado.
 - No introducir deuda técnica evitable.
 - Corregir causa raíz antes que parches superficiales.
 

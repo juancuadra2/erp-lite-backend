@@ -3,6 +3,7 @@ package com.jcuadrado.erplitebackend.domain.service.taxtype;
 import com.jcuadrado.erplitebackend.domain.exception.taxtype.InvalidTaxPercentageException;
 import com.jcuadrado.erplitebackend.domain.exception.taxtype.InvalidTaxTypeCodeException;
 import com.jcuadrado.erplitebackend.domain.exception.taxtype.InvalidTaxTypeDataException;
+import com.jcuadrado.erplitebackend.domain.model.taxtype.TaxApplicationType;
 import com.jcuadrado.erplitebackend.domain.model.taxtype.TaxType;
 
 import java.math.BigDecimal;
@@ -15,6 +16,8 @@ import java.math.BigDecimal;
  * NO usa anotaciones Spring (@Service) porque está en la capa de dominio.
  */
 public class TaxTypeDomainService {
+
+    private static final BigDecimal MAX_TAX_PERCENTAGE = new BigDecimal("100.0000");
     
     /**
      * Valida el formato del código (BR-TT-001)
@@ -49,12 +52,36 @@ public class TaxTypeDomainService {
         if (percentage.compareTo(BigDecimal.ZERO) < 0) {
             throw new InvalidTaxPercentageException("Percentage must be between 0 and 100");
         }
-        if (percentage.compareTo(new BigDecimal("100.0000")) > 0) {
+        if (percentage.compareTo(MAX_TAX_PERCENTAGE) > 0) {
             throw new InvalidTaxPercentageException("Percentage must be between 0 and 100");
         }
         if (percentage.scale() > 4) {
             throw new InvalidTaxPercentageException("Percentage cannot have more than 4 decimal places");
         }
+    }
+
+    public boolean isApplicableForSales(TaxType taxType) {
+        if (taxType == null) {
+            return false;
+        }
+        TaxApplicationType applicationType = taxType.getApplicationType();
+        return applicationType == TaxApplicationType.SALE ||
+               applicationType == TaxApplicationType.BOTH;
+    }
+
+    public boolean isApplicableForPurchases(TaxType taxType) {
+        if (taxType == null) {
+            return false;
+        }
+        TaxApplicationType applicationType = taxType.getApplicationType();
+        return applicationType == TaxApplicationType.PURCHASE ||
+               applicationType == TaxApplicationType.BOTH;
+    }
+
+    public boolean isValidPercentage(BigDecimal percentage) {
+        return percentage != null &&
+               percentage.compareTo(BigDecimal.ZERO) >= 0 &&
+               percentage.compareTo(MAX_TAX_PERCENTAGE) <= 0;
     }
     
     /**

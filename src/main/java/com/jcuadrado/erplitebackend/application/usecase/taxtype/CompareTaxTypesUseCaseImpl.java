@@ -15,11 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-/**
- * CompareTaxTypesUseCaseImpl - Implementación de casos de uso de consulta
- * 
- * Implementa el patrón CQRS (Query Side) para operaciones de lectura.
- */
 @Service
 @RequiredArgsConstructor
 public class CompareTaxTypesUseCaseImpl implements CompareTaxTypesUseCase {
@@ -46,10 +41,6 @@ public class CompareTaxTypesUseCaseImpl implements CompareTaxTypesUseCase {
         return repository.findByEnabled(true);
     }
     
-    /**
-     * Busca tipos de impuestos con múltiples filtros combinables.
-     * Los filtros se construyen dinámicamente en el repository adapter usando Specifications.
-     */
     @Override
     @Transactional(readOnly = true)
     public Page<TaxType> findAll(Map<String, Object> filters, Pageable pageable) {

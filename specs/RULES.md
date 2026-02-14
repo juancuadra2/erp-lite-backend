@@ -79,12 +79,14 @@ Si existe duda entre comentar o refactorizar, prevalece refactorizar y eliminar 
 - Clases: nombres descriptivos por responsabilidad (`[Feature]Controller`, `[Feature]RepositoryAdapter`, etc.).
 - Variables/métodos: `camelCase` descriptivo.
 - Constantes: `UPPER_SNAKE_CASE`.
+- MUST: evitar valores mágicos (strings, números, patrones repetidos) hardcodeados; definir constantes con alcance adecuado (`private static final` en clase o constantes compartidas por feature cuando corresponda).
 - Mantener consistencia con convenciones ya presentes en el repositorio.
 
 ## 10) Validaciones
 - MUST: validaciones de negocio en servicios de dominio.
 - MUST: validaciones estructurales en DTOs (Jakarta Validation).
 - MUST NOT: mezclar validación de infraestructura con reglas de negocio.
+- MUST: en modelos de dominio de catálogos (ej. document types, geography, payment methods, tax types, units of measure), mantener en la entidad solo estado y transiciones de ciclo de vida; reglas de aplicabilidad, validación y decisión de negocio deben vivir en `domain/service/[feature]`.
 
 ## 11) Excepciones
 - MUST: usar excepciones específicas por dominio/feature.
