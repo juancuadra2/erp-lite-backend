@@ -381,6 +381,26 @@ class TaxTypeDomainServiceTest {
     }
 
     @Test
+    @DisplayName("isApplicableForSales should return false when taxType is null")
+    void isApplicableForSales_shouldReturnFalseWhenTaxTypeIsNull() {
+        // When
+        boolean applies = domainService.isApplicableForSales(null);
+
+        // Then
+        assertThat(applies).isFalse();
+    }
+
+    @Test
+    @DisplayName("isApplicableForPurchases should return false when taxType is null")
+    void isApplicableForPurchases_shouldReturnFalseWhenTaxTypeIsNull() {
+        // When
+        boolean applies = domainService.isApplicableForPurchases(null);
+
+        // Then
+        assertThat(applies).isFalse();
+    }
+
+    @Test
     @DisplayName("isValidPercentage should return true when percentage is valid")
     void isValidPercentage_shouldReturnTrueWhenPercentageIsValid() {
         // When
