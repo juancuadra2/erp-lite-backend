@@ -60,7 +60,7 @@ public class DepartmentController {
         Department created = manageUseCase.create(domain);
         DepartmentResponseDto response = mapper.toResponseDto(created);
         log.info("Department created successfully with UUID: {}", created.getUuid());
-        URI location = URI.create("/api/geography/departments/" + created.getUuid());
+        URI location = URI.create("/api/v1/geography/departments/" + created.getUuid());
         return ResponseEntity.created(location).body(response);
     }
 

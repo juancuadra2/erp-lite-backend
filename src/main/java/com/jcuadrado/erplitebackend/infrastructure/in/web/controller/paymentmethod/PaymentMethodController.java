@@ -57,7 +57,7 @@ public class PaymentMethodController {
 
         log.info("Payment method created successfully with UUID: {}", created.getUuid());
 
-        URI location = URI.create("/api/payment-methods/" + created.getUuid());
+        URI location = URI.create("/api/v1/payment-methods/" + created.getUuid());
         return ResponseEntity.created(location).body(response);
     }
 
