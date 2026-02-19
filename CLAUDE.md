@@ -108,9 +108,26 @@ Reglas clave:
 
 - `specs/RULES.md` — Reglas operativas (máxima precedencia).
 - `specs/STATUS.md` — Estado de todos los features.
-- `specs/wip/[feature]/` — Specs activas: `1-functional-spec.md`, `2-technical-spec.md`, `3-tasks.json`, `STATUS.md`.
+- `specs/wip/[feature]/` — Specs activas (ver estándar de nombrado abajo).
 - `specs/features/[feature]/` — Features completados.
 - `specs/scaffolding.md` — Estructura canónica de paquetes.
+
+### Estándar de nombrado de specs
+
+**Directorio del feature:** `specs/wip/NN-feature-name/` — prefijo numérico de dos dígitos (`01`, `02`, …) y nombre en kebab-case.
+
+**Archivos del directorio (exactamente estos cuatro):**
+```
+1-functional-spec.md   → Especificación funcional
+2-technical-spec.md    → Especificación técnica
+3-tasks.json           → Listado de tareas
+STATUS.md              → Estado del feature
+```
+
+Reglas:
+- Los archivos numerados llevan prefijo `N-` seguido de guion, sin excepción.
+- `STATUS.md` siempre en **MAYÚSCULAS**.
+- No se crean archivos extra (plan, notas, etc.) dentro del directorio de specs.
 
 ## Flujo obligatorio antes de cerrar una tarea
 
