@@ -1,5 +1,15 @@
 package com.jcuadrado.erplitebackend.infrastructure.in.web.advice;
 
+import com.jcuadrado.erplitebackend.domain.exception.security.AccountLockedException;
+import com.jcuadrado.erplitebackend.domain.exception.security.DuplicateEmailException;
+import com.jcuadrado.erplitebackend.domain.exception.security.DuplicateUsernameException;
+import com.jcuadrado.erplitebackend.domain.exception.security.InvalidCredentialsException;
+import com.jcuadrado.erplitebackend.domain.exception.security.InvalidPasswordException;
+import com.jcuadrado.erplitebackend.domain.exception.security.InvalidRefreshTokenException;
+import com.jcuadrado.erplitebackend.domain.exception.security.PermissionDeniedException;
+import com.jcuadrado.erplitebackend.domain.exception.security.RoleInUseException;
+import com.jcuadrado.erplitebackend.domain.exception.security.RoleNotFoundException;
+import com.jcuadrado.erplitebackend.domain.exception.security.UserNotFoundException;
 import com.jcuadrado.erplitebackend.domain.exception.documenttypes.DocumentTypeNotFoundException;
 import com.jcuadrado.erplitebackend.domain.exception.documenttypes.DuplicateCodeException;
 import com.jcuadrado.erplitebackend.domain.exception.documenttypes.InvalidDocumentTypeException;
@@ -282,7 +292,128 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
 
+    // ==================== Security Exception Handlers ====================
+
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidCredentials(InvalidCredentialsException ex) {
+        log.warn("Invalid credentials: {}", ex.getMessage());
+        ErrorResponse error = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.UNAUTHORIZED.value())
+                .error("Unauthorized")
+                .message(ex.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+    }
+
+    @ExceptionHandler(AccountLockedException.class)
+    public ResponseEntity<ErrorResponse> handleAccountLocked(AccountLockedException ex) {
+        log.warn("Account locked: {}", ex.getMessage());
+        ErrorResponse error = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.FORBIDDEN.value())
+                .error("Forbidden")
+                .message(ex.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleUserNotFound(UserNotFoundException ex) {
+        log.error("User not found: {}", ex.getMessage());
+        ErrorResponse error = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.NOT_FOUND.value())
+                .error("Not Found")
+                .message(ex.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
+    @ExceptionHandler({DuplicateUsernameException.class, DuplicateEmailException.class})
+    public ResponseEntity<ErrorResponse> handleDuplicateUser(RuntimeException ex) {
+        log.warn("Duplicate user data: {}", ex.getMessage());
+        ErrorResponse error = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.CONFLICT.value())
+                .error("Conflict")
+                .message(ex.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
+    @ExceptionHandler(InvalidPasswordException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidPassword(InvalidPasswordException ex) {
+        log.warn("Invalid password: {}", ex.getMessage());
+        ErrorResponse error = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error("Bad Request")
+                .message(ex.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    @ExceptionHandler(InvalidRefreshTokenException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidRefreshToken(InvalidRefreshTokenException ex) {
+        log.warn("Invalid refresh token: {}", ex.getMessage());
+        ErrorResponse error = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.UNAUTHORIZED.value())
+                .error("Unauthorized")
+                .message(ex.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+    }
+
+    @ExceptionHandler(RoleNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleRoleNotFound(RoleNotFoundException ex) {
+        log.error("Role not found: {}", ex.getMessage());
+        ErrorResponse error = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.NOT_FOUND.value())
+                .error("Not Found")
+                .message(ex.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
+    @ExceptionHandler(RoleInUseException.class)
+    public ResponseEntity<ErrorResponse> handleRoleInUse(RoleInUseException ex) {
+        log.warn("Role in use: {}", ex.getMessage());
+        ErrorResponse error = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.CONFLICT.value())
+                .error("Conflict")
+                .message(ex.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
+    @ExceptionHandler(PermissionDeniedException.class)
+    public ResponseEntity<ErrorResponse> handlePermissionDenied(PermissionDeniedException ex) {
+        log.warn("Permission denied: {}", ex.getMessage());
+        ErrorResponse error = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.FORBIDDEN.value())
+                .error("Forbidden")
+                .message(ex.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+    }
+
     // ==================== Generic Exception Handlers ====================
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException ex) {
+        ErrorResponse error = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error("Bad Request")
+                .message(ex.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
 
     /**
      * Handle IllegalStateException (400)

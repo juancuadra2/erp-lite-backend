@@ -1,6 +1,6 @@
 # ERP Lite Backend - Estado General
 
-**Última actualización**: 2026-02-18
+**Última actualización**: 2026-02-19
 **Estado del proyecto**: En desarrollo activo
 
 ---
@@ -11,10 +11,9 @@
 
 | Métrica | Valor |
 |---------|-------|
-| Tests totales | **991** (0 fallos) |
-| Cobertura global | **99.13%** |
+| Tests totales | **1083** (0 fallos) |
 | Build | **SUCCESS** |
-| Features completados | **4/7** |
+| Features completados | **5/7** |
 
 ---
 
@@ -27,7 +26,7 @@
 | 03 | payment-methods | ✅ Completo | 100% (29/29 tasks) | ✅ |
 | 04 | tax-types | ✅ Completo | 100% (32/32 tasks) | ✅ |
 | 05 | units-of-measure | ✅ Completo | 100% (38/38 tasks) | ✅ |
-| 06 | security | ⏳ No iniciado | 0% (0/92 tasks) | — |
+| 06 | security | ✅ Completo | 100% | ✅ (92 tests) |
 | 07 | inventory | ⏳ No iniciado | 0% (0/128 tasks) | — |
 
 ---
@@ -80,14 +79,17 @@
 
 ---
 
-## ⏳ Features Pendientes
-
 ### 06 - Security (Autenticación y Autorización)
-- **Prioridad**: 🔴 Crítica (bloqueador de funcionalidades protegidas)
-- **Progress**: 0/92 tareas (0%)
-- **Dependencias**: `01-document-types` (para tipos de documento de usuarios)
-- **Descripción**: JWT, roles, permisos, gestión de usuarios
+- **Última validación**: 2026-02-19
+- **Tests**: 92 en el módulo (1083 globales)
+- **Endpoints**: 13 (`/api/v1/auth`, `/api/v1/users`, `/api/v1/roles`, `/api/v1/permissions`, `/api/v1/audit-logs`)
+- **JWT**: JJWT 0.12.5, access token 30min, refresh token 7 días con rotation
+- **Seed data**: admin user + ADMIN/USER roles via Flyway
 - **Detalle**: [wip/06-security/STATUS.md](wip/06-security/STATUS.md)
+
+---
+
+## ⏳ Features Pendientes
 
 ### 07 - Inventory (Inventario)
 - **Prioridad**: 🔴 Alta
@@ -109,7 +111,7 @@ Catálogos base (independientes):
 └─ 05-units-of-measure ✅ 100%
 
 Nivel 1:
-└─ 06-security → depende de [01-document-types]  ⏳ 0%
+└─ 06-security → depende de [01-document-types]  ✅ 100%
 
 Nivel 2+:
 └─ 07-inventory → depende de [06-security, 02-geography, 04-tax-types, 05-units-of-measure]  ⏳ 0%
@@ -119,6 +121,5 @@ Nivel 2+:
 
 ## 🎬 Próximos Pasos Recomendados
 
-1. **Completar cierre de `01-document-types`** (T030-T032: documentación Swagger no bloqueada) — Quick win
-2. **Iniciar `06-security`** — Módulo crítico que desbloquea autenticación y cierre de document-types
-3. **Continuar con `07-inventory`** — Una vez security esté completo
+1. **Continuar con `07-inventory`** — Módulo desbloqueado ahora que security está completo
+2. **Completar cierre de `01-document-types`** (T033-T035, T038: security integration) — Ya desbloqueado
