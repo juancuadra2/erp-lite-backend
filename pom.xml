@@ -151,6 +151,14 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>${jacoco.version}</version>
+                <configuration>
+                    <excludes>
+                        <exclude>**/*MapperImpl.class</exclude>
+                        <exclude>**/ErpLiteBackendApplication.class</exclude>
+                        <exclude>**/mapper/security/AuditLogEntityMapper.class</exclude>
+                        <exclude>**/mapper/security/PermissionEntityMapper.class</exclude>
+                    </excludes>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>

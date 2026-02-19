@@ -1,11 +1,16 @@
 package com.jcuadrado.erplitebackend.infrastructure.in.web.controller.security;
 
+import com.jcuadrado.erplitebackend.application.command.security.ChangePasswordCommand;
 import com.jcuadrado.erplitebackend.application.command.security.CreateUserCommand;
+import com.jcuadrado.erplitebackend.application.command.security.UpdateUserCommand;
 import com.jcuadrado.erplitebackend.application.port.security.CompareUserUseCase;
 import com.jcuadrado.erplitebackend.application.port.security.ManageUserUseCase;
 import com.jcuadrado.erplitebackend.domain.model.security.User;
 import com.jcuadrado.erplitebackend.infrastructure.in.web.dto.common.PagedResponseDto;
+import com.jcuadrado.erplitebackend.infrastructure.in.web.dto.security.AssignRolesRequestDto;
+import com.jcuadrado.erplitebackend.infrastructure.in.web.dto.security.ChangePasswordRequestDto;
 import com.jcuadrado.erplitebackend.infrastructure.in.web.dto.security.CreateUserRequestDto;
+import com.jcuadrado.erplitebackend.infrastructure.in.web.dto.security.UpdateUserRequestDto;
 import com.jcuadrado.erplitebackend.infrastructure.in.web.dto.security.UserResponseDto;
 import com.jcuadrado.erplitebackend.infrastructure.in.web.mapper.security.UserDtoMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -152,6 +157,36 @@ class UserControllerTest {
     }
 
     @Test
+    @DisplayName("list should return 200 with DESC sort when direction is desc")
+    void list_shouldReturnPagedResponse_withDescOrder() {
+        UUID userId = UUID.randomUUID();
+        User user = User.builder()
+                .id(userId)
+                .username("alice")
+                .active(true)
+                .failedAttempts(0)
+                .build();
+
+        UserResponseDto responseDto = UserResponseDto.builder()
+                .id(userId)
+                .username("alice")
+                .active(true)
+                .build();
+
+        Page<User> page = new PageImpl<>(List.of(user), PageRequest.of(0, 10), 1);
+
+        when(compareUserUseCase.list(any())).thenReturn(page);
+        when(mapper.toResponseDto(user)).thenReturn(responseDto);
+
+        ResponseEntity<PagedResponseDto<UserResponseDto>> response =
+                controller.list(0, 10, "username", "desc");
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getContent()).containsExactly(responseDto);
+    }
+
+    @Test
     @DisplayName("list should return 200 with an empty paged response when no users exist")
     void list_shouldReturnEmptyPagedResponse() {
         Page<User> emptyPage = new PageImpl<>(List.of(), PageRequest.of(0, 10), 0);
@@ -179,5 +214,83 @@ class UserControllerTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
         assertThat(response.getBody()).isNull();
         verify(manageUserUseCase).deleteUser(userId);
+    }
+
+    @Test
+    @DisplayName("update should return 200 with the updated user response DTO")
+    void update_shouldReturn200() {
+        UUID userId = UUID.randomUUID();
+        UpdateUserRequestDto request = new UpdateUserRequestDto(
+                "new@example.com", "NewFirst", "NewLast", null, null);
+
+        User updatedUser = User.builder()
+                .id(userId)
+                .username("alice")
+                .email("new@example.com")
+                .active(true)
+                .failedAttempts(0)
+                .build();
+
+        UserResponseDto responseDto = UserResponseDto.builder()
+                .id(userId)
+                .username("alice")
+                .email("new@example.com")
+                .active(true)
+                .build();
+
+        when(manageUserUseCase.updateUser(any(UUID.class), any(UpdateUserCommand.class))).thenReturn(updatedUser);
+        when(mapper.toResponseDto(updatedUser)).thenReturn(responseDto);
+
+        ResponseEntity<UserResponseDto> response = controller.update(userId, request);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().email()).isEqualTo("new@example.com");
+        verify(manageUserUseCase).updateUser(any(UUID.class), any(UpdateUserCommand.class));
+    }
+
+    @Test
+    @DisplayName("unlock should return 204 and invoke unlockUser on the use case")
+    void unlock_shouldReturn204() {
+        UUID userId = UUID.randomUUID();
+
+        doNothing().when(manageUserUseCase).unlockUser(userId);
+
+        ResponseEntity<Void> response = controller.unlock(userId);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        assertThat(response.getBody()).isNull();
+        verify(manageUserUseCase).unlockUser(userId);
+    }
+
+    @Test
+    @DisplayName("changePassword should return 204 and invoke changePassword on the use case")
+    void changePassword_shouldReturn204() {
+        UUID userId = UUID.randomUUID();
+        ChangePasswordRequestDto request = new ChangePasswordRequestDto("OldPass@1", "NewPass@1");
+
+        doNothing().when(manageUserUseCase).changePassword(any(UUID.class), any(ChangePasswordCommand.class));
+
+        ResponseEntity<Void> response = controller.changePassword(userId, request);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        assertThat(response.getBody()).isNull();
+        verify(manageUserUseCase).changePassword(any(UUID.class), any(ChangePasswordCommand.class));
+    }
+
+    @Test
+    @DisplayName("assignRoles should return 204 and invoke assignRoles on the use case")
+    void assignRoles_shouldReturn204() {
+        UUID userId = UUID.randomUUID();
+        UUID roleId = UUID.randomUUID();
+        AssignRolesRequestDto request = new AssignRolesRequestDto(List.of(roleId));
+
+        doNothing().when(manageUserUseCase).assignRoles(userId, List.of(roleId));
+
+        ResponseEntity<Void> response = controller.assignRoles(userId, request);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        assertThat(response.getBody()).isNull();
+        verify(manageUserUseCase).assignRoles(userId, List.of(roleId));
     }
 }

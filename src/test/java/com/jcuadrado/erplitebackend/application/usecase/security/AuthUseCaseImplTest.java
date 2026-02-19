@@ -24,7 +24,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.jcuadrado.erplitebackend.domain.model.security.Permission;
+import com.jcuadrado.erplitebackend.domain.model.security.PermissionAction;
+import com.jcuadrado.erplitebackend.domain.model.security.Role;
+
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -107,6 +112,37 @@ class AuthUseCaseImplTest {
         verify(userRepository).save(user);
         verify(refreshTokenRepository).save(any(RefreshToken.class));
         verify(auditLogRepository).save(any(AuditLog.class));
+    }
+
+    @Test
+    @DisplayName("login should build role names and permission strings when user has roles and permissions")
+    void login_shouldBuildRoleNamesAndPermissionStrings_whenUserHasRolesAndPermissions() {
+        UUID userId = UUID.randomUUID();
+        User user = User.builder()
+                .id(userId)
+                .username("editor")
+                .passwordHash("hashed")
+                .active(true)
+                .failedAttempts(0)
+                .build();
+
+        Role role = Role.create("EDITOR", "Editor role");
+        Permission permission = Permission.create("Invoice", PermissionAction.READ, null, "Read invoices");
+
+        LoginCommand command = new LoginCommand("editor", "plain", "127.0.0.1", "TestAgent");
+
+        when(userRepository.findByUsername("editor")).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches("plain", "hashed")).thenReturn(true);
+        when(roleRepository.findByUserId(userId)).thenReturn(List.of(role));
+        when(permissionRepository.findByUserId(userId)).thenReturn(List.of(permission));
+        when(tokenService.generateAccessToken(any(User.class), anyList(), anyList())).thenReturn("jwt-token");
+        when(refreshTokenRepository.save(any(RefreshToken.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(auditLogRepository.save(any(AuditLog.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        LoginResponse response = useCase.login(command);
+
+        assertThat(response.accessToken()).isEqualTo("jwt-token");
     }
 
     @Test
@@ -269,5 +305,113 @@ class AuthUseCaseImplTest {
 
         verify(refreshTokenRepository, never()).save(any());
         verify(auditLogRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("login should throw InvalidCredentialsException when user is deleted")
+    void login_shouldThrowInvalidCredentials_whenUserIsDeleted() {
+        UUID userId = UUID.randomUUID();
+        User user = User.builder()
+                .id(userId)
+                .username("deleted_user")
+                .passwordHash("hashed")
+                .active(true)
+                .failedAttempts(0)
+                .build();
+        user.softDelete();
+
+        LoginCommand command = new LoginCommand("deleted_user", "pass", "127.0.0.1", "TestAgent");
+
+        when(userRepository.findByUsername("deleted_user")).thenReturn(Optional.of(user));
+
+        assertThatThrownBy(() -> useCase.login(command))
+                .isInstanceOf(InvalidCredentialsException.class);
+
+        verify(passwordEncoder, never()).matches(anyString(), anyString());
+    }
+
+    @Test
+    @DisplayName("login should throw AccountLockedException when user is inactive but not locked (failedAttempts < 5)")
+    void login_shouldThrowAccountLocked_whenUserIsInactiveAndNotLocked() {
+        UUID userId = UUID.randomUUID();
+        User user = User.builder()
+                .id(userId)
+                .username("inactive_user")
+                .passwordHash("hashed")
+                .active(false)
+                .failedAttempts(2)
+                .build();
+
+        LoginCommand command = new LoginCommand("inactive_user", "pass", "127.0.0.1", "TestAgent");
+
+        when(userRepository.findByUsername("inactive_user")).thenReturn(Optional.of(user));
+
+        assertThatThrownBy(() -> useCase.login(command))
+                .isInstanceOf(AccountLockedException.class);
+
+        verify(passwordEncoder, never()).matches(anyString(), anyString());
+    }
+
+    @Test
+    @DisplayName("login should throw AccountLockedException when the last failed attempt triggers lock")
+    void login_shouldThrowAccountLocked_whenLastFailedAttemptTriggersLock() {
+        UUID userId = UUID.randomUUID();
+        User user = User.builder()
+                .id(userId)
+                .username("almost_locked")
+                .passwordHash("hashed")
+                .active(true)
+                .failedAttempts(4)
+                .build();
+
+        LoginCommand command = new LoginCommand("almost_locked", "wrong", "127.0.0.1", "TestAgent");
+
+        when(userRepository.findByUsername("almost_locked")).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches("wrong", "hashed")).thenReturn(false);
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(auditLogRepository.save(any(AuditLog.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        assertThatThrownBy(() -> useCase.login(command))
+                .isInstanceOf(AccountLockedException.class);
+
+        assertThat(user.getFailedAttempts()).isEqualTo(5);
+        assertThat(user.isLocked()).isTrue();
+    }
+
+    @Test
+    @DisplayName("logout should revoke token but not save audit log when user is not found")
+    void logout_shouldRevokeToken_whenUserNotFound() {
+        UUID userId = UUID.randomUUID();
+        String tokenValue = UUID.randomUUID().toString();
+
+        RefreshToken storedToken = RefreshToken.create(userId, tokenValue, 7);
+        LogoutCommand command = new LogoutCommand(tokenValue);
+
+        when(refreshTokenRepository.findByToken(tokenValue)).thenReturn(Optional.of(storedToken));
+        when(refreshTokenRepository.save(any(RefreshToken.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        useCase.logout(command);
+
+        assertThat(storedToken.isRevoked()).isTrue();
+        verify(refreshTokenRepository).save(storedToken);
+        verify(auditLogRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("refreshToken should throw InvalidRefreshTokenException when the user associated with the token is not found")
+    void refreshToken_shouldThrow_whenUserNotFound() {
+        UUID userId = UUID.randomUUID();
+        String tokenValue = UUID.randomUUID().toString();
+
+        RefreshToken storedToken = RefreshToken.create(userId, tokenValue, 7);
+        RefreshTokenCommand command = new RefreshTokenCommand(tokenValue);
+
+        when(refreshTokenRepository.findByToken(tokenValue)).thenReturn(Optional.of(storedToken));
+        when(refreshTokenRepository.save(any(RefreshToken.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> useCase.refreshToken(command))
+                .isInstanceOf(InvalidRefreshTokenException.class);
     }
 }

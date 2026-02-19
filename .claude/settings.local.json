@@ -3,7 +3,19 @@
     "allow": [
       "Bash(mvn compile:*)",
       "Bash(mvn clean compile:*)",
-      "Bash(mvn test:*)"
+      "Bash(mvn test:*)",
+      "Bash(echo:*)",
+      "Bash(bash ~/.claude/statusline-command.sh)",
+      "Bash(winget install:*)",
+      "Bash(where:*)",
+      "Bash(cmd /c \"where jq\")",
+      "Bash(\"/c/Users/juand/AppData/Local/Microsoft/WinGet/Packages/jqlang.jq_Microsoft.Winget.Source_8wekyb3d8bbwe/jq.exe\" -r '.test')",
+      "Bash(printf:*)",
+      "Bash(mvn clean test jacoco:report:*)",
+      "Bash(mvn clean verify:*)",
+      "Bash(sort:*)",
+      "Bash(grep:*)",
+      "Bash(ls:*)"
     ]
   }
 }
