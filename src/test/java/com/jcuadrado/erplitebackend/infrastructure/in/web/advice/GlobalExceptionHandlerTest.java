@@ -9,6 +9,22 @@ import com.jcuadrado.erplitebackend.domain.exception.geography.DuplicateMunicipa
 import com.jcuadrado.erplitebackend.domain.exception.geography.GeographyConstraintException;
 import com.jcuadrado.erplitebackend.domain.exception.geography.InvalidGeographyException;
 import com.jcuadrado.erplitebackend.domain.exception.geography.MunicipalityNotFoundException;
+import com.jcuadrado.erplitebackend.domain.exception.paymentmethod.DuplicatePaymentMethodCodeException;
+import com.jcuadrado.erplitebackend.domain.exception.paymentmethod.InvalidPaymentMethodCodeException;
+import com.jcuadrado.erplitebackend.domain.exception.paymentmethod.InvalidPaymentMethodDataException;
+import com.jcuadrado.erplitebackend.domain.exception.paymentmethod.PaymentMethodConstraintException;
+import com.jcuadrado.erplitebackend.domain.exception.paymentmethod.PaymentMethodNotFoundException;
+import com.jcuadrado.erplitebackend.domain.exception.taxtype.DuplicateTaxTypeCodeException;
+import com.jcuadrado.erplitebackend.domain.exception.taxtype.InvalidTaxPercentageException;
+import com.jcuadrado.erplitebackend.domain.exception.taxtype.InvalidTaxTypeCodeException;
+import com.jcuadrado.erplitebackend.domain.exception.taxtype.InvalidTaxTypeDataException;
+import com.jcuadrado.erplitebackend.domain.exception.taxtype.TaxTypeConstraintException;
+import com.jcuadrado.erplitebackend.domain.exception.taxtype.TaxTypeNotFoundException;
+import com.jcuadrado.erplitebackend.domain.exception.unitofmeasure.DuplicateUnitOfMeasureAbbreviationException;
+import com.jcuadrado.erplitebackend.domain.exception.unitofmeasure.DuplicateUnitOfMeasureNameException;
+import com.jcuadrado.erplitebackend.domain.exception.unitofmeasure.InvalidUnitOfMeasureDataException;
+import com.jcuadrado.erplitebackend.domain.exception.unitofmeasure.UnitOfMeasureInUseException;
+import com.jcuadrado.erplitebackend.domain.exception.unitofmeasure.UnitOfMeasureNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -213,6 +229,91 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
+    void handlePaymentMethodNotFound_shouldReturnNotFound() {
+        // Given
+        PaymentMethodNotFoundException exception = new PaymentMethodNotFoundException("01");
+
+        // When
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response = 
+            exceptionHandler.handlePaymentMethodNotFound(exception);
+
+        // Then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(404);
+        assertThat(response.getBody().getError()).isEqualTo("Not Found");
+        assertThat(response.getBody().getMessage()).contains("01");
+    }
+
+    @Test
+    void handleDuplicatePaymentMethodCode_shouldReturnConflict() {
+        // Given
+        DuplicatePaymentMethodCodeException exception = new DuplicatePaymentMethodCodeException("01");
+
+        // When
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response = 
+            exceptionHandler.handleDuplicatePaymentMethodCode(exception);
+
+        // Then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(409);
+        assertThat(response.getBody().getError()).isEqualTo("Conflict");
+        assertThat(response.getBody().getMessage()).contains("01");
+    }
+
+    @Test
+    void handleInvalidPaymentMethodCode_shouldReturnBadRequest() {
+        // Given
+        InvalidPaymentMethodCodeException exception = new InvalidPaymentMethodCodeException("invalid");
+
+        // When
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response = 
+            exceptionHandler.handleInvalidPaymentMethodCode(exception);
+
+        // Then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(400);
+        assertThat(response.getBody().getError()).isEqualTo("Bad Request");
+        assertThat(response.getBody().getMessage()).contains("invalid");
+    }
+
+    @Test
+    void handleInvalidPaymentMethodData_shouldReturnBadRequest() {
+        // Given
+        InvalidPaymentMethodDataException exception = new InvalidPaymentMethodDataException("Invalid data");
+
+        // When
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response = 
+            exceptionHandler.handleInvalidPaymentMethodData(exception);
+
+        // Then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(400);
+        assertThat(response.getBody().getError()).isEqualTo("Bad Request");
+        assertThat(response.getBody().getMessage()).isEqualTo("Invalid data");
+    }
+
+    @Test
+    void handlePaymentMethodConstraint_shouldReturnConflict() {
+        // Given
+        PaymentMethodConstraintException exception = new PaymentMethodConstraintException("Constraint violation");
+
+        // When
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response = 
+            exceptionHandler.handlePaymentMethodConstraint(exception);
+
+        // Then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(409);
+        assertThat(response.getBody().getError()).isEqualTo("Conflict");
+        assertThat(response.getBody().getMessage()).isEqualTo("Constraint violation");
+    }
+
+    @Test
     void handleIllegalState_shouldReturnBadRequest() {
         // Given
         IllegalStateException exception = new IllegalStateException("Illegal state");
@@ -227,6 +328,178 @@ class GlobalExceptionHandlerTest {
         assertThat(response.getBody().getStatus()).isEqualTo(400);
         assertThat(response.getBody().getError()).isEqualTo("Bad Request");
         assertThat(response.getBody().getMessage()).isEqualTo("Illegal state");
+    }
+
+    @Test
+    void handleTaxTypeNotFound_shouldReturnNotFound() {
+        // Given
+        TaxTypeNotFoundException exception = new TaxTypeNotFoundException("IVA19");
+
+        // When
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+            exceptionHandler.handleTaxTypeNotFound(exception);
+
+        // Then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(404);
+        assertThat(response.getBody().getError()).isEqualTo("Not Found");
+        assertThat(response.getBody().getMessage()).contains("IVA19");
+    }
+
+    @Test
+    void handleDuplicateTaxTypeCode_shouldReturnConflict() {
+        // Given
+        DuplicateTaxTypeCodeException exception = new DuplicateTaxTypeCodeException("IVA19");
+
+        // When
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+            exceptionHandler.handleDuplicateTaxTypeCode(exception);
+
+        // Then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(409);
+        assertThat(response.getBody().getError()).isEqualTo("Conflict");
+        assertThat(response.getBody().getMessage()).contains("IVA19");
+    }
+
+    @Test
+    void handleInvalidTaxTypeCode_shouldReturnBadRequest() {
+        // Given
+        InvalidTaxTypeCodeException exception = new InvalidTaxTypeCodeException("invalid");
+
+        // When
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+            exceptionHandler.handleInvalidTaxTypeCode(exception);
+
+        // Then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(400);
+        assertThat(response.getBody().getError()).isEqualTo("Bad Request");
+        assertThat(response.getBody().getMessage()).contains("invalid");
+    }
+
+    @Test
+    void handleInvalidTaxPercentage_shouldReturnBadRequest() {
+        // Given
+        InvalidTaxPercentageException exception = new InvalidTaxPercentageException("percentage");
+
+        // When
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+            exceptionHandler.handleInvalidTaxPercentage(exception);
+
+        // Then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(400);
+        assertThat(response.getBody().getError()).isEqualTo("Bad Request");
+        assertThat(response.getBody().getMessage()).contains("percentage");
+    }
+
+    @Test
+    void handleInvalidTaxTypeData_shouldReturnBadRequest() {
+        // Given
+        InvalidTaxTypeDataException exception = new InvalidTaxTypeDataException("Invalid tax data");
+
+        // When
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+            exceptionHandler.handleInvalidTaxTypeData(exception);
+
+        // Then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(400);
+        assertThat(response.getBody().getError()).isEqualTo("Bad Request");
+        assertThat(response.getBody().getMessage()).isEqualTo("Invalid tax data");
+    }
+
+    @Test
+    void handleTaxTypeConstraint_shouldReturnConflict() {
+        // Given
+        TaxTypeConstraintException exception = new TaxTypeConstraintException("Constraint violation");
+
+        // When
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+            exceptionHandler.handleTaxTypeConstraint(exception);
+
+        // Then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(409);
+        assertThat(response.getBody().getError()).isEqualTo("Conflict");
+        assertThat(response.getBody().getMessage()).isEqualTo("Constraint violation");
+    }
+
+    @Test
+    void handleUnitOfMeasureNotFound_shouldReturnNotFound() {
+        UnitOfMeasureNotFoundException exception = new UnitOfMeasureNotFoundException("uom-not-found");
+
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+            exceptionHandler.handleUnitOfMeasureNotFound(exception);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(404);
+        assertThat(response.getBody().getError()).isEqualTo("Not Found");
+        assertThat(response.getBody().getMessage()).contains("uom-not-found");
+    }
+
+    @Test
+    void handleDuplicateUnitOfMeasure_shouldReturnConflictForName() {
+        DuplicateUnitOfMeasureNameException exception = new DuplicateUnitOfMeasureNameException("Caja");
+
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+            exceptionHandler.handleDuplicateUnitOfMeasure(exception);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(409);
+        assertThat(response.getBody().getError()).isEqualTo("Conflict");
+        assertThat(response.getBody().getMessage()).contains("Caja");
+    }
+
+    @Test
+    void handleDuplicateUnitOfMeasure_shouldReturnConflictForAbbreviation() {
+        DuplicateUnitOfMeasureAbbreviationException exception = new DuplicateUnitOfMeasureAbbreviationException("KG");
+
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+            exceptionHandler.handleDuplicateUnitOfMeasure(exception);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(409);
+        assertThat(response.getBody().getError()).isEqualTo("Conflict");
+        assertThat(response.getBody().getMessage()).contains("KG");
+    }
+
+    @Test
+    void handleInvalidUnitOfMeasureData_shouldReturnBadRequest() {
+        InvalidUnitOfMeasureDataException exception = new InvalidUnitOfMeasureDataException("Invalid unit");
+
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+            exceptionHandler.handleInvalidUnitOfMeasureData(exception);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(400);
+        assertThat(response.getBody().getError()).isEqualTo("Bad Request");
+        assertThat(response.getBody().getMessage()).isEqualTo("Invalid unit");
+    }
+
+    @Test
+    void handleUnitOfMeasureInUse_shouldReturnConflict() {
+        UnitOfMeasureInUseException exception = new UnitOfMeasureInUseException("Unit in use");
+
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+            exceptionHandler.handleUnitOfMeasureInUse(exception);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(409);
+        assertThat(response.getBody().getError()).isEqualTo("Conflict");
+        assertThat(response.getBody().getMessage()).isEqualTo("Unit in use");
     }
 
     @Test

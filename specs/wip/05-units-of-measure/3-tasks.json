@@ -1,0 +1,558 @@
+﻿{
+  "feature": "05-units-of-measure",
+  "title": "Módulo de Unidades de Medida",
+  "description": "Catálogo de unidades de medida (Unidad, Kilogramo, Litro, Metro, etc.) para gestión de productos e inventarios",
+  "version": "1.0",
+  "created": "2026-02-01",
+  "estimationUnit": "story-points",
+  "estimatedStoryPoints": 26,
+  "taskEndGate": {
+    "id": "TASK-END-GATE-V1",
+    "description": "Validación obligatoria al finalizar cada tarea",
+    "checks": [
+      "Cumple specs/RULES.md y reglas de precedencia",
+      "Cumple 1-functional-spec.md y 2-technical-spec.md del feature",
+      "No introduce requerimientos fuera de scope",
+      "Sin ambigüedades pendientes sin decisión explícita",
+      "Validación técnica ejecutada según sección 15 de RULES.md (si aplica)"
+    ]
+  },
+  "phases": [
+    {
+      "id": "phase-1",
+      "name": "Foundation & Domain Models",
+      "storyPoints": 2,
+      "tasks": [
+        {
+          "id": "T001",
+          "title": "Crear entidad de dominio UnitOfMeasure",
+          "description": "Crear UnitOfMeasure con atributos y métodos de negocio (create, update, deactivate, activate)",
+          "phase": "phase-1",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 1,
+          "dependencies": [],
+          "tags": ["domain", "model"],
+          "endGateRef": "TASK-END-GATE-V1"
+        },
+        {
+          "id": "T002",
+          "title": "Crear excepciones del dominio",
+          "description": "Crear 6 excepciones específicas del módulo",
+          "phase": "phase-1",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 0.5,
+          "dependencies": [],
+          "tags": ["domain", "exception"],
+          "endGateRef": "TASK-END-GATE-V1"
+        },
+        {
+          "id": "T003",
+          "title": "Crear commands",
+          "description": "CreateUnitOfMeasureCommand y UpdateUnitOfMeasureCommand",
+          "phase": "phase-1",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 0.5,
+          "dependencies": ["T001"],
+          "tags": ["application", "command"],
+          "endGateRef": "TASK-END-GATE-V1"
+        }
+      ]
+    },
+    {
+      "id": "phase-2",
+      "name": "Domain Services",
+      "storyPoints": 2,
+      "tasks": [
+        {
+          "id": "T004",
+          "title": "Implementar UnitOfMeasureDomainService",
+          "description": "Servicio con validaciones de nombre, abreviatura y ensureCanBeDeleted",
+          "phase": "phase-2",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 1,
+          "dependencies": ["T001", "T002"],
+          "tags": ["domain", "service", "validation"],
+          "endGateRef": "TASK-END-GATE-V1"
+        },
+        {
+          "id": "T005",
+          "title": "Implementar UnitOfMeasureValidationService",
+          "description": "Servicio con métodos ensureNameIsUnique y ensureAbbreviationIsUnique",
+          "phase": "phase-2",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 1,
+          "dependencies": ["T002"],
+          "tags": ["domain", "service", "validation"],
+          "endGateRef": "TASK-END-GATE-V1"
+        }
+      ]
+    },
+    {
+      "id": "phase-3",
+      "name": "Application Ports",
+      "storyPoints": 1,
+      "tasks": [
+        {
+          "id": "T006",
+          "title": "Crear Input Ports (Use Cases)",
+          "description": "Crear 7 interfaces de use cases",
+          "phase": "phase-3",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 0.5,
+          "dependencies": ["T001", "T003"],
+          "tags": ["application", "port", "use-case"],
+          "endGateRef": "TASK-END-GATE-V1"
+        },
+        {
+          "id": "T007",
+          "title": "Crear Output Port (Repository Interface)",
+          "description": "Interfaz UnitOfMeasurePort con todos los métodos",
+          "phase": "phase-3",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 0.5,
+          "dependencies": ["T001"],
+          "tags": ["application", "port", "repository"],
+          "endGateRef": "TASK-END-GATE-V1"
+        }
+      ]
+    },
+    {
+      "id": "phase-4",
+      "name": "Application Services (Use Case Implementations)",
+      "storyPoints": 4,
+      "tasks": [
+        {
+          "id": "T008",
+          "title": "Implementar CreateUnitOfMeasureService",
+          "description": "Caso de uso de creación con validaciones completas",
+          "phase": "phase-4",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 1,
+          "dependencies": ["T003", "T004", "T005", "T006", "T007"],
+          "tags": ["application", "service", "use-case"],
+          "endGateRef": "TASK-END-GATE-V1"
+        },
+        {
+          "id": "T009",
+          "title": "Implementar GetUnitOfMeasureService",
+          "description": "Caso de uso de obtención por UUID",
+          "phase": "phase-4",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 0.5,
+          "dependencies": ["T006", "T007"],
+          "tags": ["application", "service", "use-case"],
+          "endGateRef": "TASK-END-GATE-V1"
+        },
+        {
+          "id": "T010",
+          "title": "Implementar UpdateUnitOfMeasureService",
+          "description": "Caso de uso de actualización con validaciones",
+          "phase": "phase-4",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 1,
+          "dependencies": ["T003", "T004", "T005", "T006", "T007"],
+          "tags": ["application", "service", "use-case"],
+          "endGateRef": "TASK-END-GATE-V1"
+        },
+        {
+          "id": "T011",
+          "title": "Implementar DeactivateUnitOfMeasureService",
+          "description": "Caso de uso de desactivación validando productos en uso",
+          "phase": "phase-4",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 0.5,
+          "dependencies": ["T004", "T006", "T007"],
+          "tags": ["application", "service", "use-case"],
+          "endGateRef": "TASK-END-GATE-V1"
+        },
+        {
+          "id": "T012",
+          "title": "Implementar ActivateUnitOfMeasureService",
+          "description": "Caso de uso de activación",
+          "phase": "phase-4",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 0.5,
+          "dependencies": ["T006", "T007"],
+          "tags": ["application", "service", "use-case"],
+          "endGateRef": "TASK-END-GATE-V1"
+        },
+        {
+          "id": "T013",
+          "title": "Implementar ListUnitsOfMeasureService",
+          "description": "Caso de uso de listado con filtro enabled",
+          "phase": "phase-4",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 0.5,
+          "dependencies": ["T006", "T007"],
+          "tags": ["application", "service", "use-case"],
+          "endGateRef": "TASK-END-GATE-V1"
+        },
+        {
+          "id": "T014",
+          "title": "Implementar SearchUnitsOfMeasureService",
+          "description": "Caso de uso de búsqueda por nombre/abreviatura",
+          "phase": "phase-4",
+          "status": "pending",
+          "priority": "medium",
+          "storyPoints": 0.5,
+          "dependencies": ["T006", "T007"],
+          "tags": ["application", "service", "use-case"],
+          "endGateRef": "TASK-END-GATE-V1"
+        }
+      ]
+    },
+    {
+      "id": "phase-5",
+      "name": "Infrastructure - Persistence",
+      "storyPoints": 3,
+      "tasks": [
+        {
+          "id": "T015",
+          "title": "Crear UnitOfMeasureEntity",
+          "description": "Entidad JPA con anotaciones, índices y constraints únicos",
+          "phase": "phase-5",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 1,
+          "dependencies": ["T001"],
+          "tags": ["infrastructure", "persistence", "entity"],
+          "endGateRef": "TASK-END-GATE-V1"
+        },
+        {
+          "id": "T016",
+          "title": "Crear UnitOfMeasureJpaRepository",
+          "description": "Repositorio JPA con métodos custom y queries",
+          "phase": "phase-5",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 1,
+          "dependencies": ["T015"],
+          "tags": ["infrastructure", "persistence", "repository"],
+          "endGateRef": "TASK-END-GATE-V1"
+        },
+        {
+          "id": "T017",
+          "title": "Crear UnitOfMeasureEntityMapper",
+          "description": "Mapper MapStruct bidireccional",
+          "phase": "phase-5",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 0.5,
+          "dependencies": ["T001", "T015"],
+          "tags": ["infrastructure", "mapper"],
+          "endGateRef": "TASK-END-GATE-V1"
+        },
+        {
+          "id": "T018",
+          "title": "Implementar UnitOfMeasureRepositoryAdapter",
+          "description": "Adapter implementando UnitOfMeasurePort",
+          "phase": "phase-5",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 0.5,
+          "dependencies": ["T007", "T016", "T017"],
+          "tags": ["infrastructure", "adapter", "persistence"],
+          "endGateRef": "TASK-END-GATE-V1"
+        }
+      ]
+    },
+    {
+      "id": "phase-6",
+      "name": "Infrastructure - API REST",
+      "storyPoints": 3,
+      "tasks": [
+        {
+          "id": "T019",
+          "title": "Crear DTOs",
+          "description": "Create, Update, Response DTOs con validaciones Jakarta",
+          "phase": "phase-6",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 1,
+          "dependencies": ["T001"],
+          "tags": ["infrastructure", "api", "dto"],
+          "endGateRef": "TASK-END-GATE-V1"
+        },
+        {
+          "id": "T020",
+          "title": "Crear UnitOfMeasureDtoMapper",
+          "description": "Mapper MapStruct para DTOs",
+          "phase": "phase-6",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 0.5,
+          "dependencies": ["T001", "T019"],
+          "tags": ["infrastructure", "mapper"],
+          "endGateRef": "TASK-END-GATE-V1"
+        },
+        {
+          "id": "T021",
+          "title": "Implementar UnitOfMeasureController",
+          "description": "Controlador REST con 7 endpoints y Swagger",
+          "phase": "phase-6",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 1,
+          "dependencies": ["T006", "T019", "T020"],
+          "tags": ["infrastructure", "api", "controller"],
+          "endGateRef": "TASK-END-GATE-V1"
+        },
+        {
+          "id": "T022",
+          "title": "Crear Global Exception Handler",
+          "description": "Mapear excepciones del dominio a HTTP responses",
+          "phase": "phase-6",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 0.5,
+          "dependencies": ["T002"],
+          "tags": ["infrastructure", "api", "exception"],
+          "endGateRef": "TASK-END-GATE-V1"
+        }
+      ]
+    },
+    {
+      "id": "phase-7",
+      "name": "Database Migrations",
+      "storyPoints": 1,
+      "tasks": [
+        {
+          "id": "T023",
+          "title": "Crear migración create_units_of_measure_table",
+          "description": "Migración V1.7 con tabla, índices y constraints",
+          "phase": "phase-7",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 0.5,
+          "dependencies": [],
+          "tags": ["database", "migration", "flyway"],
+          "endGateRef": "TASK-END-GATE-V1"
+        },
+        {
+          "id": "T024",
+          "title": "Crear migración insert_colombia_units_of_measure",
+          "description": "Migración V1.8 con 15 unidades predefinidas",
+          "phase": "phase-7",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 0.5,
+          "dependencies": ["T023"],
+          "tags": ["database", "migration", "seed-data", "flyway"],
+          "endGateRef": "TASK-END-GATE-V1"
+        }
+      ]
+    },
+    {
+      "id": "phase-8",
+      "name": "Testing - Unit Tests",
+      "storyPoints": 5,
+      "tasks": [
+        {
+          "id": "T025",
+          "title": "Test de UnitOfMeasure domain model",
+          "description": "Tests de métodos de negocio",
+          "phase": "phase-8",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 0.5,
+          "dependencies": ["T001"],
+          "tags": ["test", "unit", "domain"],
+          "endGateRef": "TASK-END-GATE-V1"
+        },
+        {
+          "id": "T026",
+          "title": "Test de UnitOfMeasureDomainService",
+          "description": "Tests de todas las validaciones",
+          "phase": "phase-8",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 1,
+          "dependencies": ["T004"],
+          "tags": ["test", "unit", "domain", "service"],
+          "endGateRef": "TASK-END-GATE-V1"
+        },
+        {
+          "id": "T027",
+          "title": "Test de UnitOfMeasureValidationService",
+          "description": "Tests de ensureNameIsUnique y ensureAbbreviationIsUnique",
+          "phase": "phase-8",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 0.5,
+          "dependencies": ["T005"],
+          "tags": ["test", "unit", "domain", "service"],
+          "endGateRef": "TASK-END-GATE-V1"
+        },
+        {
+          "id": "T028",
+          "title": "Test de CreateUnitOfMeasureService",
+          "description": "Tests de creación exitosa y errores",
+          "phase": "phase-8",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 1,
+          "dependencies": ["T008"],
+          "tags": ["test", "unit", "application", "service"],
+          "endGateRef": "TASK-END-GATE-V1"
+        },
+        {
+          "id": "T029",
+          "title": "Test de GetUnitOfMeasureService",
+          "description": "Tests de obtención",
+          "phase": "phase-8",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 0.5,
+          "dependencies": ["T009"],
+          "tags": ["test", "unit", "application", "service"],
+          "endGateRef": "TASK-END-GATE-V1"
+        },
+        {
+          "id": "T030",
+          "title": "Test de UpdateUnitOfMeasureService",
+          "description": "Tests de actualización",
+          "phase": "phase-8",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 0.5,
+          "dependencies": ["T010"],
+          "tags": ["test", "unit", "application", "service"],
+          "endGateRef": "TASK-END-GATE-V1"
+        },
+        {
+          "id": "T031",
+          "title": "Test de DeactivateUnitOfMeasureService",
+          "description": "Tests de desactivación con y sin productos",
+          "phase": "phase-8",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 0.5,
+          "dependencies": ["T011"],
+          "tags": ["test", "unit", "application", "service"],
+          "endGateRef": "TASK-END-GATE-V1"
+        },
+        {
+          "id": "T032",
+          "title": "Test de ListUnitsOfMeasureService",
+          "description": "Tests de listado con filtros",
+          "phase": "phase-8",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 0.5,
+          "dependencies": ["T013"],
+          "tags": ["test", "unit", "application", "service"],
+          "endGateRef": "TASK-END-GATE-V1"
+        },
+        {
+          "id": "T033",
+          "title": "Test de SearchUnitsOfMeasureService",
+          "description": "Tests de búsqueda",
+          "phase": "phase-8",
+          "status": "pending",
+          "priority": "medium",
+          "storyPoints": 0.5,
+          "dependencies": ["T014"],
+          "tags": ["test", "unit", "application", "service"],
+          "endGateRef": "TASK-END-GATE-V1"
+        }
+      ]
+    },
+    {
+      "id": "phase-9",
+      "name": "Testing - Integration Tests",
+      "storyPoints": 3,
+      "tasks": [
+        {
+          "id": "T034",
+          "title": "Test de UnitOfMeasureJpaRepository",
+          "description": "Tests con Testcontainers de todos los métodos",
+          "phase": "phase-9",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 1.5,
+          "dependencies": ["T016", "T023", "T024"],
+          "tags": ["test", "integration", "repository"],
+          "endGateRef": "TASK-END-GATE-V1"
+        },
+        {
+          "id": "T035",
+          "title": "Test de UnitOfMeasureRepositoryAdapter",
+          "description": "Tests del adapter con mocks",
+          "phase": "phase-9",
+          "status": "pending",
+          "priority": "medium",
+          "storyPoints": 0.5,
+          "dependencies": ["T018"],
+          "tags": ["test", "integration", "adapter"],
+          "endGateRef": "TASK-END-GATE-V1"
+        },
+        {
+          "id": "T036",
+          "title": "Test de UnitOfMeasureController",
+          "description": "Tests con MockMvc de todos los endpoints",
+          "phase": "phase-9",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 1,
+          "dependencies": ["T021"],
+          "tags": ["test", "integration", "controller", "api"],
+          "endGateRef": "TASK-END-GATE-V1"
+        }
+      ]
+    },
+    {
+      "id": "phase-10",
+      "name": "Documentation & Review",
+      "storyPoints": 2,
+      "tasks": [
+        {
+          "id": "T037",
+          "title": "Actualizar documentación Swagger",
+          "description": "Completar Swagger con ejemplos y descripciones",
+          "phase": "phase-10",
+          "status": "pending",
+          "priority": "medium",
+          "storyPoints": 1,
+          "dependencies": ["T021"],
+          "tags": ["documentation", "swagger"],
+          "endGateRef": "TASK-END-GATE-V1"
+        },
+        {
+          "id": "T038",
+          "title": "Code Review y Cleanup",
+          "description": "Cleanup final y verificación de estándares",
+          "phase": "phase-10",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 1,
+          "dependencies": ["T025", "T026", "T027", "T028", "T029", "T030", "T031", "T032", "T033", "T034", "T035", "T036", "T037"],
+          "tags": ["review", "cleanup"],
+          "endGateRef": "TASK-END-GATE-V1"
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "totalTasks": 38,
+    "completedTasks": 0,
+    "pendingTasks": 38,
+    "inProgressTasks": 0,
+    "blockedTasks": 0,
+    "progressPercentage": 0
+  }
+}
+
+

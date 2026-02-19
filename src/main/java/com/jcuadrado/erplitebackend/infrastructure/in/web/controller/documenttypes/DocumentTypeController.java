@@ -31,7 +31,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/document-types")
+@RequestMapping("/api/v1/document-types")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Document Types", description = "API for managing document types (NIT, CC, CE, Passport, etc.)")
@@ -57,7 +57,7 @@ public class DocumentTypeController {
 
         log.info("Document type created successfully with UUID: {}", created.getUuid());
 
-        URI location = URI.create("/api/document-types/" + created.getUuid());
+        URI location = URI.create("/api/v1/document-types/" + created.getUuid());
         return ResponseEntity.created(location).body(response);
     }
 

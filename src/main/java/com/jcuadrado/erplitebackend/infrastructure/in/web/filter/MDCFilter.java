@@ -27,7 +27,6 @@ public class MDCFilter implements Filter {
 
     private static final String REQUEST_ID = "requestId";
     private static final String CORRELATION_ID = "correlationId";
-    private static final String USER_ID = "userId";
 
     private static final String HEADER_REQUEST_ID = "X-Request-ID";
     private static final String HEADER_CORRELATION_ID = "X-Correlation-ID";
@@ -39,32 +38,24 @@ public class MDCFilter implements Filter {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
 
         try {
-            // Generate or retrieve requestId from header
             String requestId = httpRequest.getHeader(HEADER_REQUEST_ID);
             if (requestId == null || requestId.isBlank()) {
                 requestId = UUID.randomUUID().toString();
             }
             MDC.put(REQUEST_ID, requestId);
 
-            // Retrieve correlationId if exists (for distributed tracing)
             String correlationId = httpRequest.getHeader(HEADER_CORRELATION_ID);
             if (correlationId != null && !correlationId.isBlank()) {
                 MDC.put(CORRELATION_ID, correlationId);
             }
 
             // TODO: Extract userId from SecurityContext when authentication is implemented
-            // Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            // if (auth != null && auth.isAuthenticated()) {
-            //     String userId = extractUserIdFromAuth(auth);
-            //     MDC.put(USER_ID, userId);
-            // }
 
             log.info("Request started: {} {} [requestId={}]",
                 httpRequest.getMethod(),
                 httpRequest.getRequestURI(),
                 requestId);
 
-            // Continue with the filter chain
             chain.doFilter(request, response);
 
             log.info("Request completed: {} {}",
@@ -72,7 +63,6 @@ public class MDCFilter implements Filter {
                 httpRequest.getRequestURI());
 
         } finally {
-            // Always clear MDC to prevent memory leaks
             MDC.clear();
         }
     }
@@ -86,17 +76,5 @@ public class MDCFilter implements Filter {
     public void destroy() {
         log.info("MDC Filter destroyed");
     }
-
-    /**
-     * Extract user ID from authentication object.
-     * This will be implemented when authentication module is ready.
-     *
-     * @param auth Authentication object
-     * @return User ID as string
-     */
-    // private String extractUserIdFromAuth(Authentication auth) {
-    //     // Implementation depends on JWT structure
-    //     return auth.getName(); // Placeholder
-    // }
 }
 

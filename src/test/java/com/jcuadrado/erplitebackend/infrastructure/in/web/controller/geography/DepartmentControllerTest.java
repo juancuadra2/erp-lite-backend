@@ -1,15 +1,19 @@
 package com.jcuadrado.erplitebackend.infrastructure.in.web.controller.geography;
 
 import com.jcuadrado.erplitebackend.application.port.geography.CompareDepartmentsUseCase;
+import com.jcuadrado.erplitebackend.application.port.geography.CompareMunicipalitiesUseCase;
 import com.jcuadrado.erplitebackend.application.port.geography.ManageDepartmentUseCase;
 import com.jcuadrado.erplitebackend.domain.exception.geography.DepartmentNotFoundException;
 import com.jcuadrado.erplitebackend.domain.exception.geography.DuplicateDepartmentCodeException;
 import com.jcuadrado.erplitebackend.domain.model.geography.Department;
+import com.jcuadrado.erplitebackend.domain.model.geography.Municipality;
 import com.jcuadrado.erplitebackend.infrastructure.in.web.dto.geography.CreateDepartmentRequestDto;
 import com.jcuadrado.erplitebackend.infrastructure.in.web.dto.geography.DepartmentResponseDto;
+import com.jcuadrado.erplitebackend.infrastructure.in.web.dto.geography.MunicipalitySimplifiedDto;
 import com.jcuadrado.erplitebackend.infrastructure.in.web.dto.geography.UpdateDepartmentRequestDto;
 import com.jcuadrado.erplitebackend.infrastructure.in.web.dto.documenttypes.PagedResponseDto;
 import com.jcuadrado.erplitebackend.infrastructure.in.web.mapper.geography.DepartmentDtoMapper;
+import com.jcuadrado.erplitebackend.infrastructure.in.web.mapper.geography.MunicipalityDtoMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -38,7 +42,13 @@ public class DepartmentControllerTest {
     private CompareDepartmentsUseCase compareUseCase;
 
     @Mock
+    private CompareMunicipalitiesUseCase compareMunicipalitiesUseCase;
+
+    @Mock
     private DepartmentDtoMapper mapper;
+
+    @Mock
+    private MunicipalityDtoMapper municipalityMapper;
 
     @InjectMocks
     private DepartmentController controller;
@@ -173,6 +183,16 @@ public class DepartmentControllerTest {
         verify(compareUseCase).findAll(any(), any(Pageable.class));
     }
 
+    @Test
+    void list_shouldIgnoreEmptySearch() {
+        Page<Department> emptyPage = new PageImpl<>(Collections.emptyList());
+        when(compareUseCase.findAll(any(), any(Pageable.class))).thenReturn(emptyPage);
+
+        controller.list(null, "   ", 0, 10, "id", "asc");
+
+        verify(compareUseCase).findAll(any(), any(Pageable.class));
+    }
+
     // ==================== getAllActive ====================
 
     @Test
@@ -300,5 +320,65 @@ public class DepartmentControllerTest {
         doThrow(new DepartmentNotFoundException(uuid)).when(manageUseCase).deactivate(uuid);
 
         assertThrows(DepartmentNotFoundException.class, () -> controller.deactivate(uuid));
+    }
+
+    @Test
+    void getAllMunicipalitiesByDepartment_shouldReturn200WithMunicipalities() {
+        UUID departmentUuid = UUID.randomUUID();
+        UUID munUuid1 = UUID.randomUUID();
+        UUID munUuid2 = UUID.randomUUID();
+        Department department = Department.builder().id(1L).code("05").name("Antioquia").build();
+
+        Municipality mun1 = Municipality.builder()
+                .id(1L).uuid(munUuid1).code("05001").name("Medell\u00edn")
+                .department(department).enabled(true).build();
+        Municipality mun2 = Municipality.builder()
+                .id(2L).uuid(munUuid2).code("05002").name("Abejorral")
+                .department(department).enabled(true).build();
+
+        MunicipalitySimplifiedDto dto1 = MunicipalitySimplifiedDto.builder()
+                .uuid(munUuid1).code("05001").name("Medell\u00edn").build();
+        MunicipalitySimplifiedDto dto2 = MunicipalitySimplifiedDto.builder()
+                .uuid(munUuid2).code("05002").name("Abejorral").build();
+
+        when(compareMunicipalitiesUseCase.getAllByDepartment(departmentUuid))
+                .thenReturn(List.of(mun1, mun2));
+        when(municipalityMapper.toSimplifiedDtoList(List.of(mun1, mun2)))
+                .thenReturn(List.of(dto1, dto2));
+
+        ResponseEntity<List<MunicipalitySimplifiedDto>> result =
+                controller.getAllMunicipalitiesByDepartment(departmentUuid);
+
+        assertEquals(200, result.getStatusCode().value());
+        assertNotNull(result.getBody());
+        assertEquals(2, result.getBody().size());
+        assertEquals("05001", result.getBody().get(0).getCode());
+        assertEquals("Medell\u00edn", result.getBody().get(0).getName());
+    }
+
+    @Test
+    void getAllMunicipalitiesByDepartment_shouldReturnEmptyListWhenNoMunicipalities() {
+        UUID departmentUuid = UUID.randomUUID();
+        when(compareMunicipalitiesUseCase.getAllByDepartment(departmentUuid))
+                .thenReturn(Collections.emptyList());
+        when(municipalityMapper.toSimplifiedDtoList(Collections.emptyList()))
+                .thenReturn(Collections.emptyList());
+
+        ResponseEntity<List<MunicipalitySimplifiedDto>> result =
+                controller.getAllMunicipalitiesByDepartment(departmentUuid);
+
+        assertEquals(200, result.getStatusCode().value());
+        assertNotNull(result.getBody());
+        assertTrue(result.getBody().isEmpty());
+    }
+
+    @Test
+    void getAllMunicipalitiesByDepartment_shouldPropagateNotFoundWhenDepartmentDoesNotExist() {
+        UUID departmentUuid = UUID.randomUUID();
+        when(compareMunicipalitiesUseCase.getAllByDepartment(departmentUuid))
+                .thenThrow(new DepartmentNotFoundException(departmentUuid));
+
+        assertThrows(DepartmentNotFoundException.class,
+                () -> controller.getAllMunicipalitiesByDepartment(departmentUuid));
     }
 }
