@@ -19,12 +19,10 @@ import com.jcuadrado.erplitebackend.domain.port.security.RoleRepository;
 import com.jcuadrado.erplitebackend.domain.port.security.UserRepository;
 import com.jcuadrado.erplitebackend.domain.service.security.UserDomainService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.UUID;
 
-@Slf4j
 @RequiredArgsConstructor
 public class ManageUserUseCaseImpl implements ManageUserUseCase {
 
@@ -36,8 +34,6 @@ public class ManageUserUseCaseImpl implements ManageUserUseCase {
 
     @Override
     public User createUser(CreateUserCommand command) {
-        log.info("Creando usuario: {}", command.username());
-
         userDomainService.validateUsername(command.username());
         userDomainService.validateEmail(command.email());
         userDomainService.validatePassword(command.password());
@@ -66,14 +62,11 @@ public class ManageUserUseCaseImpl implements ManageUserUseCase {
                 command.createdBy(), null, "User", saved.getId(),
                 AuditAction.USER_CREATED, null, null));
 
-        log.info("Usuario creado con id: {}", saved.getId());
         return saved;
     }
 
     @Override
     public User updateUser(UUID id, UpdateUserCommand command) {
-        log.info("Actualizando usuario: {}", id);
-
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado: " + id));
 
@@ -91,14 +84,11 @@ public class ManageUserUseCaseImpl implements ManageUserUseCase {
                 command.updatedBy(), null, "User", id,
                 AuditAction.USER_UPDATED, null, null));
 
-        log.info("Usuario actualizado: {}", id);
         return saved;
     }
 
     @Override
     public void deleteUser(UUID id) {
-        log.info("Eliminando usuario: {}", id);
-
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado: " + id));
 
@@ -109,13 +99,10 @@ public class ManageUserUseCaseImpl implements ManageUserUseCase {
                 null, null, "User", id,
                 AuditAction.USER_DELETED, null, null));
 
-        log.info("Usuario eliminado (soft delete): {}", id);
     }
 
     @Override
     public void unlockUser(UUID id) {
-        log.info("Desbloqueando usuario: {}", id);
-
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado: " + id));
 
@@ -126,13 +113,10 @@ public class ManageUserUseCaseImpl implements ManageUserUseCase {
                 null, null, "User", id,
                 AuditAction.ACCOUNT_UNLOCKED, null, null));
 
-        log.info("Usuario desbloqueado: {}", id);
     }
 
     @Override
     public void changePassword(UUID id, ChangePasswordCommand command) {
-        log.info("Cambio de contraseña para usuario: {}", id);
-
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado: " + id));
 
@@ -145,18 +129,13 @@ public class ManageUserUseCaseImpl implements ManageUserUseCase {
         user.updatePasswordHash(newHash, command.requestedBy());
         userRepository.save(user);
 
-        log.info("Contraseña actualizada para usuario: {}", id);
     }
 
     @Override
     public void assignRoles(UUID userId, List<UUID> roleIds) {
-        log.info("Asignando {} roles al usuario: {}", roleIds.size(), userId);
-
         List<Role> roles = roleRepository.findByIds(roleIds);
         if (roles.size() != roleIds.size()) {
             throw new RoleNotFoundException("Uno o más roles no encontrados");
         }
-
-        log.info("Roles asignados al usuario: {}", userId);
     }
 }

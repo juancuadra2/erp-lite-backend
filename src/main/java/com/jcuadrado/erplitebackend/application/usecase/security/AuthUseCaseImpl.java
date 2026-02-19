@@ -1,6 +1,5 @@
 package com.jcuadrado.erplitebackend.application.usecase.security;
 
-import com.jcuadrado.erplitebackend.application.command.security.AuditLogFilter;
 import com.jcuadrado.erplitebackend.application.command.security.LoginCommand;
 import com.jcuadrado.erplitebackend.application.command.security.LoginResponse;
 import com.jcuadrado.erplitebackend.application.command.security.LogoutCommand;
@@ -13,7 +12,6 @@ import com.jcuadrado.erplitebackend.domain.exception.security.InvalidCredentials
 import com.jcuadrado.erplitebackend.domain.exception.security.InvalidRefreshTokenException;
 import com.jcuadrado.erplitebackend.domain.model.security.AuditAction;
 import com.jcuadrado.erplitebackend.domain.model.security.AuditLog;
-import com.jcuadrado.erplitebackend.domain.model.security.Permission;
 import com.jcuadrado.erplitebackend.domain.model.security.RefreshToken;
 import com.jcuadrado.erplitebackend.domain.model.security.Role;
 import com.jcuadrado.erplitebackend.domain.model.security.User;
@@ -23,13 +21,11 @@ import com.jcuadrado.erplitebackend.domain.port.security.RefreshTokenRepository;
 import com.jcuadrado.erplitebackend.domain.port.security.RoleRepository;
 import com.jcuadrado.erplitebackend.domain.port.security.UserRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-@Slf4j
 @RequiredArgsConstructor
 public class AuthUseCaseImpl implements AuthUseCase {
 
@@ -46,26 +42,21 @@ public class AuthUseCaseImpl implements AuthUseCase {
 
     @Override
     public LoginResponse login(LoginCommand command) {
-        log.info("Intento de login para usuario: {}", command.username());
 
         User user = userRepository.findByUsername(command.username())
                 .orElseThrow(() -> {
-                    log.warn("Usuario no encontrado: {}", command.username());
                     return new InvalidCredentialsException("Credenciales inválidas");
                 });
 
         if (user.isDeleted()) {
-            log.warn("Intento de login en cuenta eliminada: {}", command.username());
             throw new InvalidCredentialsException("Credenciales inválidas");
         }
 
         if (user.isLocked()) {
-            log.warn("Intento de login en cuenta bloqueada: {}", command.username());
             throw new AccountLockedException("Cuenta bloqueada. Contacte al administrador");
         }
 
         if (!user.isActive() && !user.isLocked()) {
-            log.warn("Intento de login en cuenta inactiva: {}", command.username());
             throw new AccountLockedException("Cuenta bloqueada. Contacte al administrador");
         }
 
@@ -78,7 +69,6 @@ public class AuthUseCaseImpl implements AuthUseCase {
                     AuditAction.LOGIN_FAILED, command.ipAddress(), command.userAgent()));
 
             if (user.isLocked()) {
-                log.warn("Cuenta bloqueada por múltiples intentos fallidos: {}", command.username());
                 auditLogRepository.save(AuditLog.create(
                         user.getId(), user.getUsername(), "User", user.getId(),
                         AuditAction.ACCOUNT_LOCKED, command.ipAddress(), command.userAgent()));
@@ -86,7 +76,6 @@ public class AuthUseCaseImpl implements AuthUseCase {
                         "Cuenta bloqueada por múltiples intentos fallidos. Contacte al administrador");
             }
 
-            log.warn("Contraseña incorrecta para usuario: {}", command.username());
             throw new InvalidCredentialsException("Credenciales inválidas");
         }
 
@@ -105,14 +94,11 @@ public class AuthUseCaseImpl implements AuthUseCase {
                 user.getId(), user.getUsername(), "User", user.getId(),
                 AuditAction.LOGIN, command.ipAddress(), command.userAgent()));
 
-        log.info("Login exitoso para usuario: {}", command.username());
         return new LoginResponse(accessToken, refreshTokenValue, ACCESS_TOKEN_EXPIRES_IN);
     }
 
     @Override
     public LoginResponse refreshToken(RefreshTokenCommand command) {
-        log.debug("Solicitud de refresh token");
-
         RefreshToken storedToken = refreshTokenRepository.findByToken(command.refreshToken())
                 .orElseThrow(() -> new InvalidRefreshTokenException("Refresh token inválido o revocado"));
 
@@ -134,14 +120,11 @@ public class AuthUseCaseImpl implements AuthUseCase {
         RefreshToken newRefreshToken = RefreshToken.create(user.getId(), newRefreshTokenValue, REFRESH_TOKEN_DAYS);
         refreshTokenRepository.save(newRefreshToken);
 
-        log.debug("Refresh token rotado para usuario: {}", user.getUsername());
         return new LoginResponse(newAccessToken, newRefreshTokenValue, ACCESS_TOKEN_EXPIRES_IN);
     }
 
     @Override
     public void logout(LogoutCommand command) {
-        log.debug("Solicitud de logout");
-
         RefreshToken storedToken = refreshTokenRepository.findByToken(command.refreshToken())
                 .orElse(null);
 
@@ -154,8 +137,6 @@ public class AuthUseCaseImpl implements AuthUseCase {
                             user.getId(), user.getUsername(), "User", user.getId(),
                             AuditAction.LOGOUT, null, null)));
         }
-
-        log.debug("Logout completado");
     }
 
     private List<String> buildRoleNames(UUID userId) {

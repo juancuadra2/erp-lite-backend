@@ -14,12 +14,10 @@ import com.jcuadrado.erplitebackend.domain.port.security.AuditLogRepository;
 import com.jcuadrado.erplitebackend.domain.port.security.PermissionRepository;
 import com.jcuadrado.erplitebackend.domain.port.security.RoleRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.UUID;
 
-@Slf4j
 @RequiredArgsConstructor
 public class ManageRoleUseCaseImpl implements ManageRoleUseCase {
 
@@ -29,8 +27,6 @@ public class ManageRoleUseCaseImpl implements ManageRoleUseCase {
 
     @Override
     public Role createRole(CreateRoleCommand command) {
-        log.info("Creando rol: {}", command.name());
-
         if (roleRepository.existsByName(command.name())) {
             throw new SecurityDomainException("Ya existe un rol con el nombre: " + command.name());
         }
@@ -46,14 +42,11 @@ public class ManageRoleUseCaseImpl implements ManageRoleUseCase {
                 null, null, "Role", saved.getId(),
                 AuditAction.ROLE_CREATED, null, null));
 
-        log.info("Rol creado con id: {}", saved.getId());
         return saved;
     }
 
     @Override
     public Role updateRole(UUID id, UpdateRoleCommand command) {
-        log.info("Actualizando rol: {}", id);
-
         Role role = roleRepository.findById(id)
                 .orElseThrow(() -> new RoleNotFoundException("Rol no encontrado: " + id));
 
@@ -68,14 +61,11 @@ public class ManageRoleUseCaseImpl implements ManageRoleUseCase {
                 null, null, "Role", id,
                 AuditAction.ROLE_UPDATED, null, null));
 
-        log.info("Rol actualizado: {}", id);
         return saved;
     }
 
     @Override
     public void deleteRole(UUID id) {
-        log.info("Eliminando rol: {}", id);
-
         roleRepository.findById(id)
                 .orElseThrow(() -> new RoleNotFoundException("Rol no encontrado: " + id));
 
@@ -88,14 +78,10 @@ public class ManageRoleUseCaseImpl implements ManageRoleUseCase {
         auditLogRepository.save(AuditLog.create(
                 null, null, "Role", id,
                 AuditAction.ROLE_DELETED, null, null));
-
-        log.info("Rol eliminado: {}", id);
     }
 
     @Override
     public void assignPermissions(UUID roleId, List<UUID> permissionIds) {
-        log.info("Asignando {} permisos al rol: {}", permissionIds.size(), roleId);
-
         roleRepository.findById(roleId)
                 .orElseThrow(() -> new RoleNotFoundException("Rol no encontrado: " + roleId));
 
@@ -104,6 +90,5 @@ public class ManageRoleUseCaseImpl implements ManageRoleUseCase {
             throw new SecurityDomainException("Uno o más permisos no encontrados");
         }
 
-        log.info("Permisos asignados al rol: {}", roleId);
     }
 }

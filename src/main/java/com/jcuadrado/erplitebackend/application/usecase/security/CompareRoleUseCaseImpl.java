@@ -5,12 +5,10 @@ import com.jcuadrado.erplitebackend.domain.exception.security.RoleNotFoundExcept
 import com.jcuadrado.erplitebackend.domain.model.security.Role;
 import com.jcuadrado.erplitebackend.domain.port.security.RoleRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.UUID;
 
-@Slf4j
 @RequiredArgsConstructor
 public class CompareRoleUseCaseImpl implements CompareRoleUseCase {
 
@@ -18,14 +16,12 @@ public class CompareRoleUseCaseImpl implements CompareRoleUseCase {
 
     @Override
     public Role getById(UUID id) {
-        log.debug("Buscando rol por id: {}", id);
         return roleRepository.findById(id)
                 .orElseThrow(() -> new RoleNotFoundException("Rol no encontrado: " + id));
     }
 
     @Override
     public List<Role> listAll() {
-        log.debug("Listando todos los roles");
         return roleRepository.findAll();
     }
 }
