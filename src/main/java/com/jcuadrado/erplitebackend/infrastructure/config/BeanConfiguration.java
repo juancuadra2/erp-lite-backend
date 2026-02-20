@@ -10,6 +10,7 @@ import com.jcuadrado.erplitebackend.application.port.security.ManageRoleUseCase;
 import com.jcuadrado.erplitebackend.application.port.security.ManageUserUseCase;
 import com.jcuadrado.erplitebackend.application.port.security.PasswordEncoder;
 import com.jcuadrado.erplitebackend.application.port.security.TokenService;
+import com.jcuadrado.erplitebackend.application.port.security.UserPermissionsUseCase;
 import com.jcuadrado.erplitebackend.application.usecase.security.AuditLogUseCaseImpl;
 import com.jcuadrado.erplitebackend.application.usecase.security.AuthUseCaseImpl;
 import com.jcuadrado.erplitebackend.application.usecase.security.CompareRoleUseCaseImpl;
@@ -17,6 +18,7 @@ import com.jcuadrado.erplitebackend.application.usecase.security.CompareUserUseC
 import com.jcuadrado.erplitebackend.application.usecase.security.ManagePermissionUseCaseImpl;
 import com.jcuadrado.erplitebackend.application.usecase.security.ManageRoleUseCaseImpl;
 import com.jcuadrado.erplitebackend.application.usecase.security.ManageUserUseCaseImpl;
+import com.jcuadrado.erplitebackend.application.usecase.security.UserPermissionsUseCaseImpl;
 import com.jcuadrado.erplitebackend.domain.port.documenttypes.DocumentTypeRepository;
 import com.jcuadrado.erplitebackend.domain.port.geography.DepartmentRepository;
 import com.jcuadrado.erplitebackend.domain.port.geography.MunicipalityRepository;
@@ -202,6 +204,13 @@ public class BeanConfiguration {
     @Bean
     public AuditLogUseCase auditLogUseCase(AuditLogRepository auditLogRepository) {
         return new AuditLogUseCaseImpl(auditLogRepository);
+    }
+
+    @Bean
+    public UserPermissionsUseCase userPermissionsUseCase(
+            UserRepository userRepository,
+            PermissionRepository permissionRepository) {
+        return new UserPermissionsUseCaseImpl(userRepository, permissionRepository);
     }
 }
 

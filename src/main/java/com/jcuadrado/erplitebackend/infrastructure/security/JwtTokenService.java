@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import io.jsonwebtoken.Claims;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
@@ -47,13 +48,17 @@ public class JwtTokenService implements TokenService {
 
     @Override
     public String extractUsername(String token) {
-        SecretKey key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
-        return Jwts.parser()
-                .verifyWith(key)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload()
-                .getSubject();
+        return parseClaims(token).getSubject();
+    }
+
+    @Override
+    public List<String> extractRoles(String token) {
+        return extractStringList(parseClaims(token), CLAIM_ROLES);
+    }
+
+    @Override
+    public List<String> extractPermissions(String token) {
+        return extractStringList(parseClaims(token), CLAIM_PERMISSIONS);
     }
 
     @Override
@@ -66,5 +71,25 @@ public class JwtTokenService implements TokenService {
             log.debug("Token JWT inválido: {}", e.getMessage());
             return false;
         }
+    }
+
+    private Claims parseClaims(String token) {
+        SecretKey key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+        return Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+    }
+
+    private List<String> extractStringList(Claims claims, String claimKey) {
+        Object value = claims.get(claimKey);
+        if (value instanceof List<?> list) {
+            return list.stream()
+                    .filter(String.class::isInstance)
+                    .map(String.class::cast)
+                    .toList();
+        }
+        return List.of();
     }
 }

@@ -1,6 +1,7 @@
 package com.jcuadrado.erplitebackend.infrastructure.in.web.filter;
 
 import com.jcuadrado.erplitebackend.application.port.security.TokenService;
+import com.jcuadrado.erplitebackend.application.port.security.UserPermissionsUseCase;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -12,6 +13,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -22,6 +25,9 @@ class JwtAuthenticationFilterTest {
 
     @Mock
     private TokenService tokenService;
+
+    @Mock
+    private UserPermissionsUseCase userPermissionsUseCase;
 
     @Mock
     private HttpServletRequest request;
@@ -36,7 +42,7 @@ class JwtAuthenticationFilterTest {
 
     @BeforeEach
     void setUp() {
-        filter = new JwtAuthenticationFilter(tokenService);
+        filter = new JwtAuthenticationFilter(tokenService, userPermissionsUseCase);
         SecurityContextHolder.clearContext();
     }
 
@@ -77,17 +83,40 @@ class JwtAuthenticationFilterTest {
     }
 
     @Test
-    @DisplayName("doFilterInternal should set authentication when token is valid")
+    @DisplayName("doFilterInternal should set authentication with roles from JWT and permissions from DB when token is valid")
     void doFilterInternal_shouldSetAuthentication_whenTokenIsValid() throws Exception {
         when(request.getHeader("Authorization")).thenReturn("Bearer valid-token");
         when(tokenService.validateToken("valid-token")).thenReturn(true);
         when(tokenService.extractUsername("valid-token")).thenReturn("alice");
+        when(tokenService.extractRoles("valid-token")).thenReturn(List.of("ADMIN"));
+        when(userPermissionsUseCase.getPermissionStrings("alice")).thenReturn(List.of("WAREHOUSE:READ", "WAREHOUSE:CREATE"));
 
         filter.doFilterInternal(request, response, filterChain);
 
         verify(filterChain).doFilter(request, response);
-        assertThat(SecurityContextHolder.getContext().getAuthentication()).isNotNull();
-        assertThat(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).isEqualTo("alice");
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        assertThat(auth).isNotNull();
+        assertThat(auth.getPrincipal()).isEqualTo("alice");
+        assertThat(auth.getAuthorities())
+                .extracting("authority")
+                .containsExactlyInAnyOrder("ROLE_ADMIN", "WAREHOUSE:READ", "WAREHOUSE:CREATE");
+    }
+
+    @Test
+    @DisplayName("doFilterInternal should set authentication with empty authorities when token has no roles and user has no permissions")
+    void doFilterInternal_shouldSetAuthentication_withNoAuthorities_whenTokenHasNone() throws Exception {
+        when(request.getHeader("Authorization")).thenReturn("Bearer minimal-token");
+        when(tokenService.validateToken("minimal-token")).thenReturn(true);
+        when(tokenService.extractUsername("minimal-token")).thenReturn("bob");
+        when(tokenService.extractRoles("minimal-token")).thenReturn(List.of());
+        when(userPermissionsUseCase.getPermissionStrings("bob")).thenReturn(List.of());
+
+        filter.doFilterInternal(request, response, filterChain);
+
+        verify(filterChain).doFilter(request, response);
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        assertThat(auth).isNotNull();
+        assertThat(auth.getAuthorities()).isEmpty();
     }
 
     @Test
@@ -100,5 +129,6 @@ class JwtAuthenticationFilterTest {
         filter.doFilterInternal(request, response, filterChain);
 
         verify(filterChain).doFilter(request, response);
+        assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
     }
 }

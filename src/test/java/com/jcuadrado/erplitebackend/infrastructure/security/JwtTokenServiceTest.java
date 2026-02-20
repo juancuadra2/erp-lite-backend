@@ -89,4 +89,64 @@ class JwtTokenServiceTest {
     void validateToken_shouldReturnFalse_forBlankToken() {
         assertThat(service.validateToken("")).isFalse();
     }
+
+    @Test
+    @DisplayName("extractRoles should return the roles embedded in the token")
+    void extractRoles_shouldReturnRoles_fromValidToken() {
+        User user = User.builder()
+                .id(UUID.randomUUID())
+                .username("admin")
+                .active(true)
+                .failedAttempts(0)
+                .build();
+
+        String token = service.generateAccessToken(user, List.of("ADMIN", "USER"), List.of());
+
+        assertThat(service.extractRoles(token)).containsExactlyInAnyOrder("ADMIN", "USER");
+    }
+
+    @Test
+    @DisplayName("extractRoles should return empty list when token has no roles")
+    void extractRoles_shouldReturnEmptyList_whenNoRoles() {
+        User user = User.builder()
+                .id(UUID.randomUUID())
+                .username("guest")
+                .active(true)
+                .failedAttempts(0)
+                .build();
+
+        String token = service.generateAccessToken(user, List.of(), List.of());
+
+        assertThat(service.extractRoles(token)).isEmpty();
+    }
+
+    @Test
+    @DisplayName("extractPermissions should return the permissions embedded in the token")
+    void extractPermissions_shouldReturnPermissions_fromValidToken() {
+        User user = User.builder()
+                .id(UUID.randomUUID())
+                .username("admin")
+                .active(true)
+                .failedAttempts(0)
+                .build();
+
+        String token = service.generateAccessToken(user, List.of(), List.of("WAREHOUSE:CREATE", "WAREHOUSE:READ"));
+
+        assertThat(service.extractPermissions(token)).containsExactlyInAnyOrder("WAREHOUSE:CREATE", "WAREHOUSE:READ");
+    }
+
+    @Test
+    @DisplayName("extractPermissions should return empty list when token has no permissions")
+    void extractPermissions_shouldReturnEmptyList_whenNoPermissions() {
+        User user = User.builder()
+                .id(UUID.randomUUID())
+                .username("guest")
+                .active(true)
+                .failedAttempts(0)
+                .build();
+
+        String token = service.generateAccessToken(user, List.of(), List.of());
+
+        assertThat(service.extractPermissions(token)).isEmpty();
+    }
 }

@@ -10,5 +10,9 @@ public interface TokenService {
 
     String extractUsername(String token);
 
+    List<String> extractRoles(String token);
+
+    List<String> extractPermissions(String token);
+
     boolean validateToken(String token);
 }
