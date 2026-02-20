@@ -1,0 +1,22 @@
+CREATE TABLE IF NOT EXISTS warehouses (
+    id                BIGINT AUTO_INCREMENT PRIMARY KEY,
+    uuid              VARCHAR(36)  NOT NULL UNIQUE,
+    code              VARCHAR(20)  NOT NULL UNIQUE,
+    name              VARCHAR(100) NOT NULL,
+    description       VARCHAR(255),
+    type              VARCHAR(30)  NOT NULL,
+    address           VARCHAR(255),
+    municipality_uuid VARCHAR(36),
+    responsible       VARCHAR(100),
+    email             VARCHAR(100),
+    phone             VARCHAR(20),
+    active            BOOLEAN      NOT NULL DEFAULT TRUE,
+    created_at        DATETIME     NOT NULL,
+    updated_at        DATETIME,
+    deleted_at        DATETIME,
+    INDEX idx_warehouse_uuid         (uuid),
+    INDEX idx_warehouse_code         (code),
+    INDEX idx_warehouse_type         (type),
+    INDEX idx_warehouse_active       (active),
+    INDEX idx_warehouse_municipality (municipality_uuid)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

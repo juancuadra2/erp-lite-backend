@@ -35,6 +35,12 @@ import com.jcuadrado.erplitebackend.domain.exception.unitofmeasure.DuplicateUnit
 import com.jcuadrado.erplitebackend.domain.exception.unitofmeasure.InvalidUnitOfMeasureDataException;
 import com.jcuadrado.erplitebackend.domain.exception.unitofmeasure.UnitOfMeasureInUseException;
 import com.jcuadrado.erplitebackend.domain.exception.unitofmeasure.UnitOfMeasureNotFoundException;
+import com.jcuadrado.erplitebackend.domain.exception.warehouse.DuplicateWarehouseCodeException;
+import com.jcuadrado.erplitebackend.domain.exception.warehouse.DuplicateWarehouseNameException;
+import com.jcuadrado.erplitebackend.domain.exception.warehouse.InvalidWarehouseDataException;
+import com.jcuadrado.erplitebackend.domain.exception.warehouse.SinglePrincipalWarehouseException;
+import com.jcuadrado.erplitebackend.domain.exception.warehouse.WarehouseInUseException;
+import com.jcuadrado.erplitebackend.domain.exception.warehouse.WarehouseNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -613,6 +619,66 @@ public class GlobalExceptionHandler {
         private String error;
         private String message;
         private Map<String, String> validationErrors;
+    }
+
+    @ExceptionHandler(WarehouseNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleWarehouseNotFound(WarehouseNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.NOT_FOUND.value())
+                .error("Not Found")
+                .message(ex.getMessage())
+                .build());
+    }
+
+    @ExceptionHandler(DuplicateWarehouseCodeException.class)
+    public ResponseEntity<ErrorResponse> handleDuplicateWarehouseCode(DuplicateWarehouseCodeException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.CONFLICT.value())
+                .error("Conflict")
+                .message(ex.getMessage())
+                .build());
+    }
+
+    @ExceptionHandler(DuplicateWarehouseNameException.class)
+    public ResponseEntity<ErrorResponse> handleDuplicateWarehouseName(DuplicateWarehouseNameException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.CONFLICT.value())
+                .error("Conflict")
+                .message(ex.getMessage())
+                .build());
+    }
+
+    @ExceptionHandler(WarehouseInUseException.class)
+    public ResponseEntity<ErrorResponse> handleWarehouseInUse(WarehouseInUseException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.CONFLICT.value())
+                .error("Conflict")
+                .message(ex.getMessage())
+                .build());
+    }
+
+    @ExceptionHandler(InvalidWarehouseDataException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidWarehouseData(InvalidWarehouseDataException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error("Bad Request")
+                .message(ex.getMessage())
+                .build());
+    }
+
+    @ExceptionHandler(SinglePrincipalWarehouseException.class)
+    public ResponseEntity<ErrorResponse> handleSinglePrincipalWarehouse(SinglePrincipalWarehouseException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.CONFLICT.value())
+                .error("Conflict")
+                .message(ex.getMessage())
+                .build());
     }
 }
 

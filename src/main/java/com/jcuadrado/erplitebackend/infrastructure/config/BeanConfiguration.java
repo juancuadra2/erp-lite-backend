@@ -19,6 +19,14 @@ import com.jcuadrado.erplitebackend.application.usecase.security.ManagePermissio
 import com.jcuadrado.erplitebackend.application.usecase.security.ManageRoleUseCaseImpl;
 import com.jcuadrado.erplitebackend.application.usecase.security.ManageUserUseCaseImpl;
 import com.jcuadrado.erplitebackend.application.usecase.security.UserPermissionsUseCaseImpl;
+import com.jcuadrado.erplitebackend.application.port.warehouse.CompareWarehouseUseCase;
+import com.jcuadrado.erplitebackend.application.port.warehouse.ManageWarehouseUseCase;
+import com.jcuadrado.erplitebackend.application.usecase.warehouse.CompareWarehouseUseCaseImpl;
+import com.jcuadrado.erplitebackend.application.usecase.warehouse.ManageWarehouseUseCaseImpl;
+import com.jcuadrado.erplitebackend.domain.port.warehouse.WarehouseRepository;
+import com.jcuadrado.erplitebackend.domain.service.warehouse.WarehouseDomainService;
+import com.jcuadrado.erplitebackend.domain.service.warehouse.WarehouseValidationService;
+import com.jcuadrado.erplitebackend.domain.service.warehouse.WarehouseValidator;
 import com.jcuadrado.erplitebackend.domain.port.documenttypes.DocumentTypeRepository;
 import com.jcuadrado.erplitebackend.domain.port.geography.DepartmentRepository;
 import com.jcuadrado.erplitebackend.domain.port.geography.MunicipalityRepository;
@@ -204,6 +212,38 @@ public class BeanConfiguration {
     @Bean
     public AuditLogUseCase auditLogUseCase(AuditLogRepository auditLogRepository) {
         return new AuditLogUseCaseImpl(auditLogRepository);
+    }
+
+    // ==================== Warehouse Beans ====================
+
+    @Bean
+    public WarehouseValidator warehouseValidator() {
+        return new WarehouseValidator();
+    }
+
+    @Bean
+    public WarehouseValidationService warehouseValidationService() {
+        return new WarehouseValidationService();
+    }
+
+    @Bean
+    public WarehouseDomainService warehouseDomainService(
+            WarehouseValidator validator,
+            WarehouseRepository repository) {
+        return new WarehouseDomainService(validator, repository);
+    }
+
+    @Bean
+    public ManageWarehouseUseCase manageWarehouseUseCase(
+            WarehouseRepository repository,
+            WarehouseDomainService domainService,
+            WarehouseValidationService validationService) {
+        return new ManageWarehouseUseCaseImpl(repository, domainService, validationService);
+    }
+
+    @Bean
+    public CompareWarehouseUseCase compareWarehouseUseCase(WarehouseRepository repository) {
+        return new CompareWarehouseUseCaseImpl(repository);
     }
 
     @Bean
