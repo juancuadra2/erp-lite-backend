@@ -28,6 +28,7 @@
 | 05 | units-of-measure | ✅ Completo | 100% (38/38 tasks) | ✅ |
 | 06 | security | ✅ Completo | 100% | ✅ (92 tests) |
 | 07 | inventory | ⏳ No iniciado | 0% (0/128 tasks) | — |
+| 08 | warehouses | 📋 Planeación lista | 0% (0/36 tasks) | — |
 
 ---
 
@@ -91,6 +92,14 @@
 
 ## ⏳ Features Pendientes
 
+### 08 - Warehouses (Bodegas)
+- **Prioridad**: 🔴 Alta (prerrequisito de 07-inventory)
+- **Progress**: 0/36 tareas (0%)
+- **Dependencias**: `02-geography` (municipalities)
+- **Descripción**: Catálogo de bodegas con tipos (PRINCIPAL/SUCURSAL/CONSIGNACION/TEMPORAL), referencia geográfica, CRUD completo, soft delete
+- **Decisión clave**: BR-02.2 confirmada — solo 1 bodega PRINCIPAL activa (POS)
+- **Detalle**: [wip/08-warehouses/STATUS.md](wip/08-warehouses/STATUS.md)
+
 ### 07 - Inventory (Inventario)
 - **Prioridad**: 🔴 Alta
 - **Progress**: 0/128 tareas (0%)
@@ -111,15 +120,17 @@ Catálogos base (independientes):
 └─ 05-units-of-measure ✅ 100%
 
 Nivel 1:
-└─ 06-security → depende de [01-document-types]  ✅ 100%
+├─ 06-security  → depende de [01-document-types]           ✅ 100%
+└─ 08-warehouses → depende de [02-geography]               📋 0%
 
 Nivel 2+:
-└─ 07-inventory → depende de [06-security, 02-geography, 04-tax-types, 05-units-of-measure]  ⏳ 0%
+└─ 07-inventory → depende de [06-security, 08-warehouses, 02-geography, 04-tax-types, 05-units-of-measure]  ⏳ 0%
 ```
 
 ---
 
 ## 🎬 Próximos Pasos Recomendados
 
-1. **Continuar con `07-inventory`** — Módulo desbloqueado ahora que security está completo
+1. **Implementar `08-warehouses`** — Planeación completa, prerrequisito directo de 07-inventory (36 tareas, 40 SP)
 2. **Completar cierre de `01-document-types`** (T033-T035, T038: security integration) — Ya desbloqueado
+3. **Implementar `07-inventory`** — Requiere 08-warehouses completado
