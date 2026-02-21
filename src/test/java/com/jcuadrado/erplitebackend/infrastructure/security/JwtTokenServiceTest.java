@@ -1,11 +1,15 @@
 package com.jcuadrado.erplitebackend.infrastructure.security;
 
 import com.jcuadrado.erplitebackend.domain.model.security.User;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -147,6 +151,24 @@ class JwtTokenServiceTest {
 
         String token = service.generateAccessToken(user, List.of(), List.of());
 
+        assertThat(service.extractPermissions(token)).isEmpty();
+    }
+
+    @Test
+    @DisplayName("extractRoles should return empty list when claim value is not a List")
+    void extractRoles_shouldReturnEmptyList_whenClaimIsNotAList() {
+        var key = Keys.hmacShaKeyFor(TEST_SECRET.getBytes(StandardCharsets.UTF_8));
+        String token = Jwts.builder()
+                .subject("user")
+                .claim("roles", "NOT_A_LIST")
+                .claim("permissions", "NOT_A_LIST")
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + EXPIRATION_SECONDS * 1000))
+                .issuer("erp-lite")
+                .signWith(key)
+                .compact();
+
+        assertThat(service.extractRoles(token)).isEmpty();
         assertThat(service.extractPermissions(token)).isEmpty();
     }
 }
