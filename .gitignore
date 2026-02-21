@@ -35,3 +35,4 @@ build/
 logs/
 
 .claude/sttings.local.json
+.claude/settings.local.json
