@@ -144,4 +144,19 @@ class WarehouseRepositoryAdapterTest {
                 WarehouseType.PRINCIPAL, uuid.toString())).thenReturn(false);
         assertThat(adapter.existsActivePrincipalWarehouseAndUuidNot(uuid)).isFalse();
     }
+
+    @Test
+    @DisplayName("existsByNameIgnoreCase should delegate to jpa")
+    void existsByNameIgnoreCase_shouldDelegate() {
+        when(jpaRepository.existsByNameIgnoreCase("Bodega Central")).thenReturn(true);
+        assertThat(adapter.existsByNameIgnoreCase("Bodega Central")).isTrue();
+    }
+
+    @Test
+    @DisplayName("existsByNameIgnoreCaseAndUuidNot should convert UUID to String")
+    void existsByNameIgnoreCaseAndUuidNot_shouldConvertUuid() {
+        UUID uuid = UUID.randomUUID();
+        when(jpaRepository.existsByNameIgnoreCaseAndUuidNot("Bodega Central", uuid.toString())).thenReturn(false);
+        assertThat(adapter.existsByNameIgnoreCaseAndUuidNot("Bodega Central", uuid)).isFalse();
+    }
 }

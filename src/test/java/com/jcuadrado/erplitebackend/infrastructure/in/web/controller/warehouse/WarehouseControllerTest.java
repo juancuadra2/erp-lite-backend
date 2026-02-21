@@ -187,4 +187,16 @@ class WarehouseControllerTest {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
+
+    @Test
+    @DisplayName("list should sort descending when direction is desc")
+    void list_shouldSortDescending_whenDirectionIsDesc() {
+        Page<Warehouse> emptyPage = new PageImpl<>(List.of());
+        when(compareUseCase.findAll(any(Map.class), any())).thenReturn(emptyPage);
+
+        ResponseEntity<PagedResponseDto<WarehouseResponseDto>> response =
+                controller.list(null, null, null, null, null, 0, 20, "name", "desc");
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
 }

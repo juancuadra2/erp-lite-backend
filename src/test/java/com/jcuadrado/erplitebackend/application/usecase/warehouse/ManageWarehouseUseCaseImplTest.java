@@ -160,4 +160,34 @@ class ManageWarehouseUseCaseImplTest {
 
         assertThat(result.isActive()).isFalse();
     }
+
+    @Test
+    @DisplayName("delete should throw WarehouseNotFoundException when not found")
+    void delete_shouldThrow_whenNotFound() {
+        UUID uuid = UUID.randomUUID();
+        when(repository.findByUuid(uuid)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> useCase.delete(uuid))
+                .isInstanceOf(WarehouseNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("activate should throw WarehouseNotFoundException when not found")
+    void activate_shouldThrow_whenNotFound() {
+        UUID uuid = UUID.randomUUID();
+        when(repository.findByUuid(uuid)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> useCase.activate(uuid))
+                .isInstanceOf(WarehouseNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("deactivate should throw WarehouseNotFoundException when not found")
+    void deactivate_shouldThrow_whenNotFound() {
+        UUID uuid = UUID.randomUUID();
+        when(repository.findByUuid(uuid)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> useCase.deactivate(uuid))
+                .isInstanceOf(WarehouseNotFoundException.class);
+    }
 }

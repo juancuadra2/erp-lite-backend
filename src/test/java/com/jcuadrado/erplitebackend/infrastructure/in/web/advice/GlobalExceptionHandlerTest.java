@@ -35,6 +35,12 @@ import com.jcuadrado.erplitebackend.domain.exception.unitofmeasure.DuplicateUnit
 import com.jcuadrado.erplitebackend.domain.exception.unitofmeasure.InvalidUnitOfMeasureDataException;
 import com.jcuadrado.erplitebackend.domain.exception.unitofmeasure.UnitOfMeasureInUseException;
 import com.jcuadrado.erplitebackend.domain.exception.unitofmeasure.UnitOfMeasureNotFoundException;
+import com.jcuadrado.erplitebackend.domain.exception.warehouse.DuplicateWarehouseCodeException;
+import com.jcuadrado.erplitebackend.domain.exception.warehouse.DuplicateWarehouseNameException;
+import com.jcuadrado.erplitebackend.domain.exception.warehouse.InvalidWarehouseDataException;
+import com.jcuadrado.erplitebackend.domain.exception.warehouse.SinglePrincipalWarehouseException;
+import com.jcuadrado.erplitebackend.domain.exception.warehouse.WarehouseInUseException;
+import com.jcuadrado.erplitebackend.domain.exception.warehouse.WarehouseNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -47,6 +53,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -699,6 +706,97 @@ class GlobalExceptionHandlerTest {
         assertThat(errorResponse.getStatus()).isEqualTo(404);
         assertThat(errorResponse.getError()).isEqualTo("Not Found");
         assertThat(errorResponse.getMessage()).isEqualTo("Resource not found");
+    }
+
+    // ==================== Warehouse Exception Handlers ====================
+
+    @Test
+    @DisplayName("handleWarehouseNotFound should return 404 Not Found")
+    void handleWarehouseNotFound_shouldReturnNotFound() {
+        UUID uuid = UUID.randomUUID();
+        WarehouseNotFoundException ex = new WarehouseNotFoundException(uuid);
+
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+                exceptionHandler.handleWarehouseNotFound(ex);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(404);
+        assertThat(response.getBody().getError()).isEqualTo("Not Found");
+    }
+
+    @Test
+    @DisplayName("handleDuplicateWarehouseCode should return 409 Conflict")
+    void handleDuplicateWarehouseCode_shouldReturnConflict() {
+        DuplicateWarehouseCodeException ex = new DuplicateWarehouseCodeException("BOD-001");
+
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+                exceptionHandler.handleDuplicateWarehouseCode(ex);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(409);
+        assertThat(response.getBody().getError()).isEqualTo("Conflict");
+        assertThat(response.getBody().getMessage()).contains("BOD-001");
+    }
+
+    @Test
+    @DisplayName("handleDuplicateWarehouseName should return 409 Conflict")
+    void handleDuplicateWarehouseName_shouldReturnConflict() {
+        DuplicateWarehouseNameException ex = new DuplicateWarehouseNameException("Bodega Central");
+
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+                exceptionHandler.handleDuplicateWarehouseName(ex);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(409);
+        assertThat(response.getBody().getError()).isEqualTo("Conflict");
+        assertThat(response.getBody().getMessage()).contains("Bodega Central");
+    }
+
+    @Test
+    @DisplayName("handleWarehouseInUse should return 409 Conflict")
+    void handleWarehouseInUse_shouldReturnConflict() {
+        WarehouseInUseException ex = new WarehouseInUseException("Bodega en uso");
+
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+                exceptionHandler.handleWarehouseInUse(ex);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(409);
+        assertThat(response.getBody().getError()).isEqualTo("Conflict");
+        assertThat(response.getBody().getMessage()).isEqualTo("Bodega en uso");
+    }
+
+    @Test
+    @DisplayName("handleInvalidWarehouseData should return 400 Bad Request")
+    void handleInvalidWarehouseData_shouldReturnBadRequest() {
+        InvalidWarehouseDataException ex = new InvalidWarehouseDataException("Datos inválidos");
+
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+                exceptionHandler.handleInvalidWarehouseData(ex);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(400);
+        assertThat(response.getBody().getError()).isEqualTo("Bad Request");
+        assertThat(response.getBody().getMessage()).isEqualTo("Datos inválidos");
+    }
+
+    @Test
+    @DisplayName("handleSinglePrincipalWarehouse should return 409 Conflict")
+    void handleSinglePrincipalWarehouse_shouldReturnConflict() {
+        SinglePrincipalWarehouseException ex = new SinglePrincipalWarehouseException();
+
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+                exceptionHandler.handleSinglePrincipalWarehouse(ex);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(409);
+        assertThat(response.getBody().getError()).isEqualTo("Conflict");
     }
 
     @Test

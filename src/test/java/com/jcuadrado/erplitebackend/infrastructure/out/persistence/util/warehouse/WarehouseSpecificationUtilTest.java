@@ -134,4 +134,35 @@ class WarehouseSpecificationUtilTest {
         assertThat(spec).isNotNull();
         assertThat(spec.toPredicate(root, query, cb)).isNotNull();
     }
+
+    @Test
+    @DisplayName("buildSpecification should filter by code using LIKE")
+    void buildSpecification_shouldFilterByCodeLike() {
+        setupRootPath("deletedAt");
+        setupRootPath("code");
+        when(cb.isNull(any())).thenReturn(mockPredicate());
+        when(cb.lower(any())).thenReturn(mock(jakarta.persistence.criteria.Expression.class));
+        when(cb.like(any(), anyString())).thenReturn(mockPredicate());
+        when(cb.and(any(Predicate[].class))).thenReturn(mockPredicate());
+
+        WarehouseSpecificationUtil.buildSpecification(Map.of("code", "BOD"))
+                .toPredicate(root, query, cb);
+
+        verify(cb).like(any(), eq("%bod%"));
+    }
+
+    @Test
+    @DisplayName("buildSpecification should use WarehouseType directly when value is already an enum")
+    void buildSpecification_shouldUseWarehouseTypeDirectly_whenAlreadyEnum() {
+        setupRootPath("deletedAt");
+        setupRootPath("type");
+        when(cb.isNull(any())).thenReturn(mockPredicate());
+        when(cb.equal(any(), eq(WarehouseType.PRINCIPAL))).thenReturn(mockPredicate());
+        when(cb.and(any(Predicate[].class))).thenReturn(mockPredicate());
+
+        WarehouseSpecificationUtil.buildSpecification(Map.of("type", WarehouseType.PRINCIPAL))
+                .toPredicate(root, query, cb);
+
+        verify(cb).equal(root.get("type"), WarehouseType.PRINCIPAL);
+    }
 }
