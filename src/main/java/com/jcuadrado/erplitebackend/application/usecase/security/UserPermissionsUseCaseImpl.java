@@ -1,7 +1,6 @@
 package com.jcuadrado.erplitebackend.application.usecase.security;
 
 import com.jcuadrado.erplitebackend.application.port.security.UserPermissionsUseCase;
-import com.jcuadrado.erplitebackend.domain.model.security.Permission;
 import com.jcuadrado.erplitebackend.domain.model.security.User;
 import com.jcuadrado.erplitebackend.domain.port.security.PermissionRepository;
 import com.jcuadrado.erplitebackend.domain.port.security.UserRepository;
