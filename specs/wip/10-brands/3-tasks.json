@@ -255,7 +255,7 @@
         {
           "id": "T018",
           "title": "Implementar BrandController",
-          "description": "@RestController @RequestMapping('/api/v1/brands') @RequiredArgsConstructor @Slf4j. GET sin @PreAuthorize (autenticación cubre SecurityConfig.anyRequest().authenticated()). POST/PUT/PATCH/DELETE con @PreAuthorize(\"hasRole('ADMIN')\"). ResponseEntity con Location en POST (201). Seguir patrón de WarehouseController.",
+          "description": "@RestController @RequestMapping('/api/v1/brands') @RequiredArgsConstructor @Slf4j. GET sin @PreAuthorize. POST con @PreAuthorize(\"hasRole('ADMIN') or hasAuthority('BRAND:CREATE')\"). PUT con 'BRAND:UPDATE'. PATCH activate/deactivate con 'BRAND:UPDATE'. DELETE con 'BRAND:DELETE'. ResponseEntity con Location en POST (201). Ver specs/PERMISSION-MODEL.md sección 5 (Zona C).",
           "phase": "phase-5",
           "status": "pending",
           "priority": "high",

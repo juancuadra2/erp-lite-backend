@@ -290,31 +290,51 @@ public CompareProductCategoryUseCase compareProductCategoryUseCase(
 
 ### Autorización por endpoint
 
-| Endpoint | `@PreAuthorize` | Sin JWT | JWT rol USER | JWT rol ADMIN |
-|----------|----------------|---------|--------------|---------------|
-| `GET /api/product-categories` | — | 401 | 200 | 200 |
-| `GET /api/product-categories/{uuid}` | — | 401 | 200 | 200 |
-| `POST /api/product-categories` | `hasRole('ADMIN')` | 401 | 403 | 201 |
-| `PUT /api/product-categories/{uuid}` | `hasRole('ADMIN')` | 401 | 403 | 200 |
-| `PATCH /api/product-categories/{uuid}/activate` | `hasRole('ADMIN')` | 401 | 403 | 200 |
-| `PATCH /api/product-categories/{uuid}/deactivate` | `hasRole('ADMIN')` | 401 | 403 | 200 |
-| `DELETE /api/product-categories/{uuid}` | `hasRole('ADMIN')` | 401 | 403 | 204 |
+| Endpoint | `@PreAuthorize` | Sin JWT | Sin permiso | Con permiso | JWT ADMIN |
+|----------|-----------------|---------|-------------|-------------|-----------|
+| `GET /api/product-categories` | — | 401 | 200 | 200 | 200 |
+| `GET /api/product-categories/{uuid}` | — | 401 | 200 | 200 | 200 |
+| `POST /api/product-categories` | `hasRole('ADMIN') or hasAuthority('PRODUCT_CATEGORY:CREATE')` | 401 | 403 | 201 | 201 |
+| `PUT /api/product-categories/{uuid}` | `hasRole('ADMIN') or hasAuthority('PRODUCT_CATEGORY:UPDATE')` | 401 | 403 | 200 | 200 |
+| `PATCH /api/product-categories/{uuid}/activate` | `hasRole('ADMIN') or hasAuthority('PRODUCT_CATEGORY:UPDATE')` | 401 | 403 | 200 | 200 |
+| `PATCH /api/product-categories/{uuid}/deactivate` | `hasRole('ADMIN') or hasAuthority('PRODUCT_CATEGORY:UPDATE')` | 401 | 403 | 200 | 200 |
+| `DELETE /api/product-categories/{uuid}` | `hasRole('ADMIN') or hasAuthority('PRODUCT_CATEGORY:DELETE')` | 401 | 403 | 204 | 204 |
 
-Los endpoints `GET` no llevan `@PreAuthorize`; la autenticación la garantiza `SecurityConfig`.
+- **Sin JWT**: 401 antes de llegar al controller (`anyRequest().authenticated()` en `SecurityConfig`).
+- **Sin permiso**: JWT válido pero el rol del usuario no tiene el permiso granular asignado → 403.
+- **Con permiso**: JWT válido y el permiso `PRODUCT_CATEGORY:ACTION` está en `role_permissions` del rol → éxito.
+- **JWT ADMIN**: `hasRole('ADMIN')` siempre satisface la condición → éxito.
+- Los endpoints `GET` no llevan `@PreAuthorize`; todo usuario autenticado puede leer.
 
 ### Patrón de implementación en el controller
 
 ```java
 @PostMapping
-@PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize("hasRole('ADMIN') or hasAuthority('PRODUCT_CATEGORY:CREATE')")
 public ResponseEntity<ProductCategoryResponseDto> create(...) { ... }
 
+@PutMapping("/{uuid}")
+@PreAuthorize("hasRole('ADMIN') or hasAuthority('PRODUCT_CATEGORY:UPDATE')")
+public ResponseEntity<ProductCategoryResponseDto> update(...) { ... }
+
+@PatchMapping("/{uuid}/activate")
+@PreAuthorize("hasRole('ADMIN') or hasAuthority('PRODUCT_CATEGORY:UPDATE')")
+public ResponseEntity<ProductCategoryResponseDto> activate(...) { ... }
+
+@PatchMapping("/{uuid}/deactivate")
+@PreAuthorize("hasRole('ADMIN') or hasAuthority('PRODUCT_CATEGORY:UPDATE')")
+public ResponseEntity<ProductCategoryResponseDto> deactivate(...) { ... }
+
+@DeleteMapping("/{uuid}")
+@PreAuthorize("hasRole('ADMIN') or hasAuthority('PRODUCT_CATEGORY:DELETE')")
+public ResponseEntity<Void> delete(...) { ... }
+
 @GetMapping("/{uuid}")
-// sin @PreAuthorize
+// sin @PreAuthorize — anyRequest().authenticated() cubre la autenticación
 public ResponseEntity<ProductCategoryResponseDto> findByUuid(...) { ... }
 ```
 
-Seguir el mismo patrón que `WarehouseController`.
+Ver `specs/PERMISSION-MODEL.md` para la política completa de autorización (Zona C — patrón granular).
 
 ### Origen del `userId`
 

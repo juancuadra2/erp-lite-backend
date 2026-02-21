@@ -255,7 +255,7 @@
         {
           "id": "T018",
           "title": "Implementar ProductCategoryController",
-          "description": "@RestController @RequestMapping('/api/v1/product-categories') @RequiredArgsConstructor @Slf4j. GET sin @PreAuthorize. POST/PUT/PATCH/DELETE con @PreAuthorize(\"hasRole('ADMIN')\"). ResponseEntity con Location en POST. Seguir patrón de WarehouseController.",
+          "description": "@RestController @RequestMapping('/api/v1/product-categories') @RequiredArgsConstructor @Slf4j. GET sin @PreAuthorize. POST con @PreAuthorize(\"hasRole('ADMIN') or hasAuthority('PRODUCT_CATEGORY:CREATE')\"). PUT con 'PRODUCT_CATEGORY:UPDATE'. PATCH activate/deactivate con 'PRODUCT_CATEGORY:UPDATE'. DELETE con 'PRODUCT_CATEGORY:DELETE'. ResponseEntity con Location en POST. Ver specs/PERMISSION-MODEL.md sección 5 (Zona C).",
           "phase": "phase-5",
           "status": "pending",
           "priority": "high",
