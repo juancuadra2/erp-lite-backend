@@ -15,7 +15,11 @@
       "Bash(mvn clean verify:*)",
       "Bash(sort:*)",
       "Bash(grep:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(mvn clean test:*)",
+      "Bash(git restore:*)"
     ]
   }
 }
