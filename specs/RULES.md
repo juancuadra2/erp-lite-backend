@@ -189,3 +189,26 @@ Un cambio se considera incompleto si:
 - MUST: en `3-tasks.json` cada tarea debe usar el campo `storyPoints`.
 - MUST NOT: usar `estimatedHours` en tareas nuevas o actualizadas.
 - SHOULD: mantener `estimatedStoryPoints` a nivel global del feature para total consolidado.
+
+## 22) Modelo de autorización y permisos
+
+La fuente de verdad completa es `specs/PERMISSION-MODEL.md`. Este resumen establece las reglas normativas.
+
+### Patrón de @PreAuthorize por zona
+- MUST: módulos de **Zona A** (gestión de roles, permisos, crear/eliminar/asignar-roles en usuarios) usar `@PreAuthorize("hasRole('ADMIN')")` puro — sin alternativa granular.
+- MUST: módulos de **Zona C** (catálogos y operacional, Feature ≥ 09) usar el patrón granular: `@PreAuthorize("hasRole('ADMIN') or hasAuthority('ENTITY:ACTION')")`.
+- MUST: endpoints `GET` de cualquier zona no llevan `@PreAuthorize` — `anyRequest().authenticated()` cubre la autenticación.
+
+### Migración de patrón
+- MUST NOT: modificar controllers de Features 01-08 para adoptar patrón granular — la migración retroactiva no está planificada.
+- MUST: Features ≥ 09 implementan patrón granular desde el inicio.
+
+### Permisos en BD
+- MUST NOT: insertar registros en la tabla `permissions` para operaciones de Zona A.
+- MUST: cada Feature ≥ 09 incluye su migración de permisos con los 4 actions (CREATE/READ/UPDATE/DELETE) siguiendo la convención de IDs definida en `specs/PERMISSION-MODEL.md`.
+
+### Anti-escalada
+- MUST NOT: un usuario no-admin puede, bajo ningún permiso granular, crear roles, modificar roles, crear permisos, crear usuarios, asignar roles a usuarios, eliminar usuarios, o cambiar contraseña de otro usuario.
+
+### Activate/Deactivate
+- MUST: `PATCH /{uuid}/activate` y `PATCH /{uuid}/deactivate` verifican el permiso `ENTITY:UPDATE` (no existe action separado para activate/deactivate).

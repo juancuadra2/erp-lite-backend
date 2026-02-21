@@ -4,6 +4,16 @@ import com.jcuadrado.erplitebackend.domain.exception.documenttypes.DocumentTypeN
 import com.jcuadrado.erplitebackend.domain.exception.documenttypes.DuplicateCodeException;
 import com.jcuadrado.erplitebackend.domain.exception.documenttypes.InvalidDocumentTypeException;
 import com.jcuadrado.erplitebackend.domain.exception.geography.DepartmentNotFoundException;
+import com.jcuadrado.erplitebackend.domain.exception.security.AccountLockedException;
+import com.jcuadrado.erplitebackend.domain.exception.security.DuplicateEmailException;
+import com.jcuadrado.erplitebackend.domain.exception.security.DuplicateUsernameException;
+import com.jcuadrado.erplitebackend.domain.exception.security.InvalidCredentialsException;
+import com.jcuadrado.erplitebackend.domain.exception.security.InvalidPasswordException;
+import com.jcuadrado.erplitebackend.domain.exception.security.InvalidRefreshTokenException;
+import com.jcuadrado.erplitebackend.domain.exception.security.PermissionDeniedException;
+import com.jcuadrado.erplitebackend.domain.exception.security.RoleInUseException;
+import com.jcuadrado.erplitebackend.domain.exception.security.RoleNotFoundException;
+import com.jcuadrado.erplitebackend.domain.exception.security.UserNotFoundException;
 import com.jcuadrado.erplitebackend.domain.exception.geography.DuplicateDepartmentCodeException;
 import com.jcuadrado.erplitebackend.domain.exception.geography.DuplicateMunicipalityCodeException;
 import com.jcuadrado.erplitebackend.domain.exception.geography.GeographyConstraintException;
@@ -25,6 +35,13 @@ import com.jcuadrado.erplitebackend.domain.exception.unitofmeasure.DuplicateUnit
 import com.jcuadrado.erplitebackend.domain.exception.unitofmeasure.InvalidUnitOfMeasureDataException;
 import com.jcuadrado.erplitebackend.domain.exception.unitofmeasure.UnitOfMeasureInUseException;
 import com.jcuadrado.erplitebackend.domain.exception.unitofmeasure.UnitOfMeasureNotFoundException;
+import com.jcuadrado.erplitebackend.domain.exception.warehouse.DuplicateWarehouseCodeException;
+import com.jcuadrado.erplitebackend.domain.exception.warehouse.DuplicateWarehouseNameException;
+import com.jcuadrado.erplitebackend.domain.exception.warehouse.InvalidWarehouseDataException;
+import com.jcuadrado.erplitebackend.domain.exception.warehouse.SinglePrincipalWarehouseException;
+import com.jcuadrado.erplitebackend.domain.exception.warehouse.WarehouseInUseException;
+import com.jcuadrado.erplitebackend.domain.exception.warehouse.WarehouseNotFoundException;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -36,6 +53,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -502,6 +520,161 @@ class GlobalExceptionHandlerTest {
         assertThat(response.getBody().getMessage()).isEqualTo("Unit in use");
     }
 
+    // ==================== Security Exception Handlers ====================
+
+    @Test
+    @DisplayName("handleInvalidCredentials should return 401 Unauthorized")
+    void handleInvalidCredentials_shouldReturnUnauthorized() {
+        InvalidCredentialsException ex = new InvalidCredentialsException("Invalid credentials");
+
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+                exceptionHandler.handleInvalidCredentials(ex);
+
+        assertThat(response.getStatusCode()).isEqualTo(org.springframework.http.HttpStatus.UNAUTHORIZED);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(401);
+        assertThat(response.getBody().getError()).isEqualTo("Unauthorized");
+    }
+
+    @Test
+    @DisplayName("handleAccountLocked should return 403 Forbidden")
+    void handleAccountLocked_shouldReturnForbidden() {
+        AccountLockedException ex = new AccountLockedException("Account is locked");
+
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+                exceptionHandler.handleAccountLocked(ex);
+
+        assertThat(response.getStatusCode()).isEqualTo(org.springframework.http.HttpStatus.FORBIDDEN);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(403);
+        assertThat(response.getBody().getError()).isEqualTo("Forbidden");
+    }
+
+    @Test
+    @DisplayName("handleUserNotFound should return 404 Not Found")
+    void handleUserNotFound_shouldReturnNotFound() {
+        UserNotFoundException ex = new UserNotFoundException("User not found");
+
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+                exceptionHandler.handleUserNotFound(ex);
+
+        assertThat(response.getStatusCode()).isEqualTo(org.springframework.http.HttpStatus.NOT_FOUND);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(404);
+        assertThat(response.getBody().getError()).isEqualTo("Not Found");
+    }
+
+    @Test
+    @DisplayName("handleDuplicateUser should return 409 Conflict for DuplicateUsernameException")
+    void handleDuplicateUser_shouldReturnConflict_forUsername() {
+        DuplicateUsernameException ex = new DuplicateUsernameException("Username already exists");
+
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+                exceptionHandler.handleDuplicateUser(ex);
+
+        assertThat(response.getStatusCode()).isEqualTo(org.springframework.http.HttpStatus.CONFLICT);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(409);
+        assertThat(response.getBody().getError()).isEqualTo("Conflict");
+    }
+
+    @Test
+    @DisplayName("handleDuplicateUser should return 409 Conflict for DuplicateEmailException")
+    void handleDuplicateUser_shouldReturnConflict_forEmail() {
+        DuplicateEmailException ex = new DuplicateEmailException("Email already exists");
+
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+                exceptionHandler.handleDuplicateUser(ex);
+
+        assertThat(response.getStatusCode()).isEqualTo(org.springframework.http.HttpStatus.CONFLICT);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(409);
+    }
+
+    @Test
+    @DisplayName("handleInvalidPassword should return 400 Bad Request")
+    void handleInvalidPassword_shouldReturnBadRequest() {
+        InvalidPasswordException ex = new InvalidPasswordException("Password too weak");
+
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+                exceptionHandler.handleInvalidPassword(ex);
+
+        assertThat(response.getStatusCode()).isEqualTo(org.springframework.http.HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(400);
+        assertThat(response.getBody().getError()).isEqualTo("Bad Request");
+    }
+
+    @Test
+    @DisplayName("handleInvalidRefreshToken should return 401 Unauthorized")
+    void handleInvalidRefreshToken_shouldReturnUnauthorized() {
+        InvalidRefreshTokenException ex = new InvalidRefreshTokenException("Token expired");
+
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+                exceptionHandler.handleInvalidRefreshToken(ex);
+
+        assertThat(response.getStatusCode()).isEqualTo(org.springframework.http.HttpStatus.UNAUTHORIZED);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(401);
+        assertThat(response.getBody().getError()).isEqualTo("Unauthorized");
+    }
+
+    @Test
+    @DisplayName("handleRoleNotFound should return 404 Not Found")
+    void handleRoleNotFound_shouldReturnNotFound() {
+        RoleNotFoundException ex = new RoleNotFoundException("Role not found");
+
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+                exceptionHandler.handleRoleNotFound(ex);
+
+        assertThat(response.getStatusCode()).isEqualTo(org.springframework.http.HttpStatus.NOT_FOUND);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(404);
+        assertThat(response.getBody().getError()).isEqualTo("Not Found");
+    }
+
+    @Test
+    @DisplayName("handleRoleInUse should return 409 Conflict")
+    void handleRoleInUse_shouldReturnConflict() {
+        RoleInUseException ex = new RoleInUseException("Role has assigned users");
+
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+                exceptionHandler.handleRoleInUse(ex);
+
+        assertThat(response.getStatusCode()).isEqualTo(org.springframework.http.HttpStatus.CONFLICT);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(409);
+        assertThat(response.getBody().getError()).isEqualTo("Conflict");
+    }
+
+    @Test
+    @DisplayName("handlePermissionDenied should return 403 Forbidden")
+    void handlePermissionDenied_shouldReturnForbidden() {
+        PermissionDeniedException ex = new PermissionDeniedException("Access denied");
+
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+                exceptionHandler.handlePermissionDenied(ex);
+
+        assertThat(response.getStatusCode()).isEqualTo(org.springframework.http.HttpStatus.FORBIDDEN);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(403);
+        assertThat(response.getBody().getError()).isEqualTo("Forbidden");
+    }
+
+    @Test
+    @DisplayName("handleIllegalArgument should return 400 Bad Request")
+    void handleIllegalArgument_shouldReturnBadRequest() {
+        IllegalArgumentException ex = new IllegalArgumentException("Invalid argument");
+
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+                exceptionHandler.handleIllegalArgument(ex);
+
+        assertThat(response.getStatusCode()).isEqualTo(org.springframework.http.HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(400);
+        assertThat(response.getBody().getError()).isEqualTo("Bad Request");
+    }
+
     @Test
     void handleGenericException_shouldReturnInternalServerError() {
         // Given
@@ -533,6 +706,97 @@ class GlobalExceptionHandlerTest {
         assertThat(errorResponse.getStatus()).isEqualTo(404);
         assertThat(errorResponse.getError()).isEqualTo("Not Found");
         assertThat(errorResponse.getMessage()).isEqualTo("Resource not found");
+    }
+
+    // ==================== Warehouse Exception Handlers ====================
+
+    @Test
+    @DisplayName("handleWarehouseNotFound should return 404 Not Found")
+    void handleWarehouseNotFound_shouldReturnNotFound() {
+        UUID uuid = UUID.randomUUID();
+        WarehouseNotFoundException ex = new WarehouseNotFoundException(uuid);
+
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+                exceptionHandler.handleWarehouseNotFound(ex);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(404);
+        assertThat(response.getBody().getError()).isEqualTo("Not Found");
+    }
+
+    @Test
+    @DisplayName("handleDuplicateWarehouseCode should return 409 Conflict")
+    void handleDuplicateWarehouseCode_shouldReturnConflict() {
+        DuplicateWarehouseCodeException ex = new DuplicateWarehouseCodeException("BOD-001");
+
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+                exceptionHandler.handleDuplicateWarehouseCode(ex);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(409);
+        assertThat(response.getBody().getError()).isEqualTo("Conflict");
+        assertThat(response.getBody().getMessage()).contains("BOD-001");
+    }
+
+    @Test
+    @DisplayName("handleDuplicateWarehouseName should return 409 Conflict")
+    void handleDuplicateWarehouseName_shouldReturnConflict() {
+        DuplicateWarehouseNameException ex = new DuplicateWarehouseNameException("Bodega Central");
+
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+                exceptionHandler.handleDuplicateWarehouseName(ex);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(409);
+        assertThat(response.getBody().getError()).isEqualTo("Conflict");
+        assertThat(response.getBody().getMessage()).contains("Bodega Central");
+    }
+
+    @Test
+    @DisplayName("handleWarehouseInUse should return 409 Conflict")
+    void handleWarehouseInUse_shouldReturnConflict() {
+        WarehouseInUseException ex = new WarehouseInUseException("Bodega en uso");
+
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+                exceptionHandler.handleWarehouseInUse(ex);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(409);
+        assertThat(response.getBody().getError()).isEqualTo("Conflict");
+        assertThat(response.getBody().getMessage()).isEqualTo("Bodega en uso");
+    }
+
+    @Test
+    @DisplayName("handleInvalidWarehouseData should return 400 Bad Request")
+    void handleInvalidWarehouseData_shouldReturnBadRequest() {
+        InvalidWarehouseDataException ex = new InvalidWarehouseDataException("Datos inválidos");
+
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+                exceptionHandler.handleInvalidWarehouseData(ex);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(400);
+        assertThat(response.getBody().getError()).isEqualTo("Bad Request");
+        assertThat(response.getBody().getMessage()).isEqualTo("Datos inválidos");
+    }
+
+    @Test
+    @DisplayName("handleSinglePrincipalWarehouse should return 409 Conflict")
+    void handleSinglePrincipalWarehouse_shouldReturnConflict() {
+        SinglePrincipalWarehouseException ex = new SinglePrincipalWarehouseException();
+
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+                exceptionHandler.handleSinglePrincipalWarehouse(ex);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(409);
+        assertThat(response.getBody().getError()).isEqualTo("Conflict");
     }
 
     @Test

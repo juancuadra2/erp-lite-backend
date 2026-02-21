@@ -1,9 +1,41 @@
 package com.jcuadrado.erplitebackend.infrastructure.config;
 
+import com.jcuadrado.erplitebackend.application.port.security.AuditLogUseCase;
+import com.jcuadrado.erplitebackend.application.port.security.AuthUseCase;
+import com.jcuadrado.erplitebackend.application.port.security.CompareRoleUseCase;
+import com.jcuadrado.erplitebackend.application.port.security.CompareUserUseCase;
+import com.jcuadrado.erplitebackend.application.port.security.ConditionEvaluator;
+import com.jcuadrado.erplitebackend.application.port.security.ManagePermissionUseCase;
+import com.jcuadrado.erplitebackend.application.port.security.ManageRoleUseCase;
+import com.jcuadrado.erplitebackend.application.port.security.ManageUserUseCase;
+import com.jcuadrado.erplitebackend.application.port.security.PasswordEncoder;
+import com.jcuadrado.erplitebackend.application.port.security.TokenService;
+import com.jcuadrado.erplitebackend.application.port.security.UserPermissionsUseCase;
+import com.jcuadrado.erplitebackend.application.usecase.security.AuditLogUseCaseImpl;
+import com.jcuadrado.erplitebackend.application.usecase.security.AuthUseCaseImpl;
+import com.jcuadrado.erplitebackend.application.usecase.security.CompareRoleUseCaseImpl;
+import com.jcuadrado.erplitebackend.application.usecase.security.CompareUserUseCaseImpl;
+import com.jcuadrado.erplitebackend.application.usecase.security.ManagePermissionUseCaseImpl;
+import com.jcuadrado.erplitebackend.application.usecase.security.ManageRoleUseCaseImpl;
+import com.jcuadrado.erplitebackend.application.usecase.security.ManageUserUseCaseImpl;
+import com.jcuadrado.erplitebackend.application.usecase.security.UserPermissionsUseCaseImpl;
+import com.jcuadrado.erplitebackend.application.port.warehouse.CompareWarehouseUseCase;
+import com.jcuadrado.erplitebackend.application.port.warehouse.ManageWarehouseUseCase;
+import com.jcuadrado.erplitebackend.application.usecase.warehouse.CompareWarehouseUseCaseImpl;
+import com.jcuadrado.erplitebackend.application.usecase.warehouse.ManageWarehouseUseCaseImpl;
+import com.jcuadrado.erplitebackend.domain.port.warehouse.WarehouseRepository;
+import com.jcuadrado.erplitebackend.domain.service.warehouse.WarehouseDomainService;
+import com.jcuadrado.erplitebackend.domain.service.warehouse.WarehouseValidationService;
+import com.jcuadrado.erplitebackend.domain.service.warehouse.WarehouseValidator;
 import com.jcuadrado.erplitebackend.domain.port.documenttypes.DocumentTypeRepository;
 import com.jcuadrado.erplitebackend.domain.port.geography.DepartmentRepository;
 import com.jcuadrado.erplitebackend.domain.port.geography.MunicipalityRepository;
 import com.jcuadrado.erplitebackend.domain.port.paymentmethod.PaymentMethodRepository;
+import com.jcuadrado.erplitebackend.domain.port.security.AuditLogRepository;
+import com.jcuadrado.erplitebackend.domain.port.security.PermissionRepository;
+import com.jcuadrado.erplitebackend.domain.port.security.RefreshTokenRepository;
+import com.jcuadrado.erplitebackend.domain.port.security.RoleRepository;
+import com.jcuadrado.erplitebackend.domain.port.security.UserRepository;
 import com.jcuadrado.erplitebackend.domain.port.taxtype.TaxTypeRepository;
 import com.jcuadrado.erplitebackend.domain.port.unitofmeasure.UnitOfMeasureRepository;
 import com.jcuadrado.erplitebackend.domain.service.documenttypes.DocumentTypeDomainService;
@@ -12,6 +44,7 @@ import com.jcuadrado.erplitebackend.domain.service.geography.GeographyDomainServ
 import com.jcuadrado.erplitebackend.domain.service.geography.GeographyValidator;
 import com.jcuadrado.erplitebackend.domain.service.paymentmethod.PaymentMethodDomainService;
 import com.jcuadrado.erplitebackend.domain.service.paymentmethod.PaymentMethodValidator;
+import com.jcuadrado.erplitebackend.domain.service.security.UserDomainService;
 import com.jcuadrado.erplitebackend.domain.service.taxtype.TaxTypeDomainService;
 import com.jcuadrado.erplitebackend.domain.service.taxtype.TaxTypeValidationService;
 import com.jcuadrado.erplitebackend.domain.service.unitofmeasure.UnitOfMeasureDomainService;
@@ -20,9 +53,6 @@ import com.jcuadrado.erplitebackend.domain.service.unitofmeasure.UnitOfMeasureVa
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/**
- * Bean configuration for dependency injection
- */
 @Configuration
 public class BeanConfiguration {
 
@@ -120,6 +150,107 @@ public class BeanConfiguration {
             UnitOfMeasureValidator validator,
             UnitOfMeasureValidationService validationService) {
         return new UnitOfMeasureDomainService(validator, validationService);
+    }
+
+    // ==================== Security Beans ====================
+
+    @Bean
+    public UserDomainService userDomainService() {
+        return new UserDomainService();
+    }
+
+    @Bean
+    public AuthUseCase authUseCase(
+            UserRepository userRepository,
+            RoleRepository roleRepository,
+            PermissionRepository permissionRepository,
+            RefreshTokenRepository refreshTokenRepository,
+            AuditLogRepository auditLogRepository,
+            PasswordEncoder passwordEncoder,
+            TokenService tokenService) {
+        return new AuthUseCaseImpl(userRepository, roleRepository, permissionRepository,
+                refreshTokenRepository, auditLogRepository, passwordEncoder, tokenService);
+    }
+
+    @Bean
+    public ManageUserUseCase manageUserUseCase(
+            UserRepository userRepository,
+            RoleRepository roleRepository,
+            AuditLogRepository auditLogRepository,
+            UserDomainService userDomainService,
+            PasswordEncoder passwordEncoder) {
+        return new ManageUserUseCaseImpl(userRepository, roleRepository, auditLogRepository,
+                userDomainService, passwordEncoder);
+    }
+
+    @Bean
+    public CompareUserUseCase compareUserUseCase(UserRepository userRepository) {
+        return new CompareUserUseCaseImpl(userRepository);
+    }
+
+    @Bean
+    public ManageRoleUseCase manageRoleUseCase(
+            RoleRepository roleRepository,
+            PermissionRepository permissionRepository,
+            AuditLogRepository auditLogRepository) {
+        return new ManageRoleUseCaseImpl(roleRepository, permissionRepository, auditLogRepository);
+    }
+
+    @Bean
+    public CompareRoleUseCase compareRoleUseCase(RoleRepository roleRepository) {
+        return new CompareRoleUseCaseImpl(roleRepository);
+    }
+
+    @Bean
+    public ManagePermissionUseCase managePermissionUseCase(
+            PermissionRepository permissionRepository,
+            AuditLogRepository auditLogRepository,
+            ConditionEvaluator conditionEvaluator) {
+        return new ManagePermissionUseCaseImpl(permissionRepository, auditLogRepository, conditionEvaluator);
+    }
+
+    @Bean
+    public AuditLogUseCase auditLogUseCase(AuditLogRepository auditLogRepository) {
+        return new AuditLogUseCaseImpl(auditLogRepository);
+    }
+
+    // ==================== Warehouse Beans ====================
+
+    @Bean
+    public WarehouseValidator warehouseValidator() {
+        return new WarehouseValidator();
+    }
+
+    @Bean
+    public WarehouseValidationService warehouseValidationService() {
+        return new WarehouseValidationService();
+    }
+
+    @Bean
+    public WarehouseDomainService warehouseDomainService(
+            WarehouseValidator validator,
+            WarehouseRepository repository) {
+        return new WarehouseDomainService(validator, repository);
+    }
+
+    @Bean
+    public ManageWarehouseUseCase manageWarehouseUseCase(
+            WarehouseRepository repository,
+            WarehouseDomainService domainService,
+            WarehouseValidationService validationService) {
+        return new ManageWarehouseUseCaseImpl(repository, domainService, validationService);
+    }
+
+    @Bean
+    public CompareWarehouseUseCase compareWarehouseUseCase(WarehouseRepository repository) {
+        return new CompareWarehouseUseCaseImpl(repository);
+    }
+
+    @Bean
+    public UserPermissionsUseCase userPermissionsUseCase(
+            UserRepository userRepository,
+            PermissionRepository permissionRepository) {
+        return new UserPermissionsUseCaseImpl(userRepository, permissionRepository);
     }
 }
 

@@ -1,0 +1,377 @@
+{
+  "feature": "brands",
+  "version": "1.1.0",
+  "lastUpdated": "2026-02-20T00:00:00Z",
+  "architecture": "hexagonal-scaffolding-aligned",
+  "estimatedStoryPoints": 51,
+  "summary": {
+    "total": 26,
+    "completed": 0,
+    "inProgress": 0,
+    "blocked": 0,
+    "pending": 26
+  },
+  "phases": [
+    {
+      "id": "phase-1",
+      "name": "Domain Foundation",
+      "order": 1,
+      "status": "pending",
+      "tasks": [
+        {
+          "id": "T001",
+          "title": "Crear entidad de dominio Brand",
+          "description": "Modelo de dominio puro sin JPA. Campos: id, uuid, code, name, description, active, auditoría (createdBy, updatedBy, deletedBy, timestamps). Métodos: isDeleted(), activate(), deactivate(), markAsDeleted(userId).",
+          "phase": "phase-1",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 1,
+          "tags": ["domain", "model"],
+          "location": "domain/model/brand/Brand.java"
+        },
+        {
+          "id": "T002",
+          "title": "Crear excepciones de dominio",
+          "description": "BrandDomainException (base), BrandNotFoundException, DuplicateBrandCodeException, BrandInUseException (stub hasta Feature 11). Cada excepción debe ser instanciada en tests para alcanzar 100% de cobertura.",
+          "phase": "phase-1",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 1,
+          "dependencies": ["T001"],
+          "tags": ["domain", "exception"],
+          "location": "domain/exception/brand/"
+        },
+        {
+          "id": "T003",
+          "title": "Crear BrandValidator",
+          "description": "Validaciones estructurales de dominio: validateCode (patrón ^[A-Za-z0-9-]{2,20}$), validateName (no blank, max 100 chars), validateDescription (si no null: max 500 chars). Sin @Component.",
+          "phase": "phase-1",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 2,
+          "dependencies": ["T002"],
+          "tags": ["domain", "validator"],
+          "location": "domain/service/brand/BrandValidator.java"
+        },
+        {
+          "id": "T004",
+          "title": "Implementar BrandDomainService",
+          "description": "normalizeCode() (trim+toUpperCase), validateUniqueCode() (lanza DuplicateBrandCodeException si existe), canDelete() (stub: retorna true siempre hasta Feature 11). Sin @Component.",
+          "phase": "phase-1",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 2,
+          "dependencies": ["T003"],
+          "tags": ["domain", "service"],
+          "location": "domain/service/brand/BrandDomainService.java"
+        },
+        {
+          "id": "T005",
+          "title": "Crear puerto de salida BrandRepository",
+          "description": "Interfaz: save, findByUuid(UUID), findByCode(String), existsByCode(String), findAll(Specification, Pageable). findByUuid y findByCode no retornan soft-deleted.",
+          "phase": "phase-1",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 1,
+          "dependencies": ["T001"],
+          "tags": ["domain", "port"],
+          "location": "domain/port/brand/BrandRepository.java"
+        }
+      ]
+    },
+    {
+      "id": "phase-2",
+      "name": "Database Schema",
+      "order": 2,
+      "status": "pending",
+      "tasks": [
+        {
+          "id": "T006",
+          "title": "Crear migración V18 — tabla brands",
+          "description": "SQL con CONSTRAINT uk_brands_uuid UNIQUE (uuid) y CONSTRAINT uk_brands_code UNIQUE (code). Índices en active y deleted_at. charset utf8mb4_unicode_ci. Sin datos semilla.",
+          "phase": "phase-2",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 1,
+          "dependencies": ["T005"],
+          "tags": ["database", "migration"],
+          "location": "resources/db/migration/V18__create_brands_table.sql"
+        },
+        {
+          "id": "T007",
+          "title": "Crear migración V19 — permisos BRAND",
+          "description": "INSERT IGNORE de permisos CREATE/READ/UPDATE/DELETE para entity='BRAND' con IDs prefijo 12000000-*. ADMIN recibe todos. USER recibe solo READ. Seguir exactamente el patrón de V15 (warehouses).",
+          "phase": "phase-2",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 1,
+          "dependencies": ["T006"],
+          "tags": ["database", "migration", "security"],
+          "location": "resources/db/migration/V19__insert_brand_permissions.sql"
+        }
+      ]
+    },
+    {
+      "id": "phase-3",
+      "name": "Persistence Layer",
+      "order": 3,
+      "status": "pending",
+      "tasks": [
+        {
+          "id": "T008",
+          "title": "Crear BrandEntity",
+          "description": "JPA @Entity @Table(name='brands') con @SQLRestriction(\"deleted_at IS NULL\"). Lombok: @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor. NO @Data. Campos de auditoría.",
+          "phase": "phase-3",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 2,
+          "dependencies": ["T006"],
+          "tags": ["infrastructure", "jpa", "entity"],
+          "location": "infrastructure/out/persistence/entity/brand/BrandEntity.java"
+        },
+        {
+          "id": "T009",
+          "title": "Crear BrandJpaRepository",
+          "description": "Interface extends JpaRepository<BrandEntity, Long> y JpaSpecificationExecutor<BrandEntity>. Métodos: findByUuid(UUID), findByCode(String), existsByCodeIgnoreCase(String).",
+          "phase": "phase-3",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 1,
+          "dependencies": ["T008"],
+          "tags": ["infrastructure", "repository"],
+          "location": "infrastructure/out/persistence/adapter/brand/BrandJpaRepository.java"
+        },
+        {
+          "id": "T010",
+          "title": "Crear BrandEntityMapper",
+          "description": "@Mapper(componentModel = MappingConstants.ComponentModel.SPRING): toEntity(Brand domain), toDomain(BrandEntity entity). Manejo de nulos en todos los campos.",
+          "phase": "phase-3",
+          "status": "pending",
+          "priority": "medium",
+          "storyPoints": 2,
+          "dependencies": ["T008"],
+          "tags": ["infrastructure", "mapper"],
+          "location": "infrastructure/out/persistence/mapper/brand/BrandEntityMapper.java"
+        },
+        {
+          "id": "T011",
+          "title": "Implementar BrandRepositoryAdapter",
+          "description": "@Component @RequiredArgsConstructor implementando BrandRepository. softDelete: setear deletedAt=now() y deletedBy. findByUuid lanza BrandNotFoundException si no existe.",
+          "phase": "phase-3",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 3,
+          "dependencies": ["T009", "T010"],
+          "tags": ["infrastructure", "adapter"],
+          "location": "infrastructure/out/persistence/adapter/brand/BrandRepositoryAdapter.java"
+        },
+        {
+          "id": "T012",
+          "title": "Crear BrandSpecificationUtil",
+          "description": "Specifications: bySearch (OR en code/name/description, LIKE %v%, case-insensitive), byActive (active = ?). Combinación con Specification.where().and(). byNotDeleted no necesario (lo cubre @SQLRestriction).",
+          "phase": "phase-3",
+          "status": "pending",
+          "priority": "medium",
+          "storyPoints": 2,
+          "dependencies": ["T009"],
+          "tags": ["infrastructure", "util"],
+          "location": "infrastructure/out/persistence/util/brand/BrandSpecificationUtil.java"
+        }
+      ]
+    },
+    {
+      "id": "phase-4",
+      "name": "Application Layer",
+      "order": 4,
+      "status": "pending",
+      "tasks": [
+        {
+          "id": "T013",
+          "title": "Crear interfaces de casos de uso",
+          "description": "CompareBrandUseCase: getByUuid(UUID), findAll(BrandFilterDto). ManageBrandUseCase: create, update, activate, deactivate, delete.",
+          "phase": "phase-4",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 1,
+          "dependencies": ["T005"],
+          "tags": ["application", "port"],
+          "location": "application/port/brand/"
+        },
+        {
+          "id": "T014",
+          "title": "Implementar CompareBrandUseCaseImpl",
+          "description": "getByUuid: findByUuid del repo (lanza excepción si no existe). findAll: construye Specification combinando bySearch y byActive de BrandSpecificationUtil según los filtros presentes; pageable con sort.field/sort.order.",
+          "phase": "phase-4",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 3,
+          "dependencies": ["T013", "T011", "T012"],
+          "tags": ["application", "use-case", "query"],
+          "location": "application/usecase/brand/CompareBrandUseCaseImpl.java"
+        },
+        {
+          "id": "T015",
+          "title": "Implementar ManageBrandUseCaseImpl",
+          "description": "create: normalizar, validar, construir con UUID.randomUUID() y active=true. update: findByUuid → actualizar name/description (null borra). activate/deactivate: idempotente (no lanza error si ya está en ese estado). delete: canDelete() stub → markAsDeleted.",
+          "phase": "phase-4",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 3,
+          "dependencies": ["T013", "T011", "T004"],
+          "tags": ["application", "use-case", "command"],
+          "location": "application/usecase/brand/ManageBrandUseCaseImpl.java"
+        }
+      ]
+    },
+    {
+      "id": "phase-5",
+      "name": "Web Layer",
+      "order": 5,
+      "status": "pending",
+      "tasks": [
+        {
+          "id": "T016",
+          "title": "Crear DTOs de request/response",
+          "description": "CreateBrandRequestDto: @NotBlank @Pattern code, @NotBlank @Size(max=100) name, @Size(max=500) description nullable. UpdateBrandRequestDto: solo name y description (sin code). BrandResponseDto: record. BrandFilterDto con @Min/@Max en page/limit.",
+          "phase": "phase-5",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 2,
+          "tags": ["infrastructure", "dto"],
+          "location": "infrastructure/in/web/dto/brand/"
+        },
+        {
+          "id": "T017",
+          "title": "Crear BrandDtoMapper",
+          "description": "@Mapper(componentModel = MappingConstants.ComponentModel.SPRING): toDomain(CreateBrandRequestDto), toResponseDto(Brand). El update lo maneja el use case directamente sobre el dominio (no requiere método en mapper).",
+          "phase": "phase-5",
+          "status": "pending",
+          "priority": "medium",
+          "storyPoints": 2,
+          "dependencies": ["T016"],
+          "tags": ["infrastructure", "mapper"],
+          "location": "infrastructure/in/web/mapper/brand/BrandDtoMapper.java"
+        },
+        {
+          "id": "T018",
+          "title": "Implementar BrandController",
+          "description": "@RestController @RequestMapping('/api/v1/brands') @RequiredArgsConstructor @Slf4j. GET sin @PreAuthorize. POST con @PreAuthorize(\"hasRole('ADMIN') or hasAuthority('BRAND:CREATE')\"). PUT con 'BRAND:UPDATE'. PATCH activate/deactivate con 'BRAND:UPDATE'. DELETE con 'BRAND:DELETE'. ResponseEntity con Location en POST (201). Ver specs/PERMISSION-MODEL.md sección 5 (Zona C).",
+          "phase": "phase-5",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 3,
+          "dependencies": ["T017", "T014", "T015"],
+          "tags": ["infrastructure", "controller", "security"],
+          "location": "infrastructure/in/web/controller/brand/BrandController.java"
+        },
+        {
+          "id": "T019",
+          "title": "Registrar beans en BeanConfiguration",
+          "description": "Agregar en BeanConfiguration.java: @Bean BrandValidator, @Bean BrandDomainService(repo, validator), @Bean ManageBrandUseCase(repo, service), @Bean CompareBrandUseCase(repo).",
+          "phase": "phase-5",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 1,
+          "dependencies": ["T015"],
+          "tags": ["infrastructure", "config"],
+          "location": "infrastructure/config/BeanConfiguration.java"
+        },
+        {
+          "id": "T020",
+          "title": "Registrar excepciones en GlobalExceptionHandler",
+          "description": "Agregar @ExceptionHandler para: BrandNotFoundException → 404 RESOURCE_NOT_FOUND, DuplicateBrandCodeException → 409 DUPLICATE_CODE, BrandInUseException → 422 BUSINESS_RULE_VIOLATION.",
+          "phase": "phase-5",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 1,
+          "dependencies": ["T002"],
+          "tags": ["infrastructure", "advice"],
+          "location": "infrastructure/in/web/advice/GlobalExceptionHandler.java"
+        }
+      ]
+    },
+    {
+      "id": "phase-6",
+      "name": "Testing",
+      "order": 6,
+      "status": "pending",
+      "tasks": [
+        {
+          "id": "T021",
+          "title": "Tests unitarios de dominio",
+          "description": "BrandTest: activate, deactivate, markAsDeleted, isDeleted. BrandValidatorTest: @ParameterizedTest para code válidos/inválidos (patrón, longitud), name, description. BrandDomainServiceTest: normalizeCode, validateUniqueCode (exists=false, exists=true), canDelete. Instanciar las 4 excepciones. Cobertura 100%.",
+          "phase": "phase-6",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 3,
+          "tags": ["test", "unit", "domain"],
+          "location": "test/domain/brand/"
+        },
+        {
+          "id": "T022",
+          "title": "Tests unitarios de casos de uso",
+          "description": "CompareBrandUseCaseImplTest: getByUuid OK, getByUuid 404, findAll sin filtros, findAll con search, findAll con active. ManageBrandUseCaseImplTest: create OK, create duplicate 409, update OK (description null), update 404, activate (estado cambia), activate (idempotente), deactivate (estado cambia), deactivate (idempotente), delete OK, delete 404. Mockito. Cobertura 100%.",
+          "phase": "phase-6",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 3,
+          "dependencies": ["T014", "T015"],
+          "tags": ["test", "unit", "application"],
+          "location": "test/application/usecase/brand/"
+        },
+        {
+          "id": "T023",
+          "title": "Tests de mappers",
+          "description": "BrandEntityMapperTest: toEntity (todos los campos), toDomain (todos los campos), campos null. BrandDtoMapperTest: toDomain de createRequest, toResponseDto. Cobertura 100%.",
+          "phase": "phase-6",
+          "status": "pending",
+          "priority": "medium",
+          "storyPoints": 2,
+          "tags": ["test", "unit", "mapper"],
+          "location": "test/infrastructure/"
+        },
+        {
+          "id": "T024",
+          "title": "Tests del adapter de persistencia",
+          "description": "BrandRepositoryAdapterTest con H2 (@SpringBootTest o @DataJpaTest): save, findByUuid (existe), findByUuid (no existe → excepción), findByCode, existsByCode (true/false), findAll con paginación, findAll con filtros, softDelete (verifica deleted_at poblado, no aparece en findByUuid). Cobertura 100%.",
+          "phase": "phase-6",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 3,
+          "tags": ["test", "integration", "persistence"],
+          "location": "test/infrastructure/out/persistence/adapter/brand/"
+        },
+        {
+          "id": "T025",
+          "title": "Tests del controller",
+          "description": "BrandControllerTest con @WebMvcTest o MockMvc. Cubrir: POST 201/400/409, GET uuid 200/404, GET list 200/400, PUT 200/400/404, PATCH activate 200, PATCH deactivate 200, DELETE 204/422. Seguridad: request sin JWT → 401, JWT con rol USER en POST/PUT/PATCH/DELETE → 403. Usar @WithMockUser para simular roles. Cobertura 100%.",
+          "phase": "phase-6",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 3,
+          "tags": ["test", "integration", "controller", "security"],
+          "location": "test/infrastructure/in/web/controller/brand/"
+        }
+      ]
+    },
+    {
+      "id": "phase-7",
+      "name": "Auditoría y Cierre",
+      "order": 7,
+      "status": "pending",
+      "tasks": [
+        {
+          "id": "T026",
+          "title": "Auditoría final, cobertura y sincronización docker",
+          "description": "(1) mvn clean test jacoco:report. Verificar en jacoco.csv que cada archivo nuevo/modificado tiene 100% instrucciones cubiertas. (2) Auditar contra specs/RULES.md: sin @Data en JPA, domain beans sin @Component, mappers con componentModel=SPRING, sin System.out.println, stubs documentados. (3) Copiar V18 y V19 a docker/mysql-init/.",
+          "phase": "phase-7",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 2,
+          "tags": ["quality", "audit", "docker", "coverage"],
+          "location": "target/site/jacoco/ | docker/mysql-init/"
+        }
+      ]
+    }
+  ]
+}
