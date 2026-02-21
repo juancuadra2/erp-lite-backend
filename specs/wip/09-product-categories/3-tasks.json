@@ -1,0 +1,377 @@
+{
+  "feature": "product-categories",
+  "version": "1.1.0",
+  "lastUpdated": "2026-02-20T00:00:00Z",
+  "architecture": "hexagonal-scaffolding-aligned",
+  "estimatedStoryPoints": 51,
+  "summary": {
+    "total": 26,
+    "completed": 0,
+    "inProgress": 0,
+    "blocked": 0,
+    "pending": 26
+  },
+  "phases": [
+    {
+      "id": "phase-1",
+      "name": "Domain Foundation",
+      "order": 1,
+      "status": "pending",
+      "tasks": [
+        {
+          "id": "T001",
+          "title": "Crear entidad de dominio ProductCategory",
+          "description": "Modelo de dominio puro sin JPA. Campos: id, uuid, code, name, description, active, auditoría (createdBy, updatedBy, deletedBy, timestamps). Métodos: isDeleted(), activate(), deactivate(), markAsDeleted(userId).",
+          "phase": "phase-1",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 1,
+          "tags": ["domain", "model"],
+          "location": "domain/model/productcategory/ProductCategory.java"
+        },
+        {
+          "id": "T002",
+          "title": "Crear excepciones de dominio",
+          "description": "ProductCategoryDomainException (base), ProductCategoryNotFoundException, DuplicateCategoryCodeException, CategoryInUseException (stub hasta Feature 11). Cada excepción debe ser instanciada en tests para alcanzar 100% de cobertura.",
+          "phase": "phase-1",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 1,
+          "dependencies": ["T001"],
+          "tags": ["domain", "exception"],
+          "location": "domain/exception/productcategory/"
+        },
+        {
+          "id": "T003",
+          "title": "Crear ProductCategoryValidator",
+          "description": "Validaciones estructurales de dominio: validateCode (patrón ^[A-Za-z0-9-]{2,20}$), validateName (no blank, max 100 chars), validateDescription (si no null: max 500 chars). Sin @Component.",
+          "phase": "phase-1",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 2,
+          "dependencies": ["T002"],
+          "tags": ["domain", "validator"],
+          "location": "domain/service/productcategory/ProductCategoryValidator.java"
+        },
+        {
+          "id": "T004",
+          "title": "Implementar ProductCategoryDomainService",
+          "description": "normalizeCode() (trim+toUpperCase), validateUniqueCode() (lanza DuplicateCategoryCodeException si existe), canDelete() (stub: retorna true siempre). Sin @Component.",
+          "phase": "phase-1",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 2,
+          "dependencies": ["T003"],
+          "tags": ["domain", "service"],
+          "location": "domain/service/productcategory/ProductCategoryDomainService.java"
+        },
+        {
+          "id": "T005",
+          "title": "Crear puerto de salida ProductCategoryRepository",
+          "description": "Interfaz: save, findByUuid(UUID), findByCode(String), existsByCode(String), findAll(Specification, Pageable). findByUuid y findByCode no retornan soft-deleted.",
+          "phase": "phase-1",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 1,
+          "dependencies": ["T001"],
+          "tags": ["domain", "port"],
+          "location": "domain/port/productcategory/ProductCategoryRepository.java"
+        }
+      ]
+    },
+    {
+      "id": "phase-2",
+      "name": "Database Schema",
+      "order": 2,
+      "status": "pending",
+      "tasks": [
+        {
+          "id": "T006",
+          "title": "Crear migración V16 — tabla product_categories",
+          "description": "SQL con CONSTRAINT uk_product_categories_uuid UNIQUE (uuid) y CONSTRAINT uk_product_categories_code UNIQUE (code). Índices en active y deleted_at. charset utf8mb4_unicode_ci. Sin datos semilla.",
+          "phase": "phase-2",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 1,
+          "dependencies": ["T005"],
+          "tags": ["database", "migration"],
+          "location": "resources/db/migration/V16__create_product_categories_table.sql"
+        },
+        {
+          "id": "T007",
+          "title": "Crear migración V17 — permisos PRODUCT_CATEGORY",
+          "description": "INSERT IGNORE de permisos CREATE/READ/UPDATE/DELETE para entity='PRODUCT_CATEGORY' con IDs prefijo 11000000-*. ADMIN recibe todos. USER recibe solo READ. Seguir exactamente el patrón de V15 (warehouses).",
+          "phase": "phase-2",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 1,
+          "dependencies": ["T006"],
+          "tags": ["database", "migration", "security"],
+          "location": "resources/db/migration/V17__insert_product_category_permissions.sql"
+        }
+      ]
+    },
+    {
+      "id": "phase-3",
+      "name": "Persistence Layer",
+      "order": 3,
+      "status": "pending",
+      "tasks": [
+        {
+          "id": "T008",
+          "title": "Crear ProductCategoryEntity",
+          "description": "JPA @Entity @Table(name='product_categories') con @SQLRestriction(\"deleted_at IS NULL\"). Lombok: @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor. NO @Data. Campos de auditoría.",
+          "phase": "phase-3",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 2,
+          "dependencies": ["T006"],
+          "tags": ["infrastructure", "jpa", "entity"],
+          "location": "infrastructure/out/persistence/entity/productcategory/ProductCategoryEntity.java"
+        },
+        {
+          "id": "T009",
+          "title": "Crear ProductCategoryJpaRepository",
+          "description": "Interface extends JpaRepository<ProductCategoryEntity, Long> y JpaSpecificationExecutor<ProductCategoryEntity>. Métodos: findByUuid(UUID), findByCode(String), existsByCodeIgnoreCase(String).",
+          "phase": "phase-3",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 1,
+          "dependencies": ["T008"],
+          "tags": ["infrastructure", "repository"],
+          "location": "infrastructure/out/persistence/adapter/productcategory/ProductCategoryJpaRepository.java"
+        },
+        {
+          "id": "T010",
+          "title": "Crear ProductCategoryEntityMapper",
+          "description": "@Mapper(componentModel = MappingConstants.ComponentModel.SPRING): toEntity(ProductCategory domain), toDomain(ProductCategoryEntity entity). Manejo de nulos en todos los campos.",
+          "phase": "phase-3",
+          "status": "pending",
+          "priority": "medium",
+          "storyPoints": 2,
+          "dependencies": ["T008"],
+          "tags": ["infrastructure", "mapper"],
+          "location": "infrastructure/out/persistence/mapper/productcategory/ProductCategoryEntityMapper.java"
+        },
+        {
+          "id": "T011",
+          "title": "Implementar ProductCategoryRepositoryAdapter",
+          "description": "@Component @RequiredArgsConstructor implementando ProductCategoryRepository. softDelete: setear deletedAt=now() y deletedBy. findByUuid lanza ProductCategoryNotFoundException si no existe.",
+          "phase": "phase-3",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 3,
+          "dependencies": ["T009", "T010"],
+          "tags": ["infrastructure", "adapter"],
+          "location": "infrastructure/out/persistence/adapter/productcategory/ProductCategoryRepositoryAdapter.java"
+        },
+        {
+          "id": "T012",
+          "title": "Crear ProductCategorySpecificationUtil",
+          "description": "Specifications: bySearch (OR en code/name/description, LIKE %v%, case-insensitive), byActive (active = ?). Combinación con Specification.where().and(). byNotDeleted no necesario (lo cubre @SQLRestriction).",
+          "phase": "phase-3",
+          "status": "pending",
+          "priority": "medium",
+          "storyPoints": 2,
+          "dependencies": ["T009"],
+          "tags": ["infrastructure", "util"],
+          "location": "infrastructure/out/persistence/util/productcategory/ProductCategorySpecificationUtil.java"
+        }
+      ]
+    },
+    {
+      "id": "phase-4",
+      "name": "Application Layer",
+      "order": 4,
+      "status": "pending",
+      "tasks": [
+        {
+          "id": "T013",
+          "title": "Crear interfaces de casos de uso",
+          "description": "CompareProductCategoryUseCase: getByUuid(UUID), findAll(ProductCategoryFilterDto). ManageProductCategoryUseCase: create, update, activate, deactivate, delete.",
+          "phase": "phase-4",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 1,
+          "dependencies": ["T005"],
+          "tags": ["application", "port"],
+          "location": "application/port/productcategory/"
+        },
+        {
+          "id": "T014",
+          "title": "Implementar CompareProductCategoryUseCaseImpl",
+          "description": "getByUuid: findByUuid del repo (lanza excepción si no existe). findAll: construye Specification combinando bySearch y byActive de SpecificationUtil según los filtros presentes; pageable con sort.field/sort.order.",
+          "phase": "phase-4",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 3,
+          "dependencies": ["T013", "T011", "T012"],
+          "tags": ["application", "use-case", "query"],
+          "location": "application/usecase/productcategory/CompareProductCategoryUseCaseImpl.java"
+        },
+        {
+          "id": "T015",
+          "title": "Implementar ManageProductCategoryUseCaseImpl",
+          "description": "create: normalizar, validar, construir con UUID.randomUUID() y active=true. update: findByUuid → actualizar name/description (null borra). activate/deactivate: idempotente (no lanza error si ya está en ese estado). delete: canDelete() stub → markAsDeleted.",
+          "phase": "phase-4",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 3,
+          "dependencies": ["T013", "T011", "T004"],
+          "tags": ["application", "use-case", "command"],
+          "location": "application/usecase/productcategory/ManageProductCategoryUseCaseImpl.java"
+        }
+      ]
+    },
+    {
+      "id": "phase-5",
+      "name": "Web Layer",
+      "order": 5,
+      "status": "pending",
+      "tasks": [
+        {
+          "id": "T016",
+          "title": "Crear DTOs de request/response",
+          "description": "CreateProductCategoryRequestDto: @NotBlank @Pattern code, @NotBlank @Size(max=100) name, @Size(max=500) description nullable. UpdateProductCategoryRequestDto: solo name y description (sin code). ProductCategoryResponseDto: record. ProductCategoryFilterDto con @Min/@Max en page/limit.",
+          "phase": "phase-5",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 2,
+          "tags": ["infrastructure", "dto"],
+          "location": "infrastructure/in/web/dto/productcategory/"
+        },
+        {
+          "id": "T017",
+          "title": "Crear ProductCategoryDtoMapper",
+          "description": "@Mapper(componentModel = MappingConstants.ComponentModel.SPRING): toDomain(CreateProductCategoryRequestDto), toResponseDto(ProductCategory). El update lo maneja el use case directamente sobre el dominio (no requiere método en mapper).",
+          "phase": "phase-5",
+          "status": "pending",
+          "priority": "medium",
+          "storyPoints": 2,
+          "dependencies": ["T016"],
+          "tags": ["infrastructure", "mapper"],
+          "location": "infrastructure/in/web/mapper/productcategory/ProductCategoryDtoMapper.java"
+        },
+        {
+          "id": "T018",
+          "title": "Implementar ProductCategoryController",
+          "description": "@RestController @RequestMapping('/api/v1/product-categories') @RequiredArgsConstructor @Slf4j. GET sin @PreAuthorize. POST/PUT/PATCH/DELETE con @PreAuthorize(\"hasRole('ADMIN')\"). ResponseEntity con Location en POST. Seguir patrón de WarehouseController.",
+          "phase": "phase-5",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 3,
+          "dependencies": ["T017", "T014", "T015"],
+          "tags": ["infrastructure", "controller", "security"],
+          "location": "infrastructure/in/web/controller/productcategory/ProductCategoryController.java"
+        },
+        {
+          "id": "T019",
+          "title": "Registrar beans en BeanConfiguration",
+          "description": "Agregar en BeanConfiguration.java: @Bean ProductCategoryValidator, @Bean ProductCategoryDomainService(repo, validator), @Bean ManageProductCategoryUseCase(repo, service), @Bean CompareProductCategoryUseCase(repo).",
+          "phase": "phase-5",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 1,
+          "dependencies": ["T015"],
+          "tags": ["infrastructure", "config"],
+          "location": "infrastructure/config/BeanConfiguration.java"
+        },
+        {
+          "id": "T020",
+          "title": "Registrar excepciones en GlobalExceptionHandler",
+          "description": "Agregar @ExceptionHandler para: ProductCategoryNotFoundException → 404 RESOURCE_NOT_FOUND, DuplicateCategoryCodeException → 409 DUPLICATE_CODE, CategoryInUseException → 422 BUSINESS_RULE_VIOLATION.",
+          "phase": "phase-5",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 1,
+          "dependencies": ["T002"],
+          "tags": ["infrastructure", "advice"],
+          "location": "infrastructure/in/web/advice/GlobalExceptionHandler.java"
+        }
+      ]
+    },
+    {
+      "id": "phase-6",
+      "name": "Testing",
+      "order": 6,
+      "status": "pending",
+      "tasks": [
+        {
+          "id": "T021",
+          "title": "Tests unitarios de dominio",
+          "description": "ProductCategoryTest: activate, deactivate, markAsDeleted, isDeleted. ProductCategoryValidatorTest: @ParameterizedTest para code válidos/inválidos (patrón, longitud), name, description. ProductCategoryDomainServiceTest: normalizeCode, validateUniqueCode (exists=false, exists=true), canDelete. Instanciar las 4 excepciones. Cobertura 100%.",
+          "phase": "phase-6",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 3,
+          "tags": ["test", "unit", "domain"],
+          "location": "test/domain/productcategory/"
+        },
+        {
+          "id": "T022",
+          "title": "Tests unitarios de casos de uso",
+          "description": "CompareProductCategoryUseCaseImplTest: getByUuid OK, getByUuid 404, findAll sin filtros, findAll con search, findAll con active. ManageProductCategoryUseCaseImplTest: create OK, create duplicate 409, update OK (description null), update 404, activate (estado cambia), activate (idempotente), deactivate (estado cambia), deactivate (idempotente), delete OK, delete 404. Mockito. Cobertura 100%.",
+          "phase": "phase-6",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 3,
+          "dependencies": ["T014", "T015"],
+          "tags": ["test", "unit", "application"],
+          "location": "test/application/usecase/productcategory/"
+        },
+        {
+          "id": "T023",
+          "title": "Tests de mappers",
+          "description": "ProductCategoryEntityMapperTest: toEntity (todos los campos), toDomain (todos los campos), campos null. ProductCategoryDtoMapperTest: toDomain de createRequest, toResponseDto. Cobertura 100%.",
+          "phase": "phase-6",
+          "status": "pending",
+          "priority": "medium",
+          "storyPoints": 2,
+          "tags": ["test", "unit", "mapper"],
+          "location": "test/infrastructure/"
+        },
+        {
+          "id": "T024",
+          "title": "Tests del adapter de persistencia",
+          "description": "ProductCategoryRepositoryAdapterTest con H2 (@SpringBootTest o @DataJpaTest): save, findByUuid (existe), findByUuid (no existe → excepción), findByCode, existsByCode (true/false), findAll con paginación, findAll con filtros, softDelete (verifica deleted_at poblado, no aparece en findByUuid). Cobertura 100%.",
+          "phase": "phase-6",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 3,
+          "tags": ["test", "integration", "persistence"],
+          "location": "test/infrastructure/out/persistence/adapter/productcategory/"
+        },
+        {
+          "id": "T025",
+          "title": "Tests del controller",
+          "description": "ProductCategoryControllerTest con @WebMvcTest o MockMvc. Cubrir: POST 201/400/409, GET uuid 200/404, GET list 200/400, PUT 200/400/404, PATCH activate 200, PATCH deactivate 200, DELETE 204/422. Seguridad: request sin JWT → 401, JWT con rol USER en POST/PUT/PATCH/DELETE → 403. Usar @WithMockUser para simular roles. Cobertura 100%.",
+          "phase": "phase-6",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 3,
+          "tags": ["test", "integration", "controller", "security"],
+          "location": "test/infrastructure/in/web/controller/productcategory/"
+        }
+      ]
+    },
+    {
+      "id": "phase-7",
+      "name": "Auditoría y Cierre",
+      "order": 7,
+      "status": "pending",
+      "tasks": [
+        {
+          "id": "T026",
+          "title": "Auditoría final, cobertura y sincronización docker",
+          "description": "(1) mvn clean test jacoco:report. Verificar en jacoco.csv que cada archivo nuevo/modificado tiene 100% instrucciones cubiertas. (2) Auditar contra specs/RULES.md: sin @Data en JPA, domain beans sin @Component, mappers con componentModel=SPRING, sin System.out.println, stubs documentados. (3) Copiar V16 y V17 a docker/mysql-init/.",
+          "phase": "phase-7",
+          "status": "pending",
+          "priority": "high",
+          "storyPoints": 2,
+          "tags": ["quality", "audit", "docker", "coverage"],
+          "location": "target/site/jacoco/ | docker/mysql-init/"
+        }
+      ]
+    }
+  ]
+}
